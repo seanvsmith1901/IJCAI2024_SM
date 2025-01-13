@@ -235,7 +235,7 @@ class myCanvas extends JComponent {
 				writer.close();
 
 				Runtime rt = Runtime.getRuntime();
-				String mandato = "mv ../State/HumanAllocations.tmp ../State/HumanAllocations.txt";
+				String mandato = "move ../State/HumanAllocations.tmp ../State/HumanAllocations.txt";
 				Process pr = rt.exec(mandato);
 			}
 			catch (IOException e) {

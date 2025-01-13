@@ -225,7 +225,7 @@ def recordState(round_num, sim, humanPlayerInd, gameOver):
 
     output.close()
 
-    os.system("mv ../State/state.tmp ../State/state.txt")
+    os.system("move ../State/state.tmp ../State/state.txt")
 
 def findHumanPlayer(players):
     numPlayers = len(players)

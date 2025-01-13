@@ -10,8 +10,8 @@ class HumanAgent(AbstractAgent):
     def __init__(self):
         super().__init__()
         self.whoami = "Human"
-        os.system("rm ../State/HumanAllocations.txt")
-        os.system("rm ../State/visualTraits.txt")
+        os.system("del ../State/HumanAllocations.txt")
+        os.system("del ../State/visualTraits.txt")
         self.gameParams = {}
 
 
