@@ -17,17 +17,6 @@ np.set_printoptions(precision=2, suppress=True)
 
 def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRandom):
 
-    # if hasGovment == True:
-    #     tax_rate = 0.0
-    #     gov_pop = 0.0       # base_pop * (num_players-1) * tax_rate
-    #     players = [
-    #         DummyGovtAgent(tax_rate),
-    #         *agents
-    #     ]
-    # else:
-    #     players = [
-    #         *agents
-    #     ]
     players = [
         *agents
     ]
@@ -103,9 +92,6 @@ def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRa
         a.setGameParams(game_params, forcedRandom)
         # TODO: post contract
 
-    # print(game_params)    
-
-    # rounds = int(np.random.uniform(min_rounds, max_rounds))
 
     humanInd = findHumanPlayer(players)
     # print("Human is player " + str(humanInd))
@@ -118,18 +104,10 @@ def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRa
         # print("\nRound: " + str(r))
         T = np.eye(num_players) * tkns
         T_prev = sim.get_transaction()
-        for i, plyr in enumerate(players):
-            if type(plyr) == DummyGovtAgent:
-                for j in range(len(players)):
-                    owed_taxes = plyr.get_player_taxes(j,
-                                    T_prev[:, i], 
-                                    sim.get_popularity(),
-                                    sim.get_influence(),
-                                    sim.get_extra_data(i)
-                                )
-                    sim.set_extra_data(i, j, {'is_government': True, 'taxes': owed_taxes})
 
-        for i, plyr in enumerate(players):                    
+        sim.get_player_inputs()
+
+        for i, plyr in enumerate(players): # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
             T[i] = plyr.play_round(
                         i,
                         r,
@@ -139,17 +117,8 @@ def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRa
                         sim.get_extra_data(i)
                     )
 
-        # print("transactions:")
-        # print(T)
-
-        # antes = time.time()
-
         sim.play_round(T)
 
-        # despues = time.time()
-        # print("JHG update time: " + str(despues - antes))
-
-        # print(sim.get_popularity()[1:])
         if r == 0:
             runningTotal = np.copy(sim.get_popularity())
         else:
@@ -164,9 +133,6 @@ def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRa
     fnombre = "../Results/theGameLogs/log_" + str(gener) + "_" + str(gamer) + ".csv"
     sim.save(fnombre)
 
-    # if hasGovment == True:
-    #     return sim.get_popularity()[1:], runningTotal / rounds
-    # else:
     return sim.get_popularity(), runningTotal / rounds
 
 def recordState(round_num, sim, humanPlayerInd, gameOver):
@@ -200,13 +166,7 @@ def recordState(round_num, sim, humanPlayerInd, gameOver):
             else:
                 output.write(str(int((T_prev[i, j] * int(numPlayers*2)) + 0.01)) + " ")
         output.write("\n")
-    
-    # print out the current tornadoValues
-    # influence = sim.get_influence()
-    # for i in range(0, numPlayers):
-    #     for j in range(0, numPlayers):
-    #         output.write(str(influence[j, i]) + " ")
-    #     output.write("\n")
+
 
     # print out all of the previous tornadoValues
     for t in range(0, round_num+1):
@@ -215,13 +175,6 @@ def recordState(round_num, sim, humanPlayerInd, gameOver):
             for j in range(0, numPlayers):
                 output.write(str(influence[j, i]) + " ")
             output.write("\n")
-
-    # # print out the previous tornadoValues
-    # influence = sim.get_prev_influence()
-    # for i in range(0, numPlayers):
-    #     for j in range(0, numPlayers):
-    #         output.write(str(influence[j, i]) + " ")
-    #     output.write("\n")
 
     output.close()
 
