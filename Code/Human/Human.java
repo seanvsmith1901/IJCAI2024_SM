@@ -236,13 +236,36 @@ class myCanvas extends JComponent {
 				writer.close();
 
 				Runtime rt = Runtime.getRuntime();
-		        if (System.getProperty("os.name") == "Windows") {
-		            // this needs to get fixed due to the differences in move and mv in windows and linux. lets just make sure this complies first.
-		            String mandato = "move ../State/HumanAllocations.tmp ../State/HumanAllocations.txt";
-				    Process pr = rt.exec(mandato);
-		        }
+				// this is where Sean started mucking about.
+		        if (System.getProperty("os.name").startsWith("Windows")) {
+                    System.out.println("This is where we have ended up");
+
+                    File sourceFile = new File("../State/HumanAllocations.tmp");
+                    File destFile = new File("../State/HumanAllocations.txt");
+
+                    // Delete the destination file if it exists
+                    if (destFile.exists()) {
+                        boolean deleted = destFile.delete();
+                        if (!deleted) {
+                            System.out.println("Failed to delete existing destination file.");
+                            return; // Exit if the file can't be deleted
+                        }
+                    }
+
+                    // Attempt to rename (move) the file
+                    boolean success = sourceFile.renameTo(destFile);
+
+                    if (success) {
+                        System.out.println("File moved successfully!");
+                    } else {
+                        System.out.println("Failed to move the file.");
+                    }
+                }
 		        else {
-		            String mandato = "move ../State/HumanAllocations.tmp ../State/HumanAllocations.txt";
+		            var thisName = System.getProperty("os.name");
+		            System.out.println("This is what we get for the OS name " + thisName);
+
+		            String mandato = "mv ../State/HumanAllocations.tmp ../State/HumanAllocations.txt";
 				    Process pr = rt.exec(mandato);
 		        }
 
