@@ -3,6 +3,7 @@ from os.path import exists
 
 import numpy as np
 import os
+import platform # need to know if this is windows or linux (or mac)
 import time
 
 class HumanAgent(AbstractAgent):
@@ -10,8 +11,12 @@ class HumanAgent(AbstractAgent):
     def __init__(self):
         super().__init__()
         self.whoami = "Human"
-        os.system("del ../State/HumanAllocations.txt")
-        os.system("del ../State/visualTraits.txt")
+        if platform.system() == "Windows":
+            os.system("del ../State/HumanAllocations.txt")
+            os.system("del ../State/visualTraits.txt")
+        else:
+            os.system("rm ../State/HumanAllocations.txt")
+            os.system("rm ../State/visualTraits.txt")
         self.gameParams = {}
 
 

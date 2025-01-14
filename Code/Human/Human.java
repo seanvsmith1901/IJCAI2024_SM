@@ -13,6 +13,7 @@ import java.awt.Graphics;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -235,8 +236,16 @@ class myCanvas extends JComponent {
 				writer.close();
 
 				Runtime rt = Runtime.getRuntime();
-				String mandato = "move ../State/HumanAllocations.tmp ../State/HumanAllocations.txt";
-				Process pr = rt.exec(mandato);
+		        if (System.getProperty("os.name") == "Windows") {
+		            // this needs to get fixed due to the differences in move and mv in windows and linux. lets just make sure this complies first.
+		            String mandato = "move ../State/HumanAllocations.tmp ../State/HumanAllocations.txt";
+				    Process pr = rt.exec(mandato);
+		        }
+		        else {
+		            String mandato = "move ../State/HumanAllocations.tmp ../State/HumanAllocations.txt";
+				    Process pr = rt.exec(mandato);
+		        }
+
 			}
 			catch (IOException e) {
 				System.out.println(e);

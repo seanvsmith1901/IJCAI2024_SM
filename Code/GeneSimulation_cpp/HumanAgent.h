@@ -10,6 +10,7 @@
 
 class HumanAgent : public AbstractAgent {
 public:
+    // might need to fix this for if we want to use the C++ version but for rn only the python version is being fixed.
     HumanAgent() {
         whoami = "human";
         system("del ../State/HumanAllocations.txt");
