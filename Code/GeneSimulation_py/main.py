@@ -10,6 +10,7 @@ import numpy as np
 import os
 import sys
 import random
+import platform
 
 import time
 
@@ -225,7 +226,10 @@ def recordState(round_num, sim, humanPlayerInd, gameOver):
 
     output.close()
 
-    os.system("move ../State/state.tmp ../State/state.txt")
+    if platform.system() == "Windows":
+        os.system("move ../State/state.tmp ../State/state.txt")
+    else:
+        os.system("mv ../State/state.tmp ../State/state.txt")
 
 def findHumanPlayer(players):
     numPlayers = len(players)

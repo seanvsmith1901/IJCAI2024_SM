@@ -199,7 +199,7 @@ void recordState(int roundNum, JHGEngine *jhg, int humanInd, bool gameOver) {
 
     output.close();
 
-    system("move ../State/state.tmp ../State/state.txt");
+    system("mv ../State/state.tmp ../State/state.txt");
 }
 
 PopularityMetrics *playGame(AbstractAgent **agents, int numPlayers, int numRounds, int gener, int gamer, double *initialPopularities, double povertyLine, bool forcedRandom) {
