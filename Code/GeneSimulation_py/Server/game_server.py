@@ -18,7 +18,7 @@ class GameServer():
 
     def start_game(self):
         # OK SO
-        # just take in teh client votes, tabluate them, print out all teh votes server side.
+        # just take in the client votes, tabluate them, print out all the votes server side.
         # while not all players have answered, we are going to look for the input
         # lets refer to this as a "round" for now
 
@@ -38,6 +38,20 @@ class GameServer():
             # Check if all clients have provided input
             if len(client_input) == len(self.connected_clients):
                 break
+
+        # Create a matrix to encode votes. Each row is a user (arranged by id), each column is the player they voted for
+        vote_matrix = [[0 for _ in range(len(self.connected_clients))] for _ in range(len(self.connected_clients))]
+        for i in range(len(client_input)):
+            # Because the client ids are 1 indexed (not 0 indexed), you have to use the +1 to convert to one indexing
+            # for client_input (expects the client id), and -1 to convert back to zero indexing for vote_matrix
+            vote_matrix[i][int(client_input[i+1])-1] = 1
+
+        vote_matrix_json = json.dumps(vote_matrix)
+
+        # Sends the vote matrix to each client (I think)
+        for i in range(len(self.connected_clients)):
+            self.connected_clients[i].send(vote_matrix_json.encode())
+
         return client_input
 
 

@@ -20,6 +20,7 @@ def start_client():
     message = {"NEW_INPUT": "new_input"}
     client_socket.send(json.dumps(message).encode())
 
+    # Runs the gui
     app = QApplication(sys.argv)
     window = MainWindow(client_socket)
     window.show()

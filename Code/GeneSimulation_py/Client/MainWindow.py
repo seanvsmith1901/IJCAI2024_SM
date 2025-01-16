@@ -1,8 +1,7 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget
 
 from VoteButton import VoteButton
-
 
 class MainWindow(QMainWindow):
     def __init__(self, client_socket):
@@ -29,3 +28,6 @@ class MainWindow(QMainWindow):
 
         widget.setLayout(layout)
         self.setCentralWidget(widget)
+
+    # def create_vote_table(self):
+    #     self.tableWidget = QTableWidget()
