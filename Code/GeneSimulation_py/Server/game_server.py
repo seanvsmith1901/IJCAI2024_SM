@@ -4,6 +4,9 @@ import multiprocessing
 import json
 import time
 
+# from Code.GeneSimulation_py.main import play_game
+
+
 class GameServer():
     def __init__(self, new_clients, client_id_dict, client_usernames):
         self.connected_clients = new_clients
@@ -12,12 +15,15 @@ class GameServer():
         self.start_game()
 
 
+
     def start_game(self):
         # OK SO
         # just take in teh client votes, tabluate them, print out all teh votes server side.
         # while not all players have answered, we are going to look for the input
         # lets refer to this as a "round" for now
-        print("this is the current tabulation ", self.play_round())
+
+        while True:
+            print("this is the current tabulation ", self.play_round())
 
 
     def play_round(self):

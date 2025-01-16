@@ -7,8 +7,8 @@ from game_server import GameServer
 
 
 
-
-HUMAN_PLAYERS = 2 # how many players need to join before things start to blow up.
+# Set to 1 for testing purposes
+HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up.
 
 
 connected_clients = {}
@@ -27,6 +27,8 @@ def start_server(host='127.0.0.1', port=12345):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(12)  # Allow only one connection
+
+    print("Server started")
 
     while True: # just keeps running and listening for clients, capable of running multiple servers.
         client_socket, client_address = server_socket.accept()
