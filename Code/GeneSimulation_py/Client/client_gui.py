@@ -1,6 +1,7 @@
 import socket
 import json
 import pygame
+from pycparser.ply.yacc import LRTable
 
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
@@ -9,10 +10,6 @@ import time
 
 # self.surf.fill = hare_sprite thats how you could do it if you wanted to use color tiles instead of sprites.
 
-stag_sprite = pygame.image.load("stag.png")
-hare_sprite = pygame.image.load("hare.png")
-my_hunter = pygame.image.load("my_hunter.png")
-other_hunter = pygame.image.load("other_hunter.png")
 
 #stag_color = (151, 151, 151)
 # hare_color = (222, 222, 222)
@@ -167,3 +164,5 @@ def set_username(client_socket, clock, username):
     username = True
     return username
 
+if __name__ == "__main__":
+    start_client()

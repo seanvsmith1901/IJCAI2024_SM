@@ -107,7 +107,7 @@ def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRa
 
         # basically this is where all of the magic needs to happen. Oh, just make a while loop that checks for all player input. return T when finished.
 
-        T = sim.get_player_inputs(T)
+        #T = sim.get_player_inputs(T)
 
         # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
         # for i, plyr in enumerate(players): # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
