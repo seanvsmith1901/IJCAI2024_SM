@@ -1,3 +1,9 @@
+import select
+from multiprocessing import Process
+import multiprocessing
+import json
+import time
+
 class GameServer():
     def __init__(self, new_clients, client_id_dict, client_usernames):
         self.connected_clients = new_clients
@@ -11,7 +17,7 @@ class GameServer():
         # just take in teh client votes, tabluate them, print out all teh votes server side.
         # while not all players have answered, we are going to look for the input
         # lets refer to this as a "round" for now
-        print(self.play_round()) 
+        print("this is the current tabulation ", self.play_round())
 
 
     def play_round(self):

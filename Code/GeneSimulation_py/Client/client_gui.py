@@ -38,6 +38,9 @@ def start_client():
     # Connect to the server
     client_socket.connect((host, port))
     # Send data to the server
+    message = {"NEW_INPUT": "new_input"}
+    client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
+
 
 
     # Receive a response from the server
@@ -97,7 +100,7 @@ def set_username(client_socket, clock, username):
                 elif event.key == pygame.K_RETURN:
                     # send the packet!
                     message = {
-                        "USERNAME": user_text,
+                        "VOTE": user_text, # changed to vote
                         "MESSAGE": "hello from the server!"
                     }
                     client_socket.send(json.dumps(message).encode())
