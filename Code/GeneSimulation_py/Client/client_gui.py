@@ -1,22 +1,12 @@
 import socket
 import json
 import pygame
-from pycparser.ply.yacc import LRTable
 
 SCREEN_WIDTH = 800 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
 SCREEN_HEIGHT = 800
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # establish screen as global so can draw from anywhere.
-import time
-
-# self.surf.fill = hare_sprite thats how you could do it if you wanted to use color tiles instead of sprites.
 
 
-#stag_color = (151, 151, 151)
-# hare_color = (222, 222, 222)
-# agent_1_color = (40, 30, 245)
-# agent_2_color = (135, 135, 245)
-# player_color = (45, 135, 35)
-# player_2_color = (39, 194, 21)
 
 pygame.font.init()
 font = pygame.font.Font(None, 32) # might need to dynamically allocate the font.
@@ -24,16 +14,6 @@ font_color = (0,0,0)
 leaderboard_font = pygame.font.Font(None, 64)
 leaderboard_font_color = (0,0,0)
 
-
-from pygame.locals import ( # gets us the four caridnal directions for movement from the user.
-    K_UP,
-    K_DOWN,
-    K_LEFT,
-    K_RIGHT,
-)
-
-hare_points = 1
-stag_points = 3
 
 BLACKCOLOR = (0, 0, 0)
 WHITECOLOR = (255, 255, 255)
@@ -46,12 +26,8 @@ color_passive = pygame.Color('chartreuse4')
 color = color_passive
 
 def start_client():
-
     clock = pygame.time.Clock()
-
-
     username = False
-
     global client_ID
     #host = '192.168.30.17'  # The server's IP address
     host = '127.0.0.1'  # your local host address cause you're working from home.
@@ -67,7 +43,6 @@ def start_client():
     # Receive a response from the server
     while True:
         if username != False:
-
             game_loop(client_socket)
 
         else: # they need to input a username
@@ -90,13 +65,15 @@ def game_loop(client_socket):
         pass
 
     if server_response != None:
-        print(server_response)
+        print("This was the server response! ", server_response)
 
     message = {"NEW_INPUT" : "new_input"}
     client_socket.send(json.dumps(message).encode())  # send a packet on every frame.
 
 
 
+
+# this just allows you to submit SOMETHING to the server which it can then tabulate. ITs called a username bc of old stuff. we could keep it that way
 def set_username(client_socket, clock, username):
     user_text = ''
     active = False
