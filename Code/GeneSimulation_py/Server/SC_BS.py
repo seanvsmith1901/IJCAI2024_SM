@@ -40,6 +40,8 @@ def start_server(host='127.0.0.1', port=12345):
             #client_usernames[len(connected_clients)] = received_json["USERNAME"] #use this later if ever. might not be relavant
             #client_input[client_socket] = received_json["INPUT"]
 
+            print ('received json:', received_json)
+
 
             # Create a response
             response = {
