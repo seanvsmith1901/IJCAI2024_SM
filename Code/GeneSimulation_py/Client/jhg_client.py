@@ -1,7 +1,5 @@
 import tkinter as tk
 
-current_tokens = 0
-max_tokens = 22
 
 class RowFrame(tk.Frame):
     def __init__(self, master, index):
@@ -13,15 +11,15 @@ class RowFrame(tk.Frame):
         self.index_entry.config(state='readonly')  # Make it read-only
         self.index_entry.grid(row=0, column=0)
 
-        # Text box for floats
+        # Text box for floats (popularity)
         self.float_entry = tk.Entry(self)
         self.float_entry.grid(row=0, column=1)
 
-        # Text box for integers
+        # Text box for integers (sent)
         self.int_entry1 = tk.Entry(self)
         self.int_entry1.grid(row=0, column=2)
 
-        # Another text box for integers
+        # Another text box for integers (received)
         self.int_entry2 = tk.Entry(self)
         self.int_entry2.grid(row=0, column=3)
 
@@ -29,12 +27,9 @@ class RowFrame(tk.Frame):
         self.decrement_button = tk.Button(self, text='-', command=lambda: self.decrement_value())
         self.decrement_button.grid(row=0, column=4)
 
-        # Text box that holds an integer
-        current_token = 0
-        self.hold_entry = tk.Entry(self)
-        self.hold_entry.config(state='readonly')  # Make it read-only
-        self.hold_entry.grid(row=0, column=5)
-        self.hold_entry.text = str(current_token)
+        # Label that holds an integer (allocations)
+        self.hold_label = tk.Label(self, text="0", width=5)
+        self.hold_label.grid(row=0, column=5)
 
         # Button to increment a value
         self.increment_button = tk.Button(self, text='+', command=lambda: self.increment_value())
@@ -42,21 +37,17 @@ class RowFrame(tk.Frame):
 
     def decrement_value(self):
         try:
-            current_value = int(self.hold_entry.get())
-            if current_value > 0:
-                self.hold_entry.delete(0, tk.END)
-                self.hold_entry.insert(0, str(current_value - 1))
+            current_value = int(self.hold_label['text'])
+            self.hold_label['text'] = str(current_value - 1)  # Allow negative values
         except ValueError:
-            pass  # Handle invalid input
+            self.hold_label['text'] = '-1'  # Default to -1 on invalid input
 
     def increment_value(self):
         try:
-            current_value = int(self.hold_entry.get())
-            self.hold_entry.delete(0, tk.END)
-            self.hold_entry.insert(0, str(current_value + 1))
+            current_value = int(self.hold_label['text'])
+            self.hold_label['text'] = str(current_value + 1)
         except ValueError:
-            self.hold_entry.delete(0, tk.END)
-            self.hold_entry.insert(0, '0')  # Default to 0 on invalid input
+            self.hold_label['text'] = '0'  # Default to 0 on invalid input
 
 
 class App(tk.Tk):
@@ -90,7 +81,6 @@ class App(tk.Tk):
         self.submit_button.pack(side=tk.LEFT)
 
         self.int_entry = tk.Entry(self.bottom_frame, width=5)
-        self.int_entry.config(state='readonly')  # Make it read-only
         self.int_entry.pack(side=tk.LEFT)
 
     def submit(self):
