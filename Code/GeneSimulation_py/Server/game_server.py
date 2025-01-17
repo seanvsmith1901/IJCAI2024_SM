@@ -49,8 +49,9 @@ class GameServer():
         vote_matrix_json = json.dumps(vote_matrix)
 
         # Sends the vote matrix to each client (I think)
+        message = {"RESULTS": vote_matrix_json}
         for i in range(len(self.connected_clients)):
-            self.connected_clients[i].send(vote_matrix_json.encode())
+            self.connected_clients[i].send(json.dumps(message).encode())
 
         return client_input
 

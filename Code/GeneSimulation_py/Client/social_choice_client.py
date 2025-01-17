@@ -1,6 +1,7 @@
 import sys
 import socket
 import json
+from time import sleep
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QTextLine
@@ -20,7 +21,21 @@ def start_client():
     message = {"NEW_INPUT": "new_input"}
     client_socket.send(json.dumps(message).encode())
 
-    # Runs the gui
+    # If you delete this sleep statement, the second message is sent too quickly and overwhelms the server
+    # sleep(.0001)
+    # message = {"VOTE": "1"}
+    # client_socket.send(json.dumps(message).encode())
+    #
+    # while True:
+    #     data = client_socket.recv(1024)
+    #     if data:
+    #         # This just has to be wrong. Got to be a better way... But I can't find it.
+    #         json_data = json.dumps(json.loads(data.decode()))
+    #         if "RESULT" in json_data:
+    #             vote_matrix = (json.loads(json_data))["RESULTS"]
+    #             print("hi")
+
+    # Runs the gui -- commented out while we work on stuff (need to figure out how to run the above on a slot
     app = QApplication(sys.argv)
     window = MainWindow(client_socket)
     window.show()
