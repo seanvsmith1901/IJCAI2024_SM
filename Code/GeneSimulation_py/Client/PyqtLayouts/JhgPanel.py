@@ -1,7 +1,7 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QPushButton
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QPushButton
 
 
-class BodyLayout(QHBoxLayout):
+class JhgPanel(QHBoxLayout):
     def __init__(self):
         super().__init__()
 
@@ -37,7 +37,7 @@ class BodyLayout(QHBoxLayout):
             minus_button.setFixedWidth(minus_button.fontMetrics().horizontalAdvance("-") + 20)
             plus_button.setFixedWidth(plus_button.fontMetrics().horizontalAdvance("+") + 20)
 
-            allocation_box = QLineEdit("11")
+            allocation_box = QLineEdit("0")
             allocation_box.setFixedWidth(30)
 
             allocations_row.addWidget(minus_button)

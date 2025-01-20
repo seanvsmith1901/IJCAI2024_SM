@@ -1,7 +1,7 @@
 import json
 
 from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit
 
 from VoteButton import VoteButton
 
