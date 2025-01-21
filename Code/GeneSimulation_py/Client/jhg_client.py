@@ -1,58 +1,14 @@
 import tkinter as tk
 
-
-class RowFrame(tk.Frame):
-    def __init__(self, master, index):
-        super().__init__(master)
-
-        # Row index
-        self.index_entry = tk.Entry(self, width=3)
-        self.index_entry.insert(0, str(index))
-        self.index_entry.config(state='readonly')  # Make it read-only
-        self.index_entry.grid(row=0, column=0)
-
-        # Text box for floats (popularity)
-        self.float_entry = tk.Entry(self)
-        self.float_entry.grid(row=0, column=1)
-
-        # Text box for integers (sent)
-        self.int_entry1 = tk.Entry(self)
-        self.int_entry1.grid(row=0, column=2)
-
-        # Another text box for integers (received)
-        self.int_entry2 = tk.Entry(self)
-        self.int_entry2.grid(row=0, column=3)
-
-        # Button to decrement a value
-        self.decrement_button = tk.Button(self, text='-', command=lambda: self.decrement_value())
-        self.decrement_button.grid(row=0, column=4)
-
-        # Label that holds an integer (allocations)
-        self.hold_label = tk.Label(self, text="0", width=5)
-        self.hold_label.grid(row=0, column=5)
-
-        # Button to increment a value
-        self.increment_button = tk.Button(self, text='+', command=lambda: self.increment_value())
-        self.increment_button.grid(row=0, column=6)
-
-    def decrement_value(self):
-        try:
-            current_value = int(self.hold_label['text'])
-            self.hold_label['text'] = str(current_value - 1)  # Allow negative values
-        except ValueError:
-            self.hold_label['text'] = '-1'  # Default to -1 on invalid input
-
-    def increment_value(self):
-        try:
-            current_value = int(self.hold_label['text'])
-            self.hold_label['text'] = str(current_value + 1)
-        except ValueError:
-            self.hold_label['text'] = '0'  # Default to 0 on invalid input
+current_total = 0
+max_total = 22
 
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
+        self.max_value = 22
+        self.current_total = 0
 
         self.title("Row Example")
 
@@ -70,7 +26,7 @@ class App(tk.Tk):
 
         # Create 11 rows
         for i in range(11):
-            row_frame = RowFrame(self, i)
+            row_frame = RowFrame(self, self, i)  # Pass self (App instance) to RowFrame
             row_frame.pack(pady=5)
 
         # Bottom frame for Submit button and integer entry
@@ -80,16 +36,96 @@ class App(tk.Tk):
         self.submit_button = tk.Button(self.bottom_frame, text="Submit", command=self.submit)
         self.submit_button.pack(side=tk.LEFT)
 
-        self.int_entry = tk.Entry(self.bottom_frame, width=5)
+        self.int_entry = tk.Label(self.bottom_frame, width=5)
         self.int_entry.pack(side=tk.LEFT)
+        self.int_entry["text"] = self.current_total
+
+    def update_displayed_total(self):
+        self.int_entry['text'] = str(max_total - current_total)
 
     def submit(self):
-        # Placeholder function for submit action
         try:
-            submitted_value = int(self.int_entry.get())
+            submitted_value = int(self.int_entry['text'])
             print(f"Submitted value: {submitted_value}")
         except ValueError:
             print("Invalid input! Please enter an integer.")
+
+
+class RowFrame(tk.Frame):
+    def __init__(self, master, app, index):
+        super().__init__(master)
+        self.app = app  # Store a reference to the app instance
+
+        # Row index
+        self.index_entry = tk.Entry(self, width=3)
+        self.index_entry.insert(0, str(index))
+        self.index_entry.config(state='readonly')
+        self.index_entry.grid(row=0, column=0)
+
+        # Text box for floats (popularity)
+        self.float_entry = tk.Entry(self)
+        self.float_entry.grid(row=0, column=1)
+
+        # Text box for integers (sent)
+        self.int_entry1 = tk.Entry(self)
+        self.int_entry1.grid(row=0, column=2)
+
+        # Another text box for integers (received)
+        self.int_entry2 = tk.Entry(self)
+        self.int_entry2.grid(row=0, column=3)
+
+        # Button to decrement a value
+        self.decrement_button = tk.Button(self, text='-', command=self.decrement_value)
+        self.decrement_button.grid(row=0, column=4)
+
+        # Label that holds an integer (allocations)
+        self.hold_label = tk.Label(self, text="0", width=5)
+        self.hold_label.grid(row=0, column=5)
+
+        # Button to increment a value
+        self.increment_button = tk.Button(self, text='+', command=self.increment_value)
+        self.increment_button.grid(row=0, column=6)
+
+    def decrement_value(self):
+        global current_total, max_total
+
+        current_value = int(self.hold_label['text'])
+        print("this is the current_total ", current_total)
+
+        if current_value == 0 and current_total < max_total:
+            current_total += 1
+            current_value -= 1
+
+        elif current_value > 0 and current_total < max_total+1: #to allow decremnting from max
+            current_total -= 1
+            current_value -= 1
+
+        elif current_value < 0 and current_total < max_total:
+            current_total += 1
+            current_value -= 1
+
+        self.hold_label['text'] = str(current_value)
+        self.app.update_displayed_total()
+
+    def increment_value(self):
+        global current_total, max_total
+        current_value = int(self.hold_label['text'])
+        print("this is the current_total ", current_total)
+
+        if current_value == 0 and current_total < max_total:
+            current_total += 1
+            current_value += 1
+
+        elif current_value > 0 and current_total < max_total:
+            current_total += 1
+            current_value += 1
+
+        elif current_value < 0 and current_total < max_total:
+            current_total -= 1
+            current_value += 1
+
+        self.hold_label['text'] = str(current_value)
+        self.app.update_displayed_total()
 
 
 if __name__ == "__main__":
