@@ -8,7 +8,7 @@ from game_server import GameServer
 
 
 
-HUMAN_PLAYERS = 2 # how many players need to join before things start to blow up.
+HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up.
 
 
 connected_clients = {}
@@ -46,6 +46,7 @@ def start_server(host='127.0.0.1', port=12345):
             # Create a response
             response = {
                 "message": "Hello from the server!",
+                "CLIENT_ID": client_id_dict[client_socket],
             }
             # Serialize and send the response as JSON
             client_socket.send(json.dumps(response).encode())
@@ -53,6 +54,7 @@ def start_server(host='127.0.0.1', port=12345):
             pass # don't do anything but still handle the exception
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
+            print("WE HAVE RECEIVED A CONNECTION! MAYBE")
             GameServer(connected_clients, client_id_dict, client_usernames) # might need to make a copy and overwrite connected clients
             # readies for another game maybe possibly. who knows. will prolly never test.
             connected_clients.clear()

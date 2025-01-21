@@ -1,8 +1,14 @@
+import socket
 import tkinter as tk
+import json
+from multiprocessing import Process, Queue
+
+
+import data_collection_script
 
 current_total = 0
 max_total = 22
-
+client_socket = None
 
 class App(tk.Tk):
     def __init__(self):
@@ -25,9 +31,11 @@ class App(tk.Tk):
         tk.Label(header_frame, text="").grid(row=0, column=6)  # Placeholder for button column
 
         # Create 11 rows
+        self.row_frames = []
         for i in range(11):
-            row_frame = RowFrame(self, self, i)  # Pass self (App instance) to RowFrame
+            row_frame = RowFrame(self, i)
             row_frame.pack(pady=5)
+            self.row_frames.append(row_frame)
 
         # Bottom frame for Submit button and integer entry
         self.bottom_frame = tk.Frame(self)
@@ -40,21 +48,44 @@ class App(tk.Tk):
         self.int_entry.pack(side=tk.LEFT)
         self.int_entry["text"] = self.current_total
 
+        # replace this with a process from the finished script.
+        data_collection = Process(target=data_collection_script.start_client(), args=()) # starts our actual client action to collect the data for me.
+
+    def start_receiver(self):
+        self.queue = Queue()  # Create a queue for communication
+        p = Process(target=self.receive_data, args=(self.queue,))
+        p.start()
+        self.check_queue()  # Start checking the queue for messages
+
+    def check_queue(self):
+        try:
+            while True:
+                message = self.queue.get_nowait()  # Non-blocking get
+                print("Received from server:", message)
+                # Process the message as needed
+        except Exception:
+            pass
+        self.after(100, self.check_queue)  # Check the queue again after 100 ms
+
+
+
     def update_displayed_total(self):
         self.int_entry['text'] = str(max_total - current_total)
 
     def submit(self):
-        try:
-            submitted_value = int(self.int_entry['text'])
-            print(f"Submitted value: {submitted_value}")
-        except ValueError:
-            print("Invalid input! Please enter an integer.")
-
+        results = []
+        for row_frame in self.row_frames:
+            allocations = row_frame.hold_label['text']
+            results.append(allocations)
+        print("here are the results ", results)
+        submission = {
+            "SUBMISSION": results
+        }
+        # put this in the data collection portion, call a funciton or whatever. make it an import.
 
 class RowFrame(tk.Frame):
-    def __init__(self, master, app, index):
+    def __init__(self, master, index):
         super().__init__(master)
-        self.app = app  # Store a reference to the app instance
 
         # Row index
         self.index_entry = tk.Entry(self, width=3)
@@ -90,44 +121,30 @@ class RowFrame(tk.Frame):
         global current_total, max_total
 
         current_value = int(self.hold_label['text'])
-        print("this is the current_total ", current_total)
-
         if current_value == 0 and current_total < max_total:
             current_total += 1
             current_value -= 1
-
-        elif current_value > 0 and current_total < max_total+1: #to allow decremnting from max
+        elif current_value > 0 and current_total < max_total + 1:
             current_total -= 1
             current_value -= 1
 
-        elif current_value < 0 and current_total < max_total:
-            current_total += 1
-            current_value -= 1
-
         self.hold_label['text'] = str(current_value)
-        self.app.update_displayed_total()
+        self.master.update_displayed_total()
 
     def increment_value(self):
         global current_total, max_total
         current_value = int(self.hold_label['text'])
-        print("this is the current_total ", current_total)
-
         if current_value == 0 and current_total < max_total:
             current_total += 1
             current_value += 1
-
         elif current_value > 0 and current_total < max_total:
             current_total += 1
             current_value += 1
 
-        elif current_value < 0 and current_total < max_total:
-            current_total -= 1
-            current_value += 1
-
         self.hold_label['text'] = str(current_value)
-        self.app.update_displayed_total()
+        self.master.update_displayed_total()
 
 
-if __name__ == "__main__":
+def start_gui(q): # our version of the main funciton. could probably slap this under init.
     app = App()
     app.mainloop()

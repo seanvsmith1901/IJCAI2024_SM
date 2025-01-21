@@ -4,6 +4,9 @@ import multiprocessing
 import json
 import time
 
+
+
+
 class GameServer():
     def __init__(self, new_clients, client_id_dict, client_usernames):
         self.connected_clients = new_clients
@@ -18,6 +21,12 @@ class GameServer():
         # while not all players have answered, we are going to look for the input
         # lets refer to this as a "round" for now
         print("this is the current tabulation ", self.play_round())
+        message = {
+            "RESULTS" : "This is just some string, we will rewrite this later"
+        }
+        for client in self.connected_clients:
+            self.connected_clients[client].send(json.dumps(message).encode())
+
 
 
     def play_round(self):
@@ -26,8 +35,8 @@ class GameServer():
             #self.send_state()  # sends out the current game state # there is no current game state atm
             data = self.get_client_data()
             for client, received_json in data.items():
-                if "VOTE" in received_json and received_json["VOTE"] != None:
-                    client_input[self.client_id_dict[client]] = received_json["VOTE"]
+                if "SUBMISSION" in received_json and received_json["SUBMISSION"] != None:
+                    client_input[self.client_id_dict[client]] = received_json["SUBMISSION"]
 
             # Check if all clients have provided input
             if len(client_input) == len(self.connected_clients):
