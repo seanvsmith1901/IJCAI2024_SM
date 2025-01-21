@@ -1,6 +1,7 @@
 import json
 import socket
 import queue
+import time
 
 def start_client():
     global client_socket
@@ -30,6 +31,7 @@ def receive_data(q):
         except Exception as e:
             print("Error receiving data:", e)
             break
+        time.sleep(2)
 
 
 if __name__ == '__main__':

@@ -49,7 +49,7 @@ class App(tk.Tk):
         self.int_entry["text"] = self.current_total
 
         # replace this with a process from the finished script.
-        data_collection = Process(target=data_collection_script.start_client(), args=()) # starts our actual client action to collect the data for me.
+
 
     def start_receiver(self):
         self.queue = Queue()  # Create a queue for communication
@@ -145,6 +145,6 @@ class RowFrame(tk.Frame):
         self.master.update_displayed_total()
 
 
-def start_gui(q): # our version of the main funciton. could probably slap this under init.
+def start_gui(): # our version of the main funciton. could probably slap this under init.
     app = App()
     app.mainloop()
