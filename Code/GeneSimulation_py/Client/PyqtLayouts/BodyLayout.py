@@ -10,10 +10,9 @@ from .SocialChoicePanel import SocialChoicePanel
 
 
 class BodyLayout(QHBoxLayout):
-    def __init__(self):
+    def __init__(self, round_state):
         super().__init__()
-        jhg_panel = JhgPanel()
-        jhg_panel.addWidget(QPushButton("Submit"))
+        jhg_panel = JhgPanel(round_state)
         social_choice_panel = SocialChoicePanel()
 
         # divider_line = QFrame()
@@ -21,7 +20,7 @@ class BodyLayout(QHBoxLayout):
         # divider_line.setFrameShadow(QtWidgets.QFrame.Sunken)
 
         self.addLayout(jhg_panel)
-        self.addLayout(social_choice_panel)
+        # self.addLayout(social_choice_panel)
 
         # self.addWidget(divider_line)
         # jhg_panel = JhgPanel()
