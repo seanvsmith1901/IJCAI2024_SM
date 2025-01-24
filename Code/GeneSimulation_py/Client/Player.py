@@ -1,10 +1,41 @@
 from PyQt6.QtWidgets import QLabel
 
+from PyqtComponents.allocation_buttons import MinusButton, PlusButton
 
 class Player:
     received_from_player = 0
     sent_to_player = 0
     popularity = 100
+
+    # Handle updating the sent, received, and tokens remaining fields after the minus button is pressed
+    def update_allocation_minus(self, round_state, tokens_label, player):
+        # If the client player has decided to steal from the associated player, subtract one from both that player's
+        # allocation and the tokens available to the client player
+        if round_state.allocations[player] <= 0:
+            if round_state.tokens > 0:
+                round_state.allocations[player] = round_state.allocations[player] - 1
+                round_state.tokens -= 1
+        else:
+            round_state.allocations[player] = round_state.allocations[player] - 1
+            round_state.tokens += 1
+
+        self.allocation_box.setText(str(round_state.allocations[player]))
+        tokens_label.setText("Tokens: " + str(round_state.tokens))
+
+    # Handle updating the sent, received, and tokens remaining fields after the plus button is pressed
+    def update_allocation_plus(self, round_state, tokens_label, player):
+        # If the client player has not decided to steal tokens, then one should be added to the associated player's
+        # allocation, and one subtracted from tokens available for the client player
+        if round_state.allocations[player] >= 0:
+            if round_state.tokens > 0:
+                round_state.allocations[player] = round_state.allocations[player] + 1
+                round_state.tokens -= 1
+        else:
+            round_state.allocations[player] = round_state.allocations[player] + 1
+            round_state.tokens += 1
+
+        self.allocation_box.setText(str(round_state.allocations[player]))
+        tokens_label.setText("Tokens: " + str(round_state.tokens))
 
     def __init__(self, id):
         self.id = id
@@ -13,3 +44,9 @@ class Player:
         self.popularity_label = QLabel(str(self.popularity))
         self.sent_label = QLabel(str(self.received_from_player))
         self.received_label = QLabel(str(self.sent_to_player))
+        self.minus_button = MinusButton()
+        self.plus_button = PlusButton()
+        self.allocation_box = QLabel("0")
+
+        self.minus_button.setMinimumWidth(self.minus_button.fontMetrics().horizontalAdvance("-") + 20)
+        self.plus_button.setMinimumWidth(self.plus_button.fontMetrics().horizontalAdvance("+") + 20)

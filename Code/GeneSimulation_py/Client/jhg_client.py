@@ -5,8 +5,8 @@ from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit
     QApplication, QPushButton, QSizePolicy
 
 from RoundState import RoundState
-from PyqtLayouts.JhgPanel import JhgPanel
-from PyqtLayouts.BodyLayout import BodyLayout
+from PyqtComponents.JhgPanel import JhgPanel
+from PyqtComponents.BodyLayout import BodyLayout
 
 
 class MainWindow(QMainWindow):
