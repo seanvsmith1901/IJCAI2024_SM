@@ -10,9 +10,9 @@ from .SocialChoicePanel import SocialChoicePanel
 
 
 class BodyLayout(QHBoxLayout):
-    def __init__(self, round_state):
+    def __init__(self, round_state, client_socket):
         super().__init__()
-        jhg_panel = JhgPanel(round_state)
+        jhg_panel = JhgPanel(round_state, client_socket)
         social_choice_panel = SocialChoicePanel()
 
         # divider_line = QFrame()

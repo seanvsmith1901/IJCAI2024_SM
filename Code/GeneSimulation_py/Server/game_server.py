@@ -32,24 +32,24 @@ class GameServer():
             #self.send_state()  # sends out the current game state # there is no current game state atm
             data = self.get_client_data()
             for client, received_json in data.items():
-                if "VOTE" in received_json and received_json["VOTE"] != None:
-                    client_input[self.client_id_dict[client]] = received_json["VOTE"]
+                if "CLIENT_ID" in received_json:
+                    client_input[json.loads(received_json)["CLIENT_ID"]] = json.loads(received_json)["ALLOCATIONS"]
 
             # Check if all clients have provided input
             if len(client_input) == len(self.connected_clients):
                 break
 
-        # Create a matrix to encode votes. Each row is a user (arranged by id), each column is the player they voted for
-        vote_matrix = [[0 for _ in range(len(self.connected_clients))] for _ in range(len(self.connected_clients))]
-        for i in range(len(client_input)):
-            # Because the client ids are 1 indexed (not 0 indexed), you have to use the +1 to convert to one indexing
-            # for client_input (expects the client id), and -1 to convert back to zero indexing for vote_matrix
-            vote_matrix[i][int(client_input[i+1])-1] = 1
+        # # Create a matrix to encode votes. Each row is a user (arranged by id), each column is the player they voted for
+        # vote_matrix = [[0 for _ in range(len(self.connected_clients))] for _ in range(len(self.connected_clients))]
+        # for i in range(len(client_input)):
+        #     # Because the client ids are 1 indexed (not 0 indexed), you have to use the +1 to convert to one indexing
+        #     # for client_input (expects the client id), and -1 to convert back to zero indexing for vote_matrix
+        #     vote_matrix[i][int(client_input[i+1])-1] = 1
+        #
+        # vote_matrix_json = json.dumps(vote_matrix)
 
-        vote_matrix_json = json.dumps(vote_matrix)
-
-        # Sends the vote matrix to each client (I think)
-        message = {"RESULTS": vote_matrix_json}
+        # Sends a message to each client. This should eventually be moved to its own function that sends the game state
+        message = {"RESULT": 1}
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
 

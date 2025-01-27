@@ -3,13 +3,16 @@ from functools import partial
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QWidget
 
+from .SubmitButton import SubmitButton
+
 
 class JhgPanel(QVBoxLayout):
-    def __init__(self, round_state):
+    def __init__(self, round_state, client_socket):
         super().__init__()
         # footer
         footer = QHBoxLayout()
-        submitButton = QPushButton("Submit")
+        submitButton = SubmitButton()
+        submitButton.clicked.connect(lambda: submitButton.submit(round_state, client_socket))
         footer.addWidget(submitButton)
         self.token_label = QLabel("Tokens: " + str(round_state.tokens))
         footer.addWidget(self.token_label)

@@ -1,50 +1,29 @@
+import json
 import sys
+import socket
 
+from PyQt6.QtCore import QObject, pyqtSignal, QThread
 from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QLineEdit, QTableWidget, QHBoxLayout, \
-    QApplication, QPushButton, QSizePolicy
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QHBoxLayout, QApplication
 
+from PyqtComponents.MainWindow import MainWindow
 from RoundState import RoundState
-from PyqtComponents.JhgPanel import JhgPanel
 from PyqtComponents.BodyLayout import BodyLayout
 
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        round_state = RoundState()
-        super().__init__()
-
-        self.setWindowTitle("JHG")
-
-        # Header
-        headerLayout = QHBoxLayout()
-        roundCounter = QLabel("Round 1")
-        roundCounterFont = QFont()
-        roundCounterFont.setPointSize(20)
-        roundCounter.setFont(roundCounterFont)
-        headerLayout.addWidget(roundCounter)
-
-        # Body
-        body_layout = BodyLayout(round_state)
-
-        # Footer/submit
-        foot_layout = QHBoxLayout()
-        # submitButton = QPushButton("Submit")
-        # foot_layout.addWidget(submitButton)
-
-        # Add the other layouts to the master layout
-        master_layout = QVBoxLayout()
-        master_layout.addLayout(headerLayout)
-        master_layout.addLayout(body_layout)
-        master_layout.addLayout(foot_layout)
-
-        central_widget = QWidget()
-        central_widget.setLayout(master_layout)
-
-        self.setCentralWidget(central_widget)
-
 if __name__ == "__main__":
+    # host = '192.168.30.17'  # The server's IP address
+    host = '127.0.0.1'  # your local host address cause you're working from home.
+    port = 12346  # The port number to connect to
+    # Create a TCP socket
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # Connect to the server
+    client_socket.connect((host, port))
+
+    # Send data to the server to initialize the connection
+    message = {"NEW_INPUT": "new_input"}
+    client_socket.send(json.dumps(message).encode())
+
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = MainWindow(client_socket)
     window.show()
     app.exec()
