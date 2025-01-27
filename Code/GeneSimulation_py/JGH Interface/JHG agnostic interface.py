@@ -1,4 +1,4 @@
-# this is just placeholder code its not actually intedned to do anything yet.
+# this is just placeholder code it's not actually intended to do anything yet.
 
 import socket
 import copy
