@@ -1,3 +1,6 @@
+# simulator.py in Server is basically a stripped down version of this that we will be using for our own nefarious purposes.
+
+
 from simulator import GameSimulator
 from randomagent import RandomAgent
 from geneagent3 import GeneAgent3
@@ -10,10 +13,10 @@ import numpy as np
 import os
 import sys
 import random
-
 import time
 
 np.set_printoptions(precision=2, suppress=True)
+
 
 def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRandom):
 
@@ -121,6 +124,9 @@ def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRa
         #             )
 
         sim.play_round(T)
+
+
+
 
         if r == 0:
             runningTotal = np.copy(sim.get_popularity())

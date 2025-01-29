@@ -3,15 +3,20 @@ from multiprocessing import Process
 import multiprocessing
 import json
 import time
+from simulator import Simulator
+
+total_players = 11
 
 # from Code.GeneSimulation_py.main import play_game
 
 
 class GameServer():
+    global total_players
     def __init__(self, new_clients, client_id_dict, client_usernames):
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.client_usernames = client_usernames
+        self.simulator = Simulator(len(new_clients), total_players) # creates a new simulator object
         self.start_game()
 
 
