@@ -3,7 +3,7 @@ from multiprocessing import Process
 import multiprocessing
 import json
 import time
-from simulator import Simulator
+from sim_interface import Simulator
 
 total_players = 11
 

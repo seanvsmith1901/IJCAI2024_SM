@@ -1,28 +1,24 @@
 # refer to "main.py" in ../ for more information
 
-from simulator import GameSimulator
-from randomagent import RandomAgent
-from geneagent3 import GeneAgent3
-from humanagent import HumanAgent
-from assassinagent import AssassinAgent
+
+from Code.GeneSimulation_py.geneagent3 import GeneAgent3
+from Code.GeneSimulation_py.humanagent import HumanAgent
+from Code.GeneSimulation_py.simulator import GameSimulator
+
 # from scriptagent import ScriptAgent
-from govtagent import DummyGovtAgent
 
 
 
 import numpy as np
-import os
-import sys
 import random
 sim = None # the simulator. have him as a global for now.
-import time
 
 np.set_printoptions(precision=2, suppress=True)
 
 class Simulator():
     def __init__(self, num_human_players, num_players):
 
-        start_game(num_human_players, num_players)
+        self.start_game(num_human_players, num_players)
 
 
 
@@ -42,13 +38,13 @@ class Simulator():
         plyrs = []
         for i in range(0, len(player_idxs)):
             if player_idxs[i] >= popSize:
-                plyrs.append(configuredPlayers[player_idxs[i] - popSize])
+                plyrs.append(configured_players[player_idxs[i] - popSize])
             else:
                 plyrs.append(theGenePools[player_idxs[i]])
         players = np.array(plyrs)
         agents = list(players)
 
-        initial_pops = define_initial_pops(0, len(player_idxs))
+        initial_pops = self.define_initial_pops(0, len(player_idxs))
         poverty_line = 0
         forcedRandom = False
 
@@ -112,5 +108,39 @@ class Simulator():
 
         sim.play_round(T)
 
+    def define_initial_pops(self, init_pop, num_players):
+        base_pop = 100
 
+        # assign the initial popularities
+        if init_pop == "equal":
+            initial_pops = [*[base_pop] * (num_players)]
+        elif init_pop == "random":
+            initial_pops = random.sample(range(1, 200), num_players)
+        elif init_pop == "step":
+            initial_pops = np.zeros(num_players, dtype=float)
+            for i in range(0, num_players):
+                initial_pops[i] = i + 1.0
+            random.shuffle(initial_pops)
+        elif init_pop == "power":
+            initial_pops = np.zeros(num_players, dtype=float)
+            for i in range(0, num_players):
+                initial_pops[i] = 1.0 / (pow(i + 1, 0.7))
+            random.shuffle(initial_pops)
+        elif init_pop == "highlow":
+            initial_pops = random.sample(range(1, 51), num_players)
+            for i in range(0, num_players / 2):
+                initial_pops[i] += 150
+            random.shuffle(initial_pops)
+        else:
+            print("don't understand init_pop " + str(init_pop) + " so just going with equal")
+            initial_pops = [*[base_pop] * (num_players)]
+
+        # normalize initial_pops so average popularity across all agents is 100
+        tot_start_pop = base_pop * num_players
+        sm = 1.0 * sum(initial_pops)
+        for i in range(0, num_players):
+            initial_pops[i] /= sm
+            initial_pops[i] *= tot_start_pop
+
+        return np.array(initial_pops)
 

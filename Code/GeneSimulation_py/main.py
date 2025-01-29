@@ -1,4 +1,4 @@
-# simulator.py in Server is basically a stripped down version of this that we will be using for our own nefarious purposes.
+# sim_interface.py in Server is basically a stripped down version of this that we will be using for our own nefarious purposes.
 
 
 from simulator import GameSimulator
