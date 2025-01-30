@@ -19,6 +19,7 @@ class JhgPanel(QVBoxLayout):
         # Each of the following blocks of code creates a column to display a particular type of data per player.
         # Each column loops through the players and adds the respective element from the associated player class.
         player_panel = QGridLayout()
+        print(round_state.client_id)
 
         # ID column - Displays the id + 1 (for human readability) of each player
         player_panel.addWidget(QLabel("Player"), 0, 0)

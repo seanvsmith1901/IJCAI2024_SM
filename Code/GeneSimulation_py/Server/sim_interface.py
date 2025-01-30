@@ -1,9 +1,11 @@
 # refer to "main.py" in ../ for more information
+import os
+import sys
 
-
-from Code.GeneSimulation_py.geneagent3 import GeneAgent3
-from Code.GeneSimulation_py.humanagent import HumanAgent
-from Code.GeneSimulation_py.simulator import GameSimulator
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from geneagent3 import GeneAgent3
+from humanagent import HumanAgent
+from simulator import GameSimulator
 
 # from scriptagent import ScriptAgent
 
@@ -107,7 +109,7 @@ class Simulator():
         tkns = self.num_players
         T = np.eye(self.num_players) * tkns
         T_prev = self.sim.get_transaction()
-        print("these are the allocations ", allocations)
+        # print("these are the allocations ", allocations)
         # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
         for i, plyr in enumerate(self.players):  # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
             if plyr.getType() == "Human":

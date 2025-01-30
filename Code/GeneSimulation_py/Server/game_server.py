@@ -1,8 +1,5 @@
 import select
-from multiprocessing import Process
-import multiprocessing
 import json
-import time
 from sim_interface import Simulator
 
 total_players = 11
@@ -14,35 +11,34 @@ class ReceivedData():
 
 
 class GameServer():
-    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds):
+    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_humans):
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.client_usernames = client_usernames
         self.current_round = 0
         self.simulator = Simulator(len(new_clients), total_players) # creates a new simulator object
-        self.start_game(max_rounds)
+        self.start_game(max_rounds, num_bots, num_humans)
 
         
         
 
-    def start_game(self, max_rounds):
+    def start_game(self, max_rounds, num_bots, num_humans):
         round = 1
         global total_players
         # OK SO
         # just take in the client votes, tabluate them, print out all the votes server side.
         # while not all players have answered, we are going to look for the input
         # lets refer to this as a "round" for now
-        print("lets just see if we can get here first, make sure we don't brick")
 
         while round <= max_rounds:
-            self.play_round(round)
+            self.play_round(round, num_bots, num_humans)
             print(f"Played round {round}")
             round += 1
 
         print("game over")
 
 
-    def play_round(self, round):
+    def play_round(self, round, num_bots, num_humans):
         client_input = {}
         while True:
             #self.send_state()  # sends out the current game state # there is no current game state atm
@@ -55,20 +51,14 @@ class GameServer():
             if len(client_input) == len(self.connected_clients):
                 break
 
-       
-        current_popularity = self.simulator.execute_round(client_input, self.current_round)
-        self.current_round += 1  # its expecing the first round to be 0? I guess?
-        print("current_popularity is as follows: ", current_popularity)
-        for client in self.connected_clients:
-            message = {
-                "POPULARITY": current_popularity,
-            }
-            client.send(json.dumps(message))
-
+        print(client_input)
+        print(round)
+        current_popularity = self.simulator.execute_round(client_input, round-1)
+        # print("current_popularity is as follows: ", current_popularity)
 
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
-        allocations_matrix = [client_input[str(i)].allocations for i in range(len(self.connected_clients))]
+        allocations_matrix = [client_input[str(i + num_bots)] for i in range(num_humans)]
 
         # This is temporary to expand the allocations matrix for 11 players. Eventually, all slots will be used and this will be deleted
         for i in range(11 - len(allocations_matrix)):
@@ -87,17 +77,19 @@ class GameServer():
         #     }
         #     self.connected_clients[i].send(json.dumps(message).encode())
 
-
         # Sends a list containing
+        print(current_popularity)
         for i in range(11):
             message = {
                 "ROUND": round,
                 "RECEIVED": self.get_received(i, allocations_matrix),
                 "SENT": self.get_sent(i, allocations_matrix),
+                "POPULARITY": list(current_popularity),
             }
 
             # Only sends the message to connected clients.
             if i < len(self.connected_clients):
+                print(json.dumps(message).encode())
                 self.connected_clients[i].send(json.dumps(message).encode())
 
         return client_input

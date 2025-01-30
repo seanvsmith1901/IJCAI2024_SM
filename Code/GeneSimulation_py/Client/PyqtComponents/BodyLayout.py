@@ -1,9 +1,7 @@
-from PyQt6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QLineEdit, QPushButton, QFrame
-from PyQt6.uic.properties import QtWidgets
+from PyQt6.QtWidgets import QHBoxLayout
 
 from .JhgPanel import JhgPanel
 from .SocialChoicePanel import SocialChoicePanel
-from .SubmitButton import SubmitButton
 
 
 # from .SocialChoicePanel import SocialChoicePanel

@@ -20,6 +20,7 @@ class RoundState:
         self.players.append(self.client_player)
 
     def state_to_JSON(self):
+        self.allocations[int(self.client_id)] = self.tokens
         message = {
             "CLIENT_ID": self.client_id,
             "ALLOCATIONS": self.allocations,

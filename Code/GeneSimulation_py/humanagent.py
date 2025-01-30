@@ -1,4 +1,4 @@
-from .baseagent import AbstractAgent
+from baseagent import AbstractAgent
 from os.path import exists
 
 import numpy as np

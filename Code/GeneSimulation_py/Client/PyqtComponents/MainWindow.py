@@ -3,9 +3,6 @@ import json
 from PyQt6.QtCore import QObject, pyqtSignal, QThread
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from .BodyLayout import BodyLayout
 from RoundState import RoundState
@@ -32,21 +29,19 @@ class Worker(QObject):
                     self.main_window.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
                 if "ROUND" in json_data:
                     json_data = json.loads(json_data)
-                    self.update_received_label(json_data)
-                    self.update_sent_label(json_data)
+                    self.update_labels(json_data)
+                    print(json_data["POPULARITY"])
 
                     self.round_state.round_number = int(json_data["ROUND"])
                     self.round_counter.setText(f'Round {int(json_data["ROUND"]) + 1}')
 
-    def update_received_label(self, json_data):
+    def update_labels(self, json_data):
         self.round_state.received = json_data["RECEIVED"]
-        for i in range (11):
-            self.round_state.players[i].received_label.setText(str(self.round_state.received[i]))
-
-    def update_sent_label(self, json_data):
         self.round_state.sent = json_data["SENT"]
         for i in range (11):
+            self.round_state.players[i].received_label.setText(str(self.round_state.received[i]))
             self.round_state.players[i].sent_label.setText(str(self.round_state.sent[i]))
+            self.round_state.players[i].popularity_label.setText(str(json_data["POPULARITY"][i]))
 
 class MainWindow(QMainWindow):
     def __init__(self, client_socket):
