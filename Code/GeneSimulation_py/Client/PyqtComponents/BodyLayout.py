@@ -3,6 +3,9 @@ from PyQt6.uic.properties import QtWidgets
 
 from .JhgPanel import JhgPanel
 from .SocialChoicePanel import SocialChoicePanel
+from .SubmitButton import SubmitButton
+
+
 # from .SocialChoicePanel import SocialChoicePanel
 
 
@@ -10,8 +13,8 @@ class BodyLayout(QHBoxLayout):
     def __init__(self, round_state, client_socket):
         super().__init__()
 
-        social_choice_panel = SocialChoicePanel()
         jhg_panel = JhgPanel(round_state, client_socket)
+
         self.addLayout(jhg_panel)
 
         # divider_line = QFrame()
