@@ -25,7 +25,7 @@ class Worker(QObject):
             if data:
                 json_data = json.dumps(json.loads(data.decode()))
                 if "ID" in json_data:
-                    print("eh")
+                    print(json.loads(json_data)["ID"])
                     self.round_state.client_id = json.loads(json_data)["ID"]
                 if "RESULT" in json_data:
                     print("result")
@@ -34,6 +34,12 @@ class MainWindow(QMainWindow):
     def __init__(self, client_socket):
         round_state = RoundState()
         super().__init__()
+
+        self.worker = Worker(client_socket, round_state)
+        self.worker_thread = QThread()
+        self.worker.moveToThread(self.worker_thread)
+        self.worker_thread.started.connect(self.worker.start_listening)
+        self.worker_thread.start()
 
         self.setWindowTitle("Junior High Game")
 
@@ -57,9 +63,3 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(master_layout)
 
         self.setCentralWidget(central_widget)
-
-        self.worker = Worker(client_socket, round_state)
-        self.worker_thread = QThread()
-        self.worker.moveToThread(self.worker_thread)
-        self.worker_thread.started.connect(self.worker.start_listening)
-        self.worker_thread.start()

@@ -3,23 +3,22 @@ from PyQt6.uic.properties import QtWidgets
 
 from .JhgPanel import JhgPanel
 from .SocialChoicePanel import SocialChoicePanel
-
-
-# from JhgPanel import JhgPanel
 # from .SocialChoicePanel import SocialChoicePanel
 
 
 class BodyLayout(QHBoxLayout):
     def __init__(self, round_state, client_socket):
         super().__init__()
-        jhg_panel = JhgPanel(round_state, client_socket)
+
         social_choice_panel = SocialChoicePanel()
+        jhg_panel = JhgPanel(round_state, client_socket)
+        self.addLayout(jhg_panel)
 
         # divider_line = QFrame()
         # divider_line.setFrameShape(QtWidgets.QFrame.VLine)
         # divider_line.setFrameShadow(QtWidgets.QFrame.Sunken)
 
-        self.addLayout(jhg_panel)
+        # self.addLayout(jhg_panel)
         # self.addLayout(social_choice_panel)
 
         # self.addWidget(divider_line)

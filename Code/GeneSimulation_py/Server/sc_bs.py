@@ -47,7 +47,7 @@ def start_server(host='127.0.0.1', port=12346):
 
             # Create a response
             response = {
-                "ID": str(len(connected_clients)),
+                "ID": str(len(connected_clients) - 1),
             }
             # Serialize and send the response as JSON
             client_socket.send(json.dumps(response).encode())

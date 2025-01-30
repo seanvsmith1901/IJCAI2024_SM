@@ -50,20 +50,25 @@ class JhgPanel(QVBoxLayout):
 
         # Allocations column - Shows the number of tokens that the client player has allocated to the associated player,
         # as well as buttons to change that value
-        # TODO: Change the client player's row, such that you can't allocate tokens to yourself
         allocations_column = QVBoxLayout()
         allocations_column.setAlignment(Qt.AlignmentFlag.AlignHCenter)
         allocations_column.addWidget(QLabel("Allocations"))
         for i in range(0, 11):
+            print(f"CID: {round_state.client_id} i: {i} type: {int(round_state.client_id)}")
             allocations_row = QHBoxLayout()
+            if i == int(round_state.client_id):
+                allocations_row.addWidget(QLabel("You :)"))
+                print("Ya boi")
+            else:
+                allocations_row.addWidget(round_state.players[i].minus_button, 2)
+                allocations_row.addWidget(round_state.players[i].allocation_box, .5)
+                allocations_row.addWidget(round_state.players[i].plus_button, 2)
 
-            allocations_row.addWidget(round_state.players[i].minus_button, 2)
-            allocations_row.addWidget(round_state.players[i].allocation_box, .5)
-            allocations_row.addWidget(round_state.players[i].plus_button, 2)
-
-            # Connect the functions that update counters to the plus and minus buttons
-            round_state.players[i].minus_button.update.connect(partial(round_state.players[i].update_allocation_minus, round_state, self.token_label, i))
-            round_state.players[i].plus_button.update.connect(partial(round_state.players[i].update_allocation_plus, round_state, self.token_label, i))
+                # Connect the functions that update counters to the plus and minus buttons
+                round_state.players[i].minus_button.update.connect(
+                    partial(round_state.players[i].update_allocation_minus, round_state, self.token_label, i))
+                round_state.players[i].plus_button.update.connect(
+                    partial(round_state.players[i].update_allocation_plus, round_state, self.token_label, i))
 
             allocations_column.addLayout(allocations_row)
 

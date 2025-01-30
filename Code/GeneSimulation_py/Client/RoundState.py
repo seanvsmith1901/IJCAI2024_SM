@@ -7,7 +7,7 @@ class RoundState:
     tokens = 22
     allocations = [0 for i in range(11)]
     players = []
-    client_id = 10
+    client_id = 0
 
     def __init__(self):
         self.client_player = Player(10)
