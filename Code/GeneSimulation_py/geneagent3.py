@@ -1,4 +1,4 @@
-from baseagent import AbstractAgent
+from .baseagent import AbstractAgent
 import random
 import numpy as np
 import heapq

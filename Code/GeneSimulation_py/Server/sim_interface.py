@@ -28,12 +28,19 @@ class Simulator():
         numAgents = num_players - num_human_players
         configured_players = []
         popSize = 3  # ??? I think? based on the command line arguemnts
-        player_idxs = list(np.arrange(0, numAgents))  # where numAgents is the number of actual agents, not players.
+        player_idxs = list(np.arange(0, numAgents))  # where numAgents is the number of actual agents, not players.
         for _ in range(num_human_players):
             configured_players.append(HumanAgent())
 
         for i in range(0, len(configured_players)):
             player_idxs = np.append(player_idxs, popSize + i)
+
+        theFolder = "../ResultsStudy"
+        theGen = 199
+        num_gene_copies = 3
+
+        theGenePools = loadPopulationFromFile(popSize, theFolder, theGen, num_gene_copies)
+
 
         plyrs = []
         for i in range(0, len(player_idxs)):
@@ -88,25 +95,27 @@ class Simulator():
         # print("\nRound: " + str(r))
         # build allocations here.
 
-        T = np.eye(num_players) * tkns
-        T_prev = sim.get_transaction()
+        pass # for now. one step at a time.
 
-        # basically this is where all of the magic needs to happen. Oh, just make a while loop that checks for all player input. return T when finished.
-
-        # T = sim.get_player_inputs(T)
-
-        # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
-        for i, plyr in enumerate(players):  # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
-            T[i] = plyr.play_round(
-                i,  # player index
-                r,  # round
-                T_prev[:, i],  # received
-                sim.get_popularity(),  # popularity
-                sim.get_influence(),  # influence
-                sim.get_extra_data(i)  # could NOT tell you waht this is.
-            )
-
-        sim.play_round(T)
+        # T = np.eye(num_players) * tkns
+        # T_prev = sim.get_transaction()
+        #
+        # # basically this is where all of the magic needs to happen. Oh, just make a while loop that checks for all player input. return T when finished.
+        #
+        # # T = sim.get_player_inputs(T)
+        #
+        # # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
+        # for i, plyr in enumerate(players):  # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
+        #     T[i] = plyr.play_round(
+        #         i,  # player index
+        #         r,  # round
+        #         T_prev[:, i],  # received
+        #         sim.get_popularity(),  # popularity
+        #         sim.get_influence(),  # influence
+        #         sim.get_extra_data(i)  # could NOT tell you waht this is.
+        #     )
+        #
+        # sim.play_round(T)
 
     def define_initial_pops(self, init_pop, num_players):
         base_pop = 100
@@ -143,4 +152,28 @@ class Simulator():
             initial_pops[i] *= tot_start_pop
 
         return np.array(initial_pops)
+
+
+def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
+    fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
+    print(fnombre)
+    fp = open(fnombre, "r")
+    if fp.closed:
+        print(fnombre + " not found")
+        quit()
+
+    thePopulation = []
+
+    for i in range(0,popSize):
+        line = fp.readline()
+        words = line.split(",")
+
+        thePopulation.append(GeneAgent3(words[0], num_gene_pools))
+        thePopulation[i].count = float(words[1])
+        thePopulation[i].relativeFitness = float(words[2])
+        thePopulation[i].absoluteFitness = float(words[3])
+
+    fp.close()
+
+    return thePopulation
 

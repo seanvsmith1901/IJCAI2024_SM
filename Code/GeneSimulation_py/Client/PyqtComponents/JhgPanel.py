@@ -58,7 +58,7 @@ class JhgPanel(QVBoxLayout):
             allocations_row = QHBoxLayout()
 
             allocations_row.addWidget(round_state.players[i].minus_button, 2)
-            allocations_row.addWidget(round_state.players[i].allocation_box, .5)
+            allocations_row.addWidget(round_state.players[i].allocation_box, 1)
             allocations_row.addWidget(round_state.players[i].plus_button, 2)
 
             # Connect the functions that update counters to the plus and minus buttons
