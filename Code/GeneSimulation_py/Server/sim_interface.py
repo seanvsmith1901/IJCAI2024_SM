@@ -107,13 +107,11 @@ class Simulator():
         tkns = self.num_players
         T = np.eye(self.num_players) * tkns
         T_prev = self.sim.get_transaction()
-
+        print("these are the allocations ", allocations)
         # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
-        player_index = 0
         for i, plyr in enumerate(self.players):  # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
             if plyr.getType() == "Human":
-                T[i] = allocations[str(player_index+1)] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
-                player_index += 1
+                T[i] = allocations[str(i)] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
             else:
                 T[i] = plyr.play_round(
                     i,  # player index

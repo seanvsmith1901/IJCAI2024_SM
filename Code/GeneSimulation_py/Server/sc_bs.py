@@ -3,13 +3,17 @@
 import json
 import socket
 import copy
+
+from matplotlib.backend_tools import ToolQuitAll
+
 from game_server import GameServer
 
 
 
 # Set to 1 for testing purposes
-HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up.
-
+HUMAN_PLAYERS = 2 # how many players need to join before things start to blow up.
+TOTAL_PLAYERS = 11
+BOT_PLAYERS = TOTAL_PLAYERS - HUMAN_PLAYERS
 
 connected_clients = {}
 client_input = {}
@@ -43,12 +47,12 @@ def start_server(host='127.0.0.1', port=12345):
             #client_usernames[len(connected_clients)] = received_json["USERNAME"] #use this later if ever. might not be relavant
             #client_input[client_socket] = received_json["INPUT"]
 
-            print ('New client with ID: ', len(connected_clients) - 1)
+            print ('New client with ID: ', (len(connected_clients) - 1) + BOT_PLAYERS)
 
 
             # Create a response
             response = {
-                "ID": str(len(connected_clients) - 1),
+                "ID": (str((len(connected_clients) - 1) + BOT_PLAYERS))
             }
             # Serialize and send the response as JSON
             client_socket.send(json.dumps(response).encode())

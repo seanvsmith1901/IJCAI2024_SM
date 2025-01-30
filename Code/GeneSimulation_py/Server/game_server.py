@@ -49,8 +49,7 @@ class GameServer():
             data = self.get_client_data()
             for client, received_json in data.items():
                 if "CLIENT_ID" in received_json:
-                    client_input[json.loads(received_json)["CLIENT_ID"]] \
-                        = ReceivedData(json.loads(received_json)["CLIENT_ID"], json.loads(received_json)["ALLOCATIONS"])
+                    client_input[json.loads(received_json)["CLIENT_ID"]] = json.loads(received_json)["ALLOCATIONS"]
 
             # Check if all clients have provided input
             if len(client_input) == len(self.connected_clients):
@@ -60,6 +59,11 @@ class GameServer():
         current_popularity = self.simulator.execute_round(client_input, self.current_round)
         self.current_round += 1  # its expecing the first round to be 0? I guess?
         print("current_popularity is as follows: ", current_popularity)
+        for client in self.connected_clients:
+            message = {
+                "POPULARITY": current_popularity,
+            }
+            client.send(json.dumps(message))
 
 
 
