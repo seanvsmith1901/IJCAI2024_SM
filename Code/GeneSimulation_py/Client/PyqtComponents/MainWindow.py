@@ -41,7 +41,7 @@ class Worker(QObject):
         for i in range (11):
             self.round_state.players[i].received_label.setText(str(self.round_state.received[i]))
             self.round_state.players[i].sent_label.setText(str(self.round_state.sent[i]))
-            self.round_state.players[i].popularity_label.setText(str(json_data["POPULARITY"][i]))
+            self.round_state.players[i].popularity_label.setText(str(round(json_data["POPULARITY"][i])))
 
 class MainWindow(QMainWindow):
     def __init__(self, client_socket):
