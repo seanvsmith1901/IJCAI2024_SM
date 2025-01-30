@@ -6,6 +6,8 @@ from Player import Player
 class RoundState:
     tokens = 22
     allocations = [0 for i in range(11)]
+    received = [0 for i in range(11)]
+    sent = [0 for i in range(11)]
     players = []
     client_id = 0
 

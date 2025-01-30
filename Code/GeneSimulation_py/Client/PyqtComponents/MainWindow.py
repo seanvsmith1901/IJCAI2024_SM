@@ -25,15 +25,20 @@ class Worker(QObject):
             if data:
                 json_data = json.dumps(json.loads(data.decode()))
                 if "ID" in json_data:
-                    print(json.loads(json_data)["ID"])
                     self.round_state.client_id = json.loads(json_data)["ID"]
-                if "RESULT" in json_data:
-                    self.round_state.allocations = json.loads(json_data)["RECEIVED"]
-            self.update_received()
+                if "ROUND" in json_data:
+                    self.update_received(json_data)
+                    self.update_sent(json_data)
 
-    def update_received(self):
+    def update_received(self, json_data):
+        self.round_state.received = json.loads(json_data)["RECEIVED"]
         for i in range (11):
             self.round_state.players[i].received_label.setText(str(self.round_state.received[i]))
+
+    def update_sent(self, json_data):
+        self.round_state.sent = json.loads(json_data)["SENT"]
+        for i in range (11):
+            self.round_state.players[i].sent_label.setText(str(self.round_state.sent[i]))
 
 class MainWindow(QMainWindow):
     def __init__(self, client_socket):

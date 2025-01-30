@@ -18,7 +18,8 @@ HEIGHT = 3 # leave this hardcoded for now.
 WIDTH = 3
 client_id_dict = {}
 hunters = []
-MAX_ROUNDS = 2
+# Set very high for testing purposes
+MAX_ROUNDS = 100
 round = 1
 
 
@@ -42,7 +43,7 @@ def start_server(host='127.0.0.1', port=12346):
             #client_usernames[len(connected_clients)] = received_json["USERNAME"] #use this later if ever. might not be relavant
             #client_input[client_socket] = received_json["INPUT"]
 
-            print ('received json:', received_json)
+            print ('New client with ID: ', len(connected_clients) - 1)
 
 
             # Create a response
@@ -55,15 +56,11 @@ def start_server(host='127.0.0.1', port=12346):
             pass # don't do anything but still handle the exception
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
-            GameServer(connected_clients, client_id_dict, client_usernames) # might need to make a copy and overwrite connected clients
+            GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS) # might need to make a copy and overwrite connected clients
             # readies for another game maybe possibly. who knows. will prolly never test.
             connected_clients.clear()
             client_id_dict.clear()
             client_usernames.clear()
-            # starts a smaller server.
-
-            # passes down the new player list, calls that object (so we should now be cooking) and then clears out the stuff. Do I need to make threads?
-
 
 
 if __name__ == "__main__":
