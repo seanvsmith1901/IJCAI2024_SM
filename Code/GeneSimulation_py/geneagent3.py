@@ -151,7 +151,7 @@ class GeneAgent3(AbstractAgent):
         self.theTracked = self.getTracked()
         self.played_genes = True
 
-        fp = open("../State/rnums.txt", "r")
+        fp = open("../../State/rnums.txt", "r")
 
         self.randNums = []
         for i in range(0,10000):
@@ -170,7 +170,7 @@ class GeneAgent3(AbstractAgent):
 
 
     def getTracked(self):
-        f = open("ScenarioIndicator/theTracked.txt", "r")
+        f = open("../ScenarioIndicator/theTracked.txt", "r")
         val = int(f.readline())
         f.close()
 

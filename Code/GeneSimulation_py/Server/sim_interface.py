@@ -11,23 +11,27 @@ from Code.GeneSimulation_py.simulator import GameSimulator
 
 import numpy as np
 import random
-sim = None # the simulator. have him as a global for now.
 
 np.set_printoptions(precision=2, suppress=True)
 
 class Simulator():
     def __init__(self, num_human_players, num_players):
-
+        self.num_players = num_players
+        self.sim = None
+        self.players = None
         self.start_game(num_human_players, num_players)
 
 
 
+
     def start_game(self, num_human_players, num_players):
-        global sim
+
+
+        init_pop = "equal"
 
         numAgents = num_players - num_human_players
         configured_players = []
-        popSize = 3  # ??? I think? based on the command line arguemnts
+        popSize = 60  # ??? I think? based on the command line arguemnts
         player_idxs = list(np.arange(0, numAgents))  # where numAgents is the number of actual agents, not players.
         for _ in range(num_human_players):
             configured_players.append(HumanAgent())
@@ -35,7 +39,7 @@ class Simulator():
         for i in range(0, len(configured_players)):
             player_idxs = np.append(player_idxs, popSize + i)
 
-        theFolder = "../ResultsStudy"
+        theFolder = "../../ResultsStudy"
         theGen = 199
         num_gene_copies = 3
 
@@ -49,9 +53,10 @@ class Simulator():
             else:
                 plyrs.append(theGenePools[player_idxs[i]])
         players = np.array(plyrs)
+        self.players = players
         agents = list(players)
 
-        initial_pops = self.define_initial_pops(0, len(player_idxs))
+        initial_pops = self.define_initial_pops(init_pop, len(player_idxs))
         poverty_line = 0
         forcedRandom = False
 
@@ -87,35 +92,31 @@ class Simulator():
         for a in agents:  # sets the game params for all users.
             a.setGameParams(game_params, forcedRandom)
 
-        sim = GameSimulator(
+        self.sim = GameSimulator(
             game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
 
 
-    def execute_round(self, allocations):  # all of the player allocations will get passed in here
+    def execute_round(self, allocations, round):  # all of the player allocations will get passed in here
         # print("\nRound: " + str(r))
         # build allocations here.
 
-        pass # for now. one step at a time.
+        tkns = self.num_players
+        T = np.eye(self.num_players) * tkns
+        T_prev = self.sim.get_transaction()
 
-        # T = np.eye(num_players) * tkns
-        # T_prev = sim.get_transaction()
-        #
-        # # basically this is where all of the magic needs to happen. Oh, just make a while loop that checks for all player input. return T when finished.
-        #
-        # # T = sim.get_player_inputs(T)
-        #
-        # # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
-        # for i, plyr in enumerate(players):  # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
-        #     T[i] = plyr.play_round(
-        #         i,  # player index
-        #         r,  # round
-        #         T_prev[:, i],  # received
-        #         sim.get_popularity(),  # popularity
-        #         sim.get_influence(),  # influence
-        #         sim.get_extra_data(i)  # could NOT tell you waht this is.
-        #     )
-        #
-        # sim.play_round(T)
+        # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
+        for i, plyr in enumerate(self.players):  # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
+            T[i] = plyr.play_round(
+                i,  # player index
+                round,  # round
+                T_prev[:, i],  # received
+                self.sim.get_popularity(),  # popularity
+                self.sim.get_influence(),  # influence
+                self.sim.get_extra_data(i)  # could NOT tell you waht this is.
+            )
+
+        self.sim.play_round(T)
+        return self.sim.get_popularity() # I think this is all we need? maybe?
 
     def define_initial_pops(self, init_pop, num_players):
         base_pop = 100

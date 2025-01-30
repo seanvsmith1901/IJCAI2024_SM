@@ -16,6 +16,7 @@ class GameServer():
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.client_usernames = client_usernames
+        self.current_round = 0
         self.simulator = Simulator(len(new_clients), total_players) # creates a new simulator object
         self.start_game()
 
@@ -26,6 +27,7 @@ class GameServer():
         # just take in the client votes, tabluate them, print out all the votes server side.
         # while not all players have answered, we are going to look for the input
         # lets refer to this as a "round" for now
+        print("lets just see if we can get here first, make sure we don't brick")
 
         while True:
             print("this is the current tabulation ", self.play_round())
@@ -43,6 +45,10 @@ class GameServer():
             # Check if all clients have provided input
             if len(client_input) == len(self.connected_clients):
                 break
+
+        current_popularity = self.simulator.execute_round(client_input, self.current_round)
+        self.current_round += 1  # its expecing the first round to be 0? I guess?
+        print("current_popularity is as follows: ", current_popularity)
 
         # # Create a matrix to encode votes. Each row is a user (arranged by id), each column is the player they voted for
         # vote_matrix = [[0 for _ in range(len(self.connected_clients))] for _ in range(len(self.connected_clients))]
