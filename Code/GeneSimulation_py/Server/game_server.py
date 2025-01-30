@@ -23,6 +23,7 @@ class GameServer():
 
         while round <= max_rounds:
             self.play_round(round)
+            print(f"Played round {round}")
             round += 1
 
         print("game over")
@@ -49,7 +50,6 @@ class GameServer():
         # This is temporary to expand the allocations matrix for 11 players. Eventually, all slots will be used and this will be deleted
         for i in range(11 - len(allocations_matrix)):
             allocations_matrix.append([0 for i in range(11)])
-        print(allocations_matrix)
 
         # For now, this code doesn't work because we are not filling out the full 11 players. Below code accounts for this error
         # for i in range(len(self.connected_clients) - 1):

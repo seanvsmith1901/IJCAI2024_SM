@@ -10,6 +10,7 @@ class RoundState:
     sent = [0 for i in range(11)]
     players = []
     client_id = 0
+    round_number = 0
 
     def __init__(self):
         self.client_player = Player(10)
@@ -22,7 +23,7 @@ class RoundState:
         message = {
             "CLIENT_ID": self.client_id,
             "ALLOCATIONS": self.allocations,
-            "ROUND_NUMBER": 1,
+            "ROUND_NUMBER": self.round_number,
         }
 
         return json.dumps(message)

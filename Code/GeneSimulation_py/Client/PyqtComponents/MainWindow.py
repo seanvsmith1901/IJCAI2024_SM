@@ -12,14 +12,16 @@ from RoundState import RoundState
 
 
 class Worker(QObject):
-    data_received = pyqtSignal(str)
-
-    def __init__(self, client_socket, round_state):
+    def __init__(self, client_socket, round_state, round_counter):
         super().__init__()
         self.client_socket = client_socket
         self.round_state = round_state
+        self.round_counter = round_counter
 
-    def start_listening(self):
+    # Once connected to the server, this method is called on a threaded object. Once the thread calls it, it
+    # continuously listens for data from the server. This is the entrance point for all functionality based off of
+    # receiving data from the server. Kinda a switch board of sorts
+    def start_listening(self,):
         while True:
             data = self.client_socket.recv(1024)
             if data:
@@ -27,16 +29,20 @@ class Worker(QObject):
                 if "ID" in json_data:
                     self.round_state.client_id = json.loads(json_data)["ID"]
                 if "ROUND" in json_data:
-                    self.update_received(json_data)
-                    self.update_sent(json_data)
+                    json_data = json.loads(json_data)
+                    self.update_received_label(json_data)
+                    self.update_sent_label(json_data)
 
-    def update_received(self, json_data):
-        self.round_state.received = json.loads(json_data)["RECEIVED"]
+                    self.round_state.round_number = int(json_data["ROUND"])
+                    self.round_counter.setText(f'Round {int(json_data["ROUND"]) + 1}')
+
+    def update_received_label(self, json_data):
+        self.round_state.received = json_data["RECEIVED"]
         for i in range (11):
             self.round_state.players[i].received_label.setText(str(self.round_state.received[i]))
 
-    def update_sent(self, json_data):
-        self.round_state.sent = json.loads(json_data)["SENT"]
+    def update_sent_label(self, json_data):
+        self.round_state.sent = json_data["SENT"]
         for i in range (11):
             self.round_state.players[i].sent_label.setText(str(self.round_state.sent[i]))
 
@@ -44,12 +50,6 @@ class MainWindow(QMainWindow):
     def __init__(self, client_socket):
         round_state = RoundState()
         super().__init__()
-
-        self.worker = Worker(client_socket, round_state)
-        self.worker_thread = QThread()
-        self.worker.moveToThread(self.worker_thread)
-        self.worker_thread.started.connect(self.worker.start_listening)
-        self.worker_thread.start()
 
         self.setWindowTitle("Junior High Game")
 
@@ -73,3 +73,9 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(master_layout)
 
         self.setCentralWidget(central_widget)
+
+        self.worker = Worker(client_socket, round_state, roundCounter)
+        self.worker_thread = QThread()
+        self.worker.moveToThread(self.worker_thread)
+        self.worker_thread.started.connect(self.worker.start_listening)
+        self.worker_thread.start()
