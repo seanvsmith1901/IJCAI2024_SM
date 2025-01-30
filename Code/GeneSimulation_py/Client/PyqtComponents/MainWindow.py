@@ -12,22 +12,24 @@ from RoundState import RoundState
 
 
 class Worker(QObject):
-    def __init__(self, client_socket, round_state, round_counter):
+    def __init__(self, client_socket, round_state, round_counter, main_window):
         super().__init__()
         self.client_socket = client_socket
         self.round_state = round_state
         self.round_counter = round_counter
+        self.main_window = main_window
 
     # Once connected to the server, this method is called on a threaded object. Once the thread calls it, it
     # continuously listens for data from the server. This is the entrance point for all functionality based off of
     # receiving data from the server. Kinda a switch board of sorts
-    def start_listening(self,):
+    def start_listening(self):
         while True:
             data = self.client_socket.recv(1024)
             if data:
                 json_data = json.dumps(json.loads(data.decode()))
                 if "ID" in json_data:
                     self.round_state.client_id = json.loads(json_data)["ID"]
+                    self.main_window.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
                 if "ROUND" in json_data:
                     json_data = json.loads(json_data)
                     self.update_received_label(json_data)
@@ -51,15 +53,20 @@ class MainWindow(QMainWindow):
         round_state = RoundState()
         super().__init__()
 
-        self.setWindowTitle("Junior High Game")
-
         # Header
         headerLayout = QHBoxLayout()
-        roundCounter = QLabel("Round 1")
-        roundCounterFont = QFont()
-        roundCounterFont.setPointSize(20)
-        roundCounter.setFont(roundCounterFont)
-        headerLayout.addWidget(roundCounter)
+        round_counter = QLabel("Round 1")
+        round_counter_font = QFont()
+        round_counter_font.setPointSize(20)
+        round_counter.setFont(round_counter_font)
+        headerLayout.addWidget(round_counter)
+
+        # Listens for incoming data from the server. Must be before the body layout, but after round_counter
+        self.worker = Worker(client_socket, round_state, round_counter, self)
+        self.worker_thread = QThread()
+        self.worker.moveToThread(self.worker_thread)
+        self.worker_thread.started.connect(self.worker.start_listening)
+        self.worker_thread.start()
 
         # Body
         body_layout = BodyLayout(round_state, client_socket)
@@ -73,9 +80,3 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(master_layout)
 
         self.setCentralWidget(central_widget)
-
-        self.worker = Worker(client_socket, round_state, roundCounter)
-        self.worker_thread = QThread()
-        self.worker.moveToThread(self.worker_thread)
-        self.worker_thread.started.connect(self.worker.start_listening)
-        self.worker_thread.start()

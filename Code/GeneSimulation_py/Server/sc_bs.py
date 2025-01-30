@@ -23,7 +23,7 @@ MAX_ROUNDS = 100
 round = 1
 
 
-def start_server(host='127.0.0.1', port=12346):
+def start_server(host='127.0.0.1', port=12345):
     # Create a TCP socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
