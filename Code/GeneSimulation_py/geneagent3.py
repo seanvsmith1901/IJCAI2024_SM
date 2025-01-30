@@ -218,6 +218,8 @@ class GeneAgent3(AbstractAgent):
         self.gameParams = gameParams
         self.forced_random = _forcedRandom
 
+    def getType(self):
+        return self.whoami
 
     def getString(self):
         theStr = "genes"

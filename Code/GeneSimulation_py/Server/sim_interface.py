@@ -33,11 +33,15 @@ class Simulator():
         configured_players = []
         popSize = 60  # ??? I think? based on the command line arguemnts
         player_idxs = list(np.arange(0, numAgents))  # where numAgents is the number of actual agents, not players.
+
+
         for _ in range(num_human_players):
             configured_players.append(HumanAgent())
 
+
         for i in range(0, len(configured_players)):
             player_idxs = np.append(player_idxs, popSize + i)
+
 
         theFolder = "../../ResultsStudy"
         theGen = 199
@@ -105,15 +109,20 @@ class Simulator():
         T_prev = self.sim.get_transaction()
 
         # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
+        player_index = 0
         for i, plyr in enumerate(self.players):  # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
-            T[i] = plyr.play_round(
-                i,  # player index
-                round,  # round
-                T_prev[:, i],  # received
-                self.sim.get_popularity(),  # popularity
-                self.sim.get_influence(),  # influence
-                self.sim.get_extra_data(i)  # could NOT tell you waht this is.
-            )
+            if plyr.getType() == "Human":
+                T[i] = allocations[str(player_index+1)] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
+                player_index += 1
+            else:
+                T[i] = plyr.play_round(
+                    i,  # player index
+                    round,  # round
+                    T_prev[:, i],  # received
+                    self.sim.get_popularity(),  # popularity
+                    self.sim.get_influence(),  # influence
+                    self.sim.get_extra_data(i)  # could NOT tell you waht this is.
+                )
 
         self.sim.play_round(T)
         return self.sim.get_popularity() # I think this is all we need? maybe?

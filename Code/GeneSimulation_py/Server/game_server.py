@@ -46,6 +46,7 @@ class GameServer():
             if len(client_input) == len(self.connected_clients):
                 break
 
+        print("this shouldn't go off until we have actually started, but it is possible that I will need to assemble a blank matrix to start ")
         current_popularity = self.simulator.execute_round(client_input, self.current_round)
         self.current_round += 1  # its expecing the first round to be 0? I guess?
         print("current_popularity is as follows: ", current_popularity)
