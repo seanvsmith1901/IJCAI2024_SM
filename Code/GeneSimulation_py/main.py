@@ -1,3 +1,6 @@
+# sim_interface.py in Server is basically a stripped down version of this that we will be using for our own nefarious purposes.
+
+
 from simulator import GameSimulator
 from randomagent import RandomAgent
 from geneagent3 import GeneAgent3
@@ -10,10 +13,10 @@ import numpy as np
 import os
 import sys
 import random
-
 import time
 
 np.set_printoptions(precision=2, suppress=True)
+
 
 def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRandom):
 
@@ -105,9 +108,8 @@ def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRa
         T = np.eye(num_players) * tkns
         T_prev = sim.get_transaction()
 
-        # basically this is where all of the magic needs to happen. Oh, just make a while loop that checks for all player input. return T when finished.
 
-        #T = sim.get_player_inputs(T)
+
 
         # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
         # for i, plyr in enumerate(players): # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
@@ -121,6 +123,9 @@ def play_game(agents, rounds, gener, gamer, initial_pops, poverty_line, forcedRa
         #             )
 
         sim.play_round(T)
+
+
+
 
         if r == 0:
             runningTotal = np.copy(sim.get_popularity())

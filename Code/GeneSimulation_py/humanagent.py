@@ -1,4 +1,4 @@
-from baseagent import AbstractAgent
+from .baseagent import AbstractAgent
 from os.path import exists
 
 import numpy as np
@@ -46,6 +46,9 @@ class HumanAgent(AbstractAgent):
 
     def setGameParams(self, gameParams, _forcedRandom):
         self.gameParams = gameParams
+
+    def getType(self):
+        return self.whoami
 
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):

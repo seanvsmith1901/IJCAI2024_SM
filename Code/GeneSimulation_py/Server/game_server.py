@@ -2,6 +2,10 @@ import select
 from multiprocessing import Process
 import multiprocessing
 import json
+import time
+from sim_interface import Simulator
+
+total_players = 11
 
 class ReceivedData():
     def __init__(self, client_id, allocations):
@@ -14,12 +18,21 @@ class GameServer():
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.client_usernames = client_usernames
+        self.current_round = 0
+        self.simulator = Simulator(len(new_clients), total_players) # creates a new simulator object
         self.start_game(max_rounds)
 
-
+        
+        
 
     def start_game(self, max_rounds):
         round = 1
+        global total_players
+        # OK SO
+        # just take in the client votes, tabluate them, print out all the votes server side.
+        # while not all players have answered, we are going to look for the input
+        # lets refer to this as a "round" for now
+        print("lets just see if we can get here first, make sure we don't brick")
 
         while round <= max_rounds:
             self.play_round(round)
@@ -42,6 +55,12 @@ class GameServer():
             # Check if all clients have provided input
             if len(client_input) == len(self.connected_clients):
                 break
+
+       
+        current_popularity = self.simulator.execute_round(client_input, self.current_round)
+        self.current_round += 1  # its expecing the first round to be 0? I guess?
+        print("current_popularity is as follows: ", current_popularity)
+
 
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
