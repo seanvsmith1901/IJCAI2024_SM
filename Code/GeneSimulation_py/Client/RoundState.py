@@ -9,7 +9,7 @@ class RoundState:
     received = [0 for i in range(11)]
     sent = [0 for i in range(11)]
     players = []
-    client_id = 0
+    client_id = -1 # look at JHG panel for debugging stuff.
     round_number = 0
 
     def __init__(self):

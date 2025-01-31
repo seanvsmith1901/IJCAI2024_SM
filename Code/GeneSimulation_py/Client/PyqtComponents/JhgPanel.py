@@ -1,3 +1,4 @@
+import time
 from functools import partial
 
 from PyQt6.QtCore import Qt
@@ -8,6 +9,8 @@ from .SubmitButton import SubmitButton
 class JhgPanel(QVBoxLayout):
     def __init__(self, round_state, client_socket):
         super().__init__()
+        while round_state.client_id == -1: # tripping over its own shoelaces.
+            pass
         # footer
         footer = QHBoxLayout()
         submitButton = SubmitButton()
@@ -44,6 +47,7 @@ class JhgPanel(QVBoxLayout):
         # Allocations column - Shows the number of tokens that the client player has allocated to the associated player,
         # as well as buttons to change that value
         player_panel.addWidget(QLabel("Allocations"), 0, 4)
+
         for i in range(0, 11):
             allocations_row = QHBoxLayout()
             if i == int(round_state.client_id):
