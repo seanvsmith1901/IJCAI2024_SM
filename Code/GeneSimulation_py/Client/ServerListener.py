@@ -1,9 +1,10 @@
 import json
 
-from PyQt6.QtCore import QObject
+from PyQt6.QtCore import QObject, pyqtSignal
 
 
 class ServerListener(QObject):
+    update_round_signal = pyqtSignal()
     def __init__(self, main_window, client_socket, round_state, round_counter, token_label, jhg_plot):
         super().__init__()
         self.client_socket = client_socket
@@ -31,22 +32,15 @@ class ServerListener(QObject):
 
     # Prepares the client for the next round by updating self.round_state and the gui
     def update_round_state(self, json_data):
+        self.round_state.message = json_data
         self.round_state.received = json_data["RECEIVED"]
         self.round_state.sent = json_data["SENT"]
         self.round_state.round_number = int(json_data["ROUND"])
+        self.round_state.tokens = self.round_state.num_players * 2
 
         self.jhg_plot.clear()
 
-        for i in range (11):
-            self.round_state.allocations[i] = 0
-            self.round_state.tokens = self.round_state.num_players * 2
-
-            self.round_state.players[i].received_label.setText(str(self.round_state.received[i]))
-            self.round_state.players[i].sent_label.setText(str(self.round_state.sent[i]))
-            self.round_state.players[i].popularity_label.setText(str(round(json_data["POPULARITY"][i])))
-            self.round_state.players[i].popularity_over_time.append(json_data["POPULARITY"][i])
-            self.round_state.players[i].allocation_box.setText("0")
-            self.jhg_plot.plot(self.round_state.players[i].popularity_over_time)
+        self.update_round_signal.emit()
             # print(self.round_state.players[i].popularity_over_time)
 
 

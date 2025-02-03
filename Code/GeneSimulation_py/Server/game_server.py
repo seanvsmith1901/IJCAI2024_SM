@@ -4,13 +4,13 @@ from sim_interface import Simulator
 
 total_players = 11
 
-class ReceivedData():
+class ReceivedData:
     def __init__(self, client_id, allocations):
         self.client_id = client_id
         self.allocations = allocations
 
 
-class GameServer():
+class GameServer:
     def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_humans):
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
@@ -26,7 +26,7 @@ class GameServer():
         round = 1
         global total_players
         # OK SO
-        # just take in the client votes, tabluate them, print out all the votes server side.
+        # just take in the client votes, table them, print out all the votes server side.
         # while not all players have answered, we are going to look for the input
         # lets refer to this as a "round" for now
 

@@ -5,10 +5,10 @@ from Player import Player
 
 class RoundState:
     tokens = 22
-    allocations = [0 for i in range(11)]
-    received = [0 for i in range(11)]
-    sent = [0 for i in range(11)]
-    popularity_over_time = [100 for i in range(11)]
+    allocations = [0 for _ in range(11)]
+    received = [0 for _ in range(11)]
+    sent = [0 for _ in range(11)]
+    popularity_over_time = [100 for _ in range(11)]
     num_players = 0
     players = []
     client_id = -1 # look at JHG panel for debugging stuff.

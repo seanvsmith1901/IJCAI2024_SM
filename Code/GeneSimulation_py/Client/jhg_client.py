@@ -2,16 +2,11 @@ import json
 import sys
 import socket
 
-from PyQt6.QtCore import QObject, pyqtSignal, QThread
-from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QHBoxLayout, QApplication
+from PyQt6.QtWidgets import QApplication
 
 from PyqtComponents.MainWindow import MainWindow
-from RoundState import RoundState
-from PyqtComponents.BodyLayout import BodyLayout
 
 if __name__ == "__main__":
-    # host = '192.168.30.17'  # The server's IP address
     host = '127.0.0.1'  # your local host address cause you're working from home.
     port = 12345  # The port number to connect to
     # Create a TCP socket
@@ -24,6 +19,7 @@ if __name__ == "__main__":
     client_socket.send(json.dumps(message).encode())
 
     app = QApplication(sys.argv)
+    # This is the entrance to the gui
     window = MainWindow(client_socket)
     window.show()
     app.exec()

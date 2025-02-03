@@ -52,7 +52,8 @@ def start_server(host='127.0.0.1', port=12345):
 
             # Create a response
             response = {
-                "ID": (str((len(connected_clients) - 1) + BOT_PLAYERS))
+                "ID": (str((len(connected_clients) - 1) + BOT_PLAYERS)),
+                "NUM_PLAYERS": TOTAL_PLAYERS,
             }
             # Serialize and send the response as JSON
             client_socket.send(json.dumps(response).encode())
