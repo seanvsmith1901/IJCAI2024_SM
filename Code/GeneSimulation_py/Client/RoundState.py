@@ -8,6 +8,8 @@ class RoundState:
     allocations = [0 for i in range(11)]
     received = [0 for i in range(11)]
     sent = [0 for i in range(11)]
+    popularity_over_time = [100 for i in range(11)]
+    num_players = 0
     players = []
     client_id = 0
     round_number = 0

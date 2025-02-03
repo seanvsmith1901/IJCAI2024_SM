@@ -39,6 +39,7 @@ class Player:
 
     def __init__(self, id):
         self.id = id
+        self.popularity_over_time = [self.popularity]
 
         self.id_label = QLabel(str(self.id + 1))
         self.popularity_label = QLabel(str(self.popularity))

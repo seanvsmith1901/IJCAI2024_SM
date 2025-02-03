@@ -1,4 +1,4 @@
-import json
+import pyqtgraph as pg
 
 from PyQt6.QtCore import QObject, pyqtSignal, QThread
 from PyQt6.QtGui import QFont
@@ -7,46 +7,18 @@ from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidg
 from .BodyLayout import BodyLayout
 from RoundState import RoundState
 
+from ServerListener import ServerListener
 
-class Worker(QObject):
-    def __init__(self, client_socket, round_state, round_counter, main_window):
-        super().__init__()
-        self.client_socket = client_socket
-        self.round_state = round_state
-        self.round_counter = round_counter
-        self.main_window = main_window
-
-    # Once connected to the server, this method is called on a threaded object. Once the thread calls it, it
-    # continuously listens for data from the server. This is the entrance point for all functionality based off of
-    # receiving data from the server. Kinda a switch board of sorts
-    def start_listening(self):
-        while True:
-            data = self.client_socket.recv(1024)
-            if data:
-                json_data = json.dumps(json.loads(data.decode()))
-                if "ID" in json_data:
-                    self.round_state.client_id = json.loads(json_data)["ID"]
-                    self.main_window.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
-                if "ROUND" in json_data:
-                    json_data = json.loads(json_data)
-                    self.update_labels(json_data)
-                    print(json_data["POPULARITY"])
-
-                    self.round_state.round_number = int(json_data["ROUND"])
-                    self.round_counter.setText(f'Round {int(json_data["ROUND"]) + 1}')
-
-    def update_labels(self, json_data):
-        self.round_state.received = json_data["RECEIVED"]
-        self.round_state.sent = json_data["SENT"]
-        for i in range (11):
-            self.round_state.players[i].received_label.setText(str(self.round_state.received[i]))
-            self.round_state.players[i].sent_label.setText(str(self.round_state.sent[i]))
-            self.round_state.players[i].popularity_label.setText(str(round(json_data["POPULARITY"][i])))
 
 class MainWindow(QMainWindow):
     def __init__(self, client_socket):
         round_state = RoundState()
         super().__init__()
+
+        # This is dynamically updated elsewhere, so it must exist before the SeverListener. It is finally added to
+        # a layout in JhgPanel.py
+        self.token_label = QLabel()
+        jhg_plot = pg.PlotWidget()
 
         # Header
         headerLayout = QHBoxLayout()
@@ -57,14 +29,14 @@ class MainWindow(QMainWindow):
         headerLayout.addWidget(round_counter)
 
         # Listens for incoming data from the server. Must be before the body layout, but after round_counter
-        self.worker = Worker(client_socket, round_state, round_counter, self)
-        self.worker_thread = QThread()
-        self.worker.moveToThread(self.worker_thread)
-        self.worker_thread.started.connect(self.worker.start_listening)
-        self.worker_thread.start()
+        self.ServerListener = ServerListener(self, client_socket, round_state, round_counter, self.token_label, jhg_plot)
+        self.ServerListener_thread = QThread()
+        self.ServerListener.moveToThread(self.ServerListener_thread)
+        self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
+        self.ServerListener_thread.start()
 
         # Body
-        body_layout = BodyLayout(round_state, client_socket)
+        body_layout = BodyLayout(round_state, client_socket, self.token_label, jhg_plot)
 
         # Add the other layouts to the master layout
         master_layout = QVBoxLayout()

@@ -1,4 +1,5 @@
-from PyQt6.QtWidgets import QHBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout
+import pyqtgraph as pg
 
 from .JhgPanel import JhgPanel
 from .SocialChoicePanel import SocialChoicePanel
@@ -8,12 +9,16 @@ from .SocialChoicePanel import SocialChoicePanel
 
 
 class BodyLayout(QHBoxLayout):
-    def __init__(self, round_state, client_socket):
+    def __init__(self, round_state, client_socket, token_counter, jhg_plot):
         super().__init__()
 
-        jhg_panel = JhgPanel(round_state, client_socket)
+        jhg_panel = JhgPanel(round_state, client_socket, token_counter)
+        right_panel = QVBoxLayout()
+
+        right_panel.addWidget(jhg_plot)
 
         self.addLayout(jhg_panel)
+        self.addLayout(right_panel)
 
         # divider_line = QFrame()
         # divider_line.setFrameShape(QtWidgets.QFrame.VLine)

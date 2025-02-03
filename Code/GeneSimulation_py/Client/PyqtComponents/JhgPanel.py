@@ -6,20 +6,19 @@ from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QWidg
 from .SubmitButton import SubmitButton
 
 class JhgPanel(QVBoxLayout):
-    def __init__(self, round_state, client_socket):
+    def __init__(self, round_state, client_socket, token_counter):
         super().__init__()
         # footer
         footer = QHBoxLayout()
         submitButton = SubmitButton()
         submitButton.clicked.connect(lambda: submitButton.submit(round_state, client_socket))
         footer.addWidget(submitButton)
-        self.token_label = QLabel("Tokens: " + str(round_state.tokens))
-        footer.addWidget(self.token_label)
+        token_counter.setText(f"Tokens: {round_state.tokens}")
+        footer.addWidget(token_counter)
 
         # Each of the following blocks of code creates a column to display a particular type of data per player.
         # Each column loops through the players and adds the respective element from the associated player class.
         player_panel = QGridLayout()
-        print(round_state.client_id)
 
         # ID column - Displays the id + 1 (for human readability) of each player
         player_panel.addWidget(QLabel("Player"), 0, 0)
@@ -55,9 +54,9 @@ class JhgPanel(QVBoxLayout):
 
                 # Connect the functions that update counters to the plus and minus buttons
                 round_state.players[i].minus_button.update.connect(
-                    partial(round_state.players[i].update_allocation_minus, round_state, self.token_label, i))
+                    partial(round_state.players[i].update_allocation_minus, round_state, token_counter, i))
                 round_state.players[i].plus_button.update.connect(
-                    partial(round_state.players[i].update_allocation_plus, round_state, self.token_label, i))
+                    partial(round_state.players[i].update_allocation_plus, round_state, token_counter, i))
             player_panel.addLayout(allocations_row, i + 1, 4)
 
         self.addLayout(player_panel)
