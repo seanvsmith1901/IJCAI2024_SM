@@ -41,6 +41,7 @@ class Player:
         self.id = id
         self.popularity_over_time = [self.popularity]
 
+        # PyQt elements that make up the rows of the JHG_panel. Contained in the Player class for ease of access/tying them to the player
         self.id_label = QLabel(str(self.id + 1))
         self.popularity_label = QLabel(str(self.popularity))
         self.sent_label = QLabel(str(self.received_from_player))

@@ -4,9 +4,9 @@ from Player import Player
 
 
 class RoundState:
-    tokens = 22
-    allocations = [0 for _ in range(11)]
-    received = [0 for _ in range(11)]
+    tokens = 22 # Number of tokens remaining for the current round
+    allocations = [0 for _ in range(11)] # Represents the tokens that you will send to others
+    received = [0 for _ in range(11)] # Each position in the list represents the number of tokens received from the player with id _
     sent = [0 for _ in range(11)]
     popularity_over_time = [100 for _ in range(11)]
     num_players = 0

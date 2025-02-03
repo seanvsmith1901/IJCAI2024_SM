@@ -13,6 +13,7 @@ class JhgPanel(QVBoxLayout):
             pass
         # footer
         footer = QHBoxLayout()
+        # Needs to go through the SubmitButton class so that the signal and socket works correctly
         submitButton = SubmitButton()
         submitButton.clicked.connect(lambda: submitButton.submit(round_state, client_socket))
         footer.addWidget(submitButton)
@@ -23,32 +24,23 @@ class JhgPanel(QVBoxLayout):
         # Each column loops through the players and adds the respective element from the associated player class.
         player_panel = QGridLayout()
 
-        # ID column - Displays the id + 1 (for human readability) of each player
+        # Headers for the table
         player_panel.addWidget(QLabel("Player"), 0, 0)
-        for i in range(0, 11):
-            player_panel.addWidget(round_state.players[i].id_label, i + 1, 0)
-
-        # Popularity column - Displays the popularity of the player at the start of the current round
         player_panel.addWidget(QLabel("Popularity"), 0, 1)
-        for i in range(0, 11):
-            player_panel.addWidget(round_state.players[i].popularity_label, i + 1, 1)
-
-        # Sent column - Displays the number of tokens that the client player sent to the associated player the last round
         player_panel.addWidget(QLabel("Sent"), 0, 2)
-        for i in range(0, 11):
-            player_panel.addWidget(round_state.players[i].sent_label, i + 1, 2)
-
-        # Received column - Displays the number of tokens that the client player received from the associated player the last round
         player_panel.addWidget(QLabel("Received"), 0, 3)
-        for i in range(0, 11):
-            player_panel.addWidget(round_state.players[i].received_label, i + 1, 3)
-
-        # Allocations column - Shows the number of tokens that the client player has allocated to the associated player,
-        # as well as buttons to change that value
         player_panel.addWidget(QLabel("Allocations"), 0, 4)
 
+        # Creates a row in the gui for each player to display the popularity, tokens sent to, and tokens received from
+        # that player the last round. Also adds the elements to allow for token allocations
         for i in range(0, 11):
+            player_panel.addWidget(round_state.players[i].id_label, i + 1, 0)         # Player ID
+            player_panel.addWidget(round_state.players[i].popularity_label, i + 1, 1) # Popularity at the start of this round
+            player_panel.addWidget(round_state.players[i].sent_label, i + 1, 2)       # Tokens client sent to this player last round
+            player_panel.addWidget(round_state.players[i].received_label, i + 1, 3)   # Tokens received by the client from this player last round
+
             allocations_row = QHBoxLayout()
+            # If the current player is the client, then simply place a QLabel labeling it in the allocations_row
             if i == int(round_state.client_id):
                 allocations_row.addWidget(QLabel("You :)"))
             else:
@@ -62,6 +54,7 @@ class JhgPanel(QVBoxLayout):
                 round_state.players[i].plus_button.update.connect(
                     partial(round_state.players[i].update_allocation_plus, round_state, token_counter, i))
             player_panel.addLayout(allocations_row, i + 1, 4)
+
 
         self.addLayout(player_panel)
         self.addLayout(footer)
