@@ -22,7 +22,7 @@ class Simulator():
         self.sim = None
         self.players = None
         self.start_game(num_human_players, num_players)
-
+        self.T = None
 
 
 
@@ -125,6 +125,7 @@ class Simulator():
                 )
 
         self.sim.play_round(T)
+        self.T = T
         return self.sim.get_popularity() # I think this is all we need? maybe?
 
     def define_initial_pops(self, init_pop, num_players):
@@ -163,6 +164,8 @@ class Simulator():
 
         return np.array(initial_pops)
 
+    def get_T(self):
+        return self.T
 
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
     fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
