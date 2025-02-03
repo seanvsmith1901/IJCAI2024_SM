@@ -11,7 +11,7 @@ class RoundState:
     popularity_over_time = [100 for i in range(11)]
     num_players = 0
     players = []
-    client_id = 0
+    client_id = -1 # look at JHG panel for debugging stuff.
     round_number = 0
 
     def __init__(self):
