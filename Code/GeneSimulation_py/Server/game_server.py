@@ -41,7 +41,6 @@ class GameServer:
     def play_round(self, round, num_bots, num_humans):
         client_input = {}
         while True:
-            #self.send_state()  # sends out the current game state # there is no current game state atm
             data = self.get_client_data()
             for client, received_json in data.items():
                 if "CLIENT_ID" in received_json:
@@ -51,18 +50,16 @@ class GameServer:
             if len(client_input) == len(self.connected_clients):
                 break
 
-        print(client_input)
-        print(round)
         current_popularity = self.simulator.execute_round(client_input, round-1)
-        # print("current_popularity is as follows: ", current_popularity)
 
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
-        allocations_matrix = [client_input[str(i + num_bots)] for i in range(num_humans)]
+        allocations_matrix = self.simulator.get_T()
+        print(allocations_matrix)
 
         # This is temporary to expand the allocations matrix for 11 players. Eventually, all slots will be used and this will be deleted
-        for i in range(11 - len(allocations_matrix)):
-            allocations_matrix.append([0 for i in range(11)])
+        # for i in range(11 - len(allocations_matrix)):
+        #     allocations_matrix.append([0 for i in range(11)])
 
         # For now, this code doesn't work because we are not filling out the full 11 players. Below code accounts for this error
         # for i in range(len(self.connected_clients) - 1):
@@ -78,7 +75,6 @@ class GameServer:
         #     self.connected_clients[i].send(json.dumps(message).encode())
 
         # Sends a list containing
-        print(current_popularity)
         for i in range(11):
             message = {
                 "ROUND": round,
@@ -86,11 +82,10 @@ class GameServer:
                 "SENT": self.get_sent(i, allocations_matrix),
                 "POPULARITY": list(current_popularity),
             }
-
             # Only sends the message to connected clients.
-            if i < len(self.connected_clients):
-                print(json.dumps(message).encode())
-                self.connected_clients[i].send(json.dumps(message).encode())
+            if i >= num_bots:
+                print(json.dumps(message))
+                self.connected_clients[i - num_bots].send(json.dumps(message).encode())
 
         return client_input
 
@@ -105,7 +100,6 @@ class GameServer:
         sent = [0 for i in range(11)]
         for j in range(11):
             sent[j] = allocations_matrix[id][j]
-
         return sent
 
 

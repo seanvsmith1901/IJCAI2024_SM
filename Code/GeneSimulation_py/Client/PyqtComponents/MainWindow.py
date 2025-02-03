@@ -57,8 +57,8 @@ class MainWindow(QMainWindow):
         for i in range (11):
             self.round_state.allocations[i] = 0
 
-            self.round_state.players[i].received_label.setText(str(self.round_state.received[i]))
-            self.round_state.players[i].sent_label.setText(str(self.round_state.sent[i]))
+            self.round_state.players[i].received_label.setText(str(int(self.round_state.received[i])))
+            self.round_state.players[i].sent_label.setText(str(int(self.round_state.sent[i])))
             self.round_state.players[i].popularity_label.setText(str(round(self.round_state.message["POPULARITY"][i])))
             self.round_state.players[i].popularity_over_time.append(self.round_state.message["POPULARITY"][i])
             self.round_state.players[i].allocation_box.setText("0")
