@@ -3,9 +3,9 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from geneagent3 import GeneAgent3
-from humanagent import HumanAgent
-from simulator import GameSimulator
+from Code.GeneSimulation_py.geneagent3 import GeneAgent3
+from Code.GeneSimulation_py.humanagent import HumanAgent
+from Code.GeneSimulation_py.simulator import GameSimulator
 
 # from scriptagent import ScriptAgent
 
@@ -16,7 +16,7 @@ import random
 
 np.set_printoptions(precision=2, suppress=True)
 
-class Simulator():
+class JHG_simulator():
     def __init__(self, num_human_players, num_players):
         self.num_players = num_players
         self.sim = None
