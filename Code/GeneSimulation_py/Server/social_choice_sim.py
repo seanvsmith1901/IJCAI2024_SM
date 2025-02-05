@@ -27,8 +27,6 @@ class Social_Choice_Sim:
         print("this is what we look like after we have voted ", winning_vote, "\n", self.players)
 
 
-
-
     def create_options_matrix(self):
         #self.options_matrix = [[10,-10,-10]]
         #return self.options_matrix
