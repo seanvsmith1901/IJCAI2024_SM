@@ -3,9 +3,9 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from Code.GeneSimulation_py.geneagent3 import GeneAgent3
-from Code.GeneSimulation_py.humanagent import HumanAgent
-from Code.GeneSimulation_py.simulator import GameSimulator
+from geneagent3 import GeneAgent3
+from humanagent import HumanAgent
+from simulator import GameSimulator
 
 # from scriptagent import ScriptAgent
 
