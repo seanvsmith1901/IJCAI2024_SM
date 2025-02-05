@@ -36,15 +36,16 @@ class GameServer:
 
         while round <= max_rounds:
             for i in range(3):
-                self.play_round(round, num_bots, num_humans)
+                new_influences = self.play_round(round, num_bots, num_humans)
                 print(f"Played round {round}")
                 round += 1
-            self.social_choice_round()
+            self.social_choice_round(new_influences)
 
         print("game over")
 
-    def social_choice_round(self):
+    def social_choice_round(self, new_influences):
         self.sc_sim.start_round()
+        self.sc_sim.calculate_relation_strength(new_influences)
         current_options_matrix = self.sc_sim.get_current_options_matrix()
         player_nodes = self.sc_sim.get_player_nodes()
         causes = self.sc_sim.get_causes()
@@ -76,7 +77,7 @@ class GameServer:
             client.send(json.dumps(message))
         # and congrats! that should be something of like how we would like to see it. will probably need some polish but
         # thats the "basic" framework that we can expand upon.
-        
+
 
 
     def get_client_input(self):
@@ -137,8 +138,8 @@ class GameServer:
             if i >= num_bots:
                 print(json.dumps(message))
                 self.connected_clients[i - num_bots].send(json.dumps(message).encode())
-
-        return client_input
+        new_influence = self.jhg_sim.get_influence()
+        return new_influence
 
     def get_received(self, id, allocations_matrix):
         received = [0 for i in range(11)]

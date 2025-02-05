@@ -8,6 +8,7 @@ class Social_Choice_Sim:
     def __init__(self, num_players, num_causes):
         self.num_players = num_players
         self.players = self.create_players()
+        self.cpp = 3
         self.num_options = 3 # we can do more? just to start here.
         self.rad = 5  # hardcoded just work with me here
         self.num_causes = num_causes
@@ -86,4 +87,14 @@ class Social_Choice_Sim:
         self.current_options_matrix = self.create_options_matrix()
         self.player_nodes = self.create_player_nodes()
         # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
+
+    def calculate_relation_strength(self, new_relations):
+        cpp = self.cpp
+        relation_strength = {}
+        for i in range(self.num_players):
+            current_column = [row[i] for row in new_relations]
+            sorted_column = sorted(current_column, key=lambda x: abs(x), reverse=True)
+            top_values = sorted_column[:cpp] # grabs the 3 highest connections
+            relation_strength[str(i)] = top_values
+        print("here are the relation strength: ", relation_strength)
 
