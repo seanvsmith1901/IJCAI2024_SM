@@ -13,7 +13,7 @@ class Social_Choice_Sim:
         self.num_causes = num_causes
         self.causes = self.create_cause_nodes(num_causes)
         self.current_options_matrix = {}
-        self.player_nodes = {}
+        self.player_nodes = []
 
     def create_players(self):
         players = {}
@@ -71,6 +71,15 @@ class Social_Choice_Sim:
 
     def get_current_options_matrix(self):
         return self.current_options_matrix
+
+    def get_player_nodes(self):
+        return self.player_nodes
+
+    def get_nodes(self):
+        return self.player_nodes + self.causes
+
+    def get_player_utility(self):
+        return self.players
 
     def start_round(self):
         # options may change but the cuases themselves don't so we can generate them in init functionality.

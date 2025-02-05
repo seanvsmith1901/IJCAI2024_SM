@@ -1,3 +1,5 @@
+from collections import Counter
+
 import select
 import json
 from sim_interface import JHG_simulator
@@ -23,8 +25,6 @@ class GameServer:
 
         self.start_game(max_rounds, num_bots, num_humans)
 
-        
-        
 
     def start_game(self, max_rounds, num_bots, num_humans):
         round = 1
@@ -44,10 +44,11 @@ class GameServer:
         print("game over")
 
     def social_choice_round(self):
-        current_options_matrix = self.sc_sim.create_options_matrix()
-        player_nodes = self.sc_sim.create_player_nodes()
+        self.sc_sim.start_round()
+        current_options_matrix = self.sc_sim.get_current_options_matrix()
+        player_nodes = self.sc_sim.get_player_nodes()
         causes = self.sc_sim.get_causes()
-        all_nodes = causes + player_nodes
+        all_nodes = causes | player_nodes
         message = {
             "OPTIONS" : current_options_matrix,
             "NODES" : [node.to_json() for node in all_nodes],
@@ -55,15 +56,27 @@ class GameServer:
         for client in self.connected_clients:
             client.send(json.dumps(message))
 
-        votes = {}
-        self.get_bot_votes(current_options_matrix)
+        # might need to rethink the way that we are taking input in from the client.
+        # becuase right now they are making those decisions independently, which means that the bots will never be able to lie.
+        # very very odd. Maybe scramble it somehow?
+        # anyway just try to iron this out for now and come back to this very interesting problem later.
 
-
-    def get_bot_votes(self, current_options_matrix):
-        self.jhg_sim.get_bot_votes(current_options_matrix)
-
-
-
+        bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
+        player_votes = self.get_client_input() # OK how can I make the bots see what the players are voting for and use that appropriately?
+        all_votes = bot_votes | player_votes
+        winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
+        self.sc_sim.apply_vote(winning_vote)  # once again needs to be done from gameserver, as that is where winning vote is consolidated.
+        # aight now you have the winnign vote, so what you need to do is export
+        # 1. the winning vote, 2. the new utility of each player, and yeah thats pretty much it
+        message = {
+            "WINNING_VOTE" : winning_vote,
+            "NEW_UTILITY" : self.sc_sim.get_player_utility()
+        }
+        for client in self.connected_clients:
+            client.send(json.dumps(message))
+        # and congrats! that should be something of like how we would like to see it. will probably need some polish but
+        # thats the "basic" framework that we can expand upon.
+        
 
 
     def get_client_input(self):
