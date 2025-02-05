@@ -81,7 +81,6 @@ class GameServer:
         return client_input
 
 
-
     def play_round(self, round, num_bots, num_humans):
         client_input = self.get_client_input()
 

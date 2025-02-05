@@ -8,14 +8,14 @@ from collections import Counter
 
 
 if __name__ == "__main__":
-    sim = Social_Choice_Sim(11, 3)
-    jhg_sim = JHG_simulator(2, 11)
-    current_options_matrix = sim.create_options_matrix()
-    print("this is the current options matrix, \n", current_options_matrix)
-    player_nodes = sim.create_player_nodes()
-    causes = sim.get_causes()
+    # aight let me give you the breakdown on this code.
 
-    # print("this is the current player nodes, \n", player_nodes)
+    sim = Social_Choice_Sim(11, 3) # starts the social choice sim, call it whatever you want
+    jhg_sim = JHG_simulator(2, 11) # already done in game_server, so you're chillin
+    sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
+    current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
+
+    # print("this is the current player nodes, \n", player_nodes)  # funny graphing stuff if you so desire. shows how to access causes and players for graphing utilities.
     # x = []
     # y = []
     # for cause in causes:
@@ -29,9 +29,11 @@ if __name__ == "__main__":
     # plt.plot(x,y,'o')
     # plt.show()
 
-    bot_votes = jhg_sim.get_bot_votes(current_options_matrix)
-    player_votes = {"9": 1, "10": 1}
-    all_votes = bot_votes | player_votes
-    winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
+    bot_votes = jhg_sim.get_bot_votes(current_options_matrix) # you will need to do this in gameserver.
+    # IN GAMESERVER, YOU WILL NEED TO GRAB THE VOTES FROM THE BOTS FROM THE JHG SIM - THAT FUNCTIONALITY DOESN'T EXIST IN SC.
+    player_votes = {"9": 1, "10": 1} # made up votes --> get these from client input.
 
-    sim.apply_vote(winning_vote) # make sure that this is doing what we want it to do
+    # you can copy and paste these 3 lines directly into gameserver and they will do what you think they do.
+    all_votes = bot_votes | player_votes # you can copy and paste this directly into gameserver. this and the next line.
+    winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
+    sim.apply_vote(winning_vote) # once again needs to be done from gameserver, as that is where winning vote is consolidated.

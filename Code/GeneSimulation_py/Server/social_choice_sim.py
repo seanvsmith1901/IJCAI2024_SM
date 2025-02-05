@@ -12,6 +12,8 @@ class Social_Choice_Sim:
         self.rad = 5  # hardcoded just work with me here
         self.num_causes = num_causes
         self.causes = self.create_cause_nodes(num_causes)
+        self.current_options_matrix = {}
+        self.player_nodes = {}
 
     def create_players(self):
         players = {}
@@ -67,6 +69,12 @@ class Social_Choice_Sim:
     def get_causes(self):
         return self.causes
 
+    def get_current_options_matrix(self):
+        return self.current_options_matrix
 
-def normalize_vector(vector):
-    return vector / np.linalg.norm(vector)
+    def start_round(self):
+        # options may change but the cuases themselves don't so we can generate them in init functionality.
+        self.current_options_matrix = self.create_options_matrix()
+        self.player_nodes = self.create_player_nodes()
+        # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
+
