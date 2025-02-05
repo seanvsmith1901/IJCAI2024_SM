@@ -34,7 +34,6 @@ class ServerListener(QObject):
     def update_round_state(self, json_data):
         self.round_state.message = json_data
         self.round_state.received = json_data["RECEIVED"]
-        print(json_data["RECEIVED"])
         self.round_state.sent = json_data["SENT"]
         self.round_state.round_number = int(json_data["ROUND"])
         self.round_state.tokens = self.round_state.num_players * 2
