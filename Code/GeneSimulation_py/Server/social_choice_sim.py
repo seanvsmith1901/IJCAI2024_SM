@@ -7,10 +7,26 @@ from Code.GeneSimulation_py.Server.Node import Node
 class Social_Choice_Sim:
     def __init__(self, num_players, num_causes):
         self.num_players = num_players
+        self.players = self.create_players()
         self.num_options = 3 # we can do more? just to start here.
         self.rad = 5  # hardcoded just work with me here
         self.num_causes = num_causes
         self.causes = self.create_cause_nodes(num_causes)
+
+    def create_players(self):
+        players = {}
+        for i in range(self.num_players):
+            players[str(i)] = 0
+        return players
+        # creates a 0 dict for all the players at some list i. I could not do that, but this feels safer.
+
+    def apply_vote(self, winning_vote):
+        print("this is the index we are currently considering, ", winning_vote)
+        for i in range(self.num_players):
+            self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
+        print("this is what we look like after we have voted ", winning_vote, "\n", self.players)
+
+
 
 
     def create_options_matrix(self):
@@ -46,7 +62,6 @@ class Social_Choice_Sim:
                 current_x += position_x
                 current_y += position_y
 
-            print("this is the node that we are appending ", current_x, current_y)
             player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(i+1)))
 
         return player_nodes

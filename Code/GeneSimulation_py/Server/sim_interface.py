@@ -167,6 +167,13 @@ class JHG_simulator():
     def get_T(self):
         return self.T
 
+    def get_bot_votes(self, current_options_matrix):
+        votes = {}
+        for i, player in enumerate(self.players):
+            if player.getType() != "Human":
+                votes[str(i)] = player.getVote(current_options_matrix, i)
+        return votes
+
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
     fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
     print(fnombre)

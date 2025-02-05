@@ -221,6 +221,20 @@ class GeneAgent3(AbstractAgent):
     def getType(self):
         return self.whoami
 
+    def getVote(self, options_matrix, index):
+        # I want them to be able to look at the whole options and matrix and understand what they can do.
+        current_options = options_matrix[index]
+        current_max = -11 # not a real value, unrealistic min
+        current_index = -1
+        for index in range(len(current_options)):
+            if current_options[index] > current_max:
+                current_max = current_options[index]
+                current_index = index
+
+        return current_index
+
+
+
     def getString(self):
         theStr = "genes"
         # Change on Sep 21

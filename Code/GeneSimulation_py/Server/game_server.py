@@ -55,8 +55,15 @@ class GameServer:
         for client in self.connected_clients:
             client.send(json.dumps(message))
 
+        votes = {}
+        self.get_bot_votes(current_options_matrix)
 
-        
+
+    def get_bot_votes(self, current_options_matrix):
+        self.jhg_sim.get_bot_votes(current_options_matrix)
+
+
+
 
 
     def get_client_input(self):
