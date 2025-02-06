@@ -7,6 +7,9 @@ class Player:
     sent_to_player = 0
     popularity = 100
 
+    # For SC
+    displayed_vote = None
+
     # Handle updating the sent, received, and tokens remaining fields after the minus button is pressed
     def update_allocation_minus(self, round_state, tokens_label, player):
         # If the client player has decided to steal from the associated player, subtract one from both that player's
