@@ -52,7 +52,7 @@ class GameServer:
         message = {
             "RELATIONS" : return_values,
         }
-        
+
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
 

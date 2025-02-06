@@ -15,6 +15,7 @@ class Social_Choice_Sim:
         self.current_options_matrix = {}
         self.player_nodes = []
         np.set_printoptions(legacy='1.25')
+        self.all_votes = {}
 
     def create_players(self):
         players = {}
@@ -153,4 +154,8 @@ class Social_Choice_Sim:
                     relation_strengths[i][j] = 0
                     relation_strengths[j][i] = 0
         return relation_strengths
+
+    def add_votes(self, round, votes):
+        # we gotta put em all somewhere and here works as good as anywhere else. Not sure if we will need it.
+        self.all_votes[round] = votes
 

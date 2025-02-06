@@ -39,6 +39,8 @@ if __name__ == "__main__":
 
     # you can copy and paste these 3 lines directly into gameserver and they will do what you think they do.
     all_votes = bot_votes | player_votes # you can copy and paste this directly into gameserver. this and the next line.
+    curr_round = 0
+    sim.add_votes(curr_round, all_votes)
     winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
     sim.apply_vote(winning_vote) # once again needs to be done from gameserver, as that is where winning vote is consolidated.
     for i in range(10):
