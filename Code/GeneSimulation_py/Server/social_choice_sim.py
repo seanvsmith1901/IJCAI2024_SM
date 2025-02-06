@@ -2,13 +2,12 @@ import math
 import random
 import numpy as np
 
-from Code.GeneSimulation_py.Server.Node import Node
+from Server.Node import Node
 
 class Social_Choice_Sim:
     def __init__(self, num_players, num_causes):
         self.num_players = num_players
         self.players = self.create_players()
-        self.num_options = 3 # we can do more? just to start here.
         self.rad = 5  # hardcoded just work with me here
         self.num_causes = num_causes
         self.causes = self.create_cause_nodes(num_causes)
@@ -30,9 +29,7 @@ class Social_Choice_Sim:
 
 
     def create_options_matrix(self):
-        #self.options_matrix = [[10,-10,-10]]
-        #return self.options_matrix
-        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_options)] for _ in range(self.num_players)]
+        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.num_players)]
         return self.options_matrix # because why not
 
     def create_cause_nodes(self, num_causes):
