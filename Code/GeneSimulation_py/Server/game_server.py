@@ -45,6 +45,18 @@ class GameServer:
         print("game over")
 
     def play_social_choice_round(self):
+        # before we play the round, lets get the info out to all the players.
+        influence_matrix = self.jhg_sim.get_influence()
+        return_values = self.sc_sim.calculate_relation_strength(influence_matrix)
+
+        message = {
+            "RELATIONS" : return_values,
+        }
+        
+        for i in range(len(self.connected_clients)):
+            self.connected_clients[i].send(json.dumps(message).encode())
+
+
         self.sc_sim.start_round()
         current_options_matrix = self.sc_sim.get_current_options_matrix()
         player_nodes = self.sc_sim.get_player_nodes()
