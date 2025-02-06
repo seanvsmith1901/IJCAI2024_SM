@@ -3,9 +3,9 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from geneagent3 import GeneAgent3
-from humanagent import HumanAgent
-from simulator import GameSimulator
+from Code.GeneSimulation_py.geneagent3 import GeneAgent3
+from Code.GeneSimulation_py.humanagent import HumanAgent
+from Code.GeneSimulation_py.simulator import GameSimulator
 
 # from scriptagent import ScriptAgent
 
@@ -173,6 +173,9 @@ class JHG_simulator():
             if player.getType() != "Human":
                 votes[str(i)] = player.getVote(current_options_matrix, i)
         return votes
+
+    def get_influence(self):
+        return self.sim.get_influence()
 
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
     fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
