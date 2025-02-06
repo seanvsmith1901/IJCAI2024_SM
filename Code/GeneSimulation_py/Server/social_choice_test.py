@@ -17,7 +17,7 @@ if __name__ == "__main__":
     sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
     current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
 
-    current_popularity = jhg_sim.execute_round({}, 0) # make the bots play a round against eachother
+
 
     # print("this is the current player nodes, \n", player_nodes)  # funny graphing stuff if you so desire. shows how to access causes and players for graphing utilities.
     # x = []
@@ -41,5 +41,11 @@ if __name__ == "__main__":
     all_votes = bot_votes | player_votes # you can copy and paste this directly into gameserver. this and the next line.
     winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
     sim.apply_vote(winning_vote) # once again needs to be done from gameserver, as that is where winning vote is consolidated.
-    new_relations = jhg_sim.get_influence()
-    sim.calculate_relation_strength(new_relations)
+    for i in range(10):
+        current_popularity = jhg_sim.execute_round({}, 0)  # make the bots play a round against eachother
+        current_allocations = jhg_sim.get_T() # want to be able to see what moves were actually made.
+        print("here were the allocations \n", current_allocations)
+        new_relations = jhg_sim.get_influence()
+        readable_relations = new_relations.tolist()
+        return_values = sim.calculate_relation_strength(new_relations)
+        print('here are the return values, \n', return_values)

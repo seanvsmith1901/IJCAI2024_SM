@@ -9,12 +9,12 @@ class Social_Choice_Sim:
         self.num_players = num_players
         self.players = self.create_players()
         self.cpp = 3
-        self.num_options = 3 # we can do more? just to start here.
         self.rad = 5  # hardcoded just work with me here
         self.num_causes = num_causes
         self.causes = self.create_cause_nodes(num_causes)
         self.current_options_matrix = {}
         self.player_nodes = []
+        np.set_printoptions(legacy='1.25')
 
     def create_players(self):
         players = {}
@@ -33,7 +33,7 @@ class Social_Choice_Sim:
     def create_options_matrix(self):
         #self.options_matrix = [[10,-10,-10]]
         #return self.options_matrix
-        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_options)] for _ in range(self.num_players)]
+        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.num_players)]
         return self.options_matrix # because why not
 
     def create_cause_nodes(self, num_causes):
@@ -88,13 +88,69 @@ class Social_Choice_Sim:
         self.player_nodes = self.create_player_nodes()
         # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
 
+    # takes in the influence matrix, and then spits out the 3 strongest caluclated relations for every player.
     def calculate_relation_strength(self, new_relations):
-        cpp = self.cpp
-        relation_strength = {}
-        for i in range(self.num_players):
-            current_column = [row[i] for row in new_relations]
-            sorted_column = sorted(current_column, key=lambda x: abs(x), reverse=True)
-            top_values = sorted_column[:cpp] # grabs the 3 highest connections
-            relation_strength[str(i)] = top_values
-        print("here are the relation strength: ", relation_strength)
+        cpp = self.cpp # how many closest personal promises each player has or something.
+        # this is where I had to decide how I wanted to gauge strength of relations
+        new_values = self.apply_heuristic(new_relations)
+        # specialized bc of negative values and possible stealing.
+        normalized_values = self.normalize(new_values)
+        # goes through the normalized heuristic, finds the cpp strongest, and makes them into a seralizable dictionary we can send across.
+        return_values = self.make_dict(normalized_values, cpp)
+        return return_values
+
+
+    def make_dict(self, normalized_values, cpp):
+        return_values = {}
+        for i in range(len(normalized_values)): # its square so it doesn't really matter
+            row = np.array(normalized_values[i]) # I think that works?
+            indices = np.argsort(np.abs(row))[-cpp:]
+            extreme_values = row[indices]
+            return_values[i] = {}
+            dict_pop = {}
+            for idx, value in zip(indices, extreme_values):
+                dict_pop[idx] = value
+            return_values[i] = dict_pop
+        return return_values
+
+
+    def normalize(self, new_values):
+        normalized_matrix = np.array(new_values)
+        if normalized_matrix.min() < 0: # for negative values - likely doesn't work.
+            for element in normalized_matrix.flat: # literally no freakin clue if this will work.
+                if element > 0:
+                    normalized_matrix[element] = element / (normalized_matrix.max())
+                elif element < 0:
+                    normalized_matrix[element] = element / (normalized_matrix.min())
+                # otherwise its 0 and we don't have to do anything.
+
+        else: # all positive values, so we can normalize this the easy way.
+            normalized_matrix = (normalized_matrix - normalized_matrix.min()) / (normalized_matrix.max() - normalized_matrix.min())
+
+        normalized_matrix = np.round(normalized_matrix, decimals=2) # reduce size.
+        return normalized_matrix
+
+    def apply_heuristic(self, new_relations):
+        # I GOT IT FINALLY! This line structure has been messing with me for a while now.
+        relation_strengths = [[0] * self.num_players for _ in range(self.num_players)]
+        for i in range(len(new_relations)):
+            for j in range(len(new_relations)):
+                if i == j: # This way we don't consider self relations - just remove them from matrix.
+                    new_relations[i][j] = 0
+                if new_relations[i][j] != 0 and new_relations[j][i] != 0:
+                    new_value = (new_relations[i][j] + new_relations[j][i]) / 2
+                    relation_strengths[i][j] = new_value
+                    relation_strengths[j][i] = new_value
+                elif new_relations[i][j] == 0 and new_relations[j][i] != 0:
+                    new_value = math.sqrt(new_relations[j][i])
+                    relation_strengths[j][i] = new_value
+                    relation_strengths[i][j] = new_value
+                elif new_relations[j][i] == 0 and new_relations[i][j] != 0:
+                    new_value = math.sqrt(new_relations[i][j])
+                    relation_strengths[i][j] = new_value
+                    relation_strengths[j][i] = new_value
+                else:
+                    relation_strengths[i][j] = 0
+                    relation_strengths[j][i] = 0
+        return relation_strengths
 
