@@ -46,15 +46,15 @@ class GameServer:
 
     def play_social_choice_round(self):
         # before we play the round, lets get the info out to all the players.
-        influence_matrix = self.jhg_sim.get_influence()
-        return_values = self.sc_sim.calculate_relation_strength(influence_matrix)
-
-        message = {
-            "RELATIONS" : return_values,
-        }
-
-        for i in range(len(self.connected_clients)):
-            self.connected_clients[i].send(json.dumps(message).encode())
+        # influence_matrix = self.jhg_sim.get_influence()
+        # return_values = self.sc_sim.calculate_relation_strength(influence_matrix)
+        #
+        # message = {
+        #     "RELATIONS" : return_values,
+        # }
+        #
+        # for i in range(len(self.connected_clients)):
+        #     self.connected_clients[i].send(json.dumps(message).encode())
 
 
         self.sc_sim.start_round()
@@ -78,19 +78,22 @@ class GameServer:
         # anyway just try to iron this out for now and come back to this very interesting problem later.
 
 
-        player_votes = self.get_client_input() # OK how can I make the bots see what the players are voting for and use that appropriately?
-
+        # player_votes = self.get_client_input() # OK how can I make the bots see what the players are voting for and use that appropriately?
+        player_votes = {}
         # Keeps listening for client votes until all players have voted
         # TODO: send the displayed vote to the bots so they can interact with the system.
         while len(player_votes) < len(self.connected_clients):
             data = self.get_client_data()
             for client, received_json in data.items():
                 if "FINAL_VOTE" in received_json:
-                    player_votes[json.loads(received_json)["CLIENT_ID"]] = json.loads(received_json)["VOTE"]
+                    print("Final vote received")
+                    print(type(received_json["FINAL_VOTE"]))
+                    player_votes[received_json["CLIENT_ID"]] = received_json["FINAL_VOTE"]
+
 
         bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
 
-        all_votes = bot_votes + player_votes
+        all_votes = bot_votes | player_votes
         winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
         self.sc_sim.apply_vote(winning_vote)  # once again needs to be done from gameserver, as that is where winning vote is consolidated.
         # aight now you have the winning vote, so what you need to do is export

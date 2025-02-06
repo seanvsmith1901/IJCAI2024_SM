@@ -2,7 +2,7 @@ import math
 import random
 import numpy as np
 
-from Code.GeneSimulation_py.Server.Node import Node
+from Node import Node
 
 class Social_Choice_Sim:
     def __init__(self, num_players, num_causes):
@@ -14,7 +14,7 @@ class Social_Choice_Sim:
         self.causes = self.create_cause_nodes(num_causes)
         self.current_options_matrix = {}
         self.player_nodes = []
-        np.set_printoptions(legacy='1.25')
+        # np.set_printoptions(legacy='1.25')
         self.all_votes = {}
 
     def create_players(self):

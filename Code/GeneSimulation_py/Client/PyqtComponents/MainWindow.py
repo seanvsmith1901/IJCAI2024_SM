@@ -1,9 +1,12 @@
+import json
+from functools import partial
+
 import pyqtgraph as pg
 
-from PyQt6.QtCore import QThread
+from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QStackedLayout, QTabWidget, \
-    QGridLayout
+    QGridLayout, QPushButton, QSizePolicy
 
 from .JhgTab import JhgTab
 from RoundState import RoundState
@@ -14,8 +17,10 @@ from .SocialChoicePanel import SocialChoicePanel
 
 
 class MainWindow(QMainWindow):
+    SC_vote = pyqtSignal()
     def __init__(self, client_socket):
         self.round_state = RoundState()
+        self.client_socket = client_socket
         super().__init__()
 
         # This is dynamically updated elsewhere, so it must exist before the SeverListener. It is finally added to
@@ -87,26 +92,42 @@ class MainWindow(QMainWindow):
     def create_sc_labels(self):
         self.utility_qlabels.clear()
 
+        # Add the player id column
+        self.cause_table_layout.addWidget(QLabel("Player"), 0, 0)
+        self.cause_table_layout.setColumnStretch(0, 1)
+        for player in self.round_state.players:
+            self.cause_table_layout.addWidget(QLabel(str(player.id + 1)), player.id + 1, 0)
+
         # For each cause
         for i in range(self.round_state.num_causes):
+            self.cause_table_layout.addWidget(QLabel("Cause #" + str(i)), 0, i + 1)
+            self.cause_table_layout.setColumnStretch(i + 1, 1)
             row = []
             # Create a Qlabel, add it to self.utility_qlabels, and add it to the cause_table_layout
             for j in range(self.round_state.num_players):
-                row.append(QLabel())
+                row.append(QLabel("0"))
                 self.cause_table_layout.addWidget(row[j], j + 1, i + 1)
             self.utility_qlabels.append(row)
 
-        self.cause_table_layout.addWidget(QLabel("Player"), 0, 0)
+            vote_button = QPushButton("Vote")
+            vote_button.clicked.connect(partial(self.sc_vote, i))
+            button_layout = QHBoxLayout()
+            button_layout.addWidget(vote_button)
+            button_layout.addStretch(1)
+            self.cause_table_layout.addLayout(button_layout, self.round_state.num_players + 2, i + 1)
 
-        for player in self.round_state.players:
-            self.cause_table_layout.addWidget(QLabel(str(player.id + 1)), player.id + 1, 0)
         self.social_choice_tab.setLayout(self.cause_table_layout)
-        self.update_sc_labels()
 
     def update_sc_labels(self):
         # For each cause column...
         for i in range(self.round_state.num_causes):
-            self.cause_table_layout.addWidget(QLabel("Cause #" + str(i)), 0, i + 1)
-
             for j in range(self.round_state.num_players):
                 self.utility_qlabels[i][j].setText(str(self.round_state.utilities[j][i]))
+
+    def sc_vote(self, vote):
+        message = {
+            "CLIENT_ID": self.round_state.client_id,
+            "FINAL_VOTE": vote,
+        }
+        self.client_socket.send(json.dumps(message).encode())
+        print("voted")

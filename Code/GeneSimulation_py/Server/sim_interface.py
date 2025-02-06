@@ -3,9 +3,9 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from Code.GeneSimulation_py.geneagent3 import GeneAgent3
-from Code.GeneSimulation_py.humanagent import HumanAgent
-from Code.GeneSimulation_py.simulator import GameSimulator
+from geneagent3 import GeneAgent3
+from humanagent import HumanAgent
+from simulator import GameSimulator
 
 # from scriptagent import ScriptAgent
 
@@ -115,6 +115,7 @@ class JHG_simulator():
             if plyr.getType() == "Human":
                 T[i] = allocations[str(i)] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
             else:
+                print(type(round))
                 T[i] = plyr.play_round(
                     i,  # player index
                     round,  # round
