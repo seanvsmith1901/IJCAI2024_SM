@@ -9,9 +9,10 @@ from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidg
     QGridLayout, QPushButton, QSizePolicy
 
 from .JhgTab import JhgTab
-from RoundState import RoundState
+# if this is breaking stuff for you garrett, let me know. The imports always break on my end if I don't do this.
+from Code.GeneSimulation_py.Client.RoundState import RoundState
 
-from ServerListener import ServerListener
+from Code.GeneSimulation_py.Client.ServerListener import ServerListener
 
 from .SocialChoicePanel import SocialChoicePanel
 
@@ -96,6 +97,9 @@ class MainWindow(QMainWindow):
         self.cause_table_layout.addWidget(QLabel("Player"), 0, 0)
         self.cause_table_layout.setColumnStretch(0, 1)
         for player in self.round_state.players:
+            print("this is the client_id ", self.round_state.client_id, " and this is the player player id ", player.id)
+            if (str(self.round_state.client_id) == str(player.id)):
+                self.cause_table_layout.addWidget(QLabel(str(player.id + 1) + " You :)"), player.id + 1, 0)
             self.cause_table_layout.addWidget(QLabel(str(player.id + 1)), player.id + 1, 0)
 
         # For each cause

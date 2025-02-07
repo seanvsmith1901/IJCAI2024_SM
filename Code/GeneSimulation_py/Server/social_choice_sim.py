@@ -55,8 +55,8 @@ class Social_Choice_Sim:
                 # get the strength of the new vectors
                 position_x, position_y = self.causes[cause_index].get_x(), self.causes[cause_index].get_y()
                 if self.options_matrix[i][cause_index] >= 0:
-                    position_x = (position_x * self.options_matrix[i][cause_index]) / (2.1 * self.rad)
-                    position_y = (position_y * self.options_matrix[i][cause_index]) / (2.1 * self.rad)
+                    position_x = (position_x * self.options_matrix[i][cause_index]) / (2 * self.rad)
+                    position_y = (position_y * self.options_matrix[i][cause_index]) / (2 * self.rad)
                 else: # ignore negative numbers. too many headaches.
                     position_x = 0
                     position_y = 0

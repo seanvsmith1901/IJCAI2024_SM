@@ -102,8 +102,8 @@ class GameServer:
             "WINNING_VOTE" : winning_vote,
             "NEW_UTILITY" : self.sc_sim.get_player_utility()
         }
-        for client in self.connected_clients:
-            client.send(json.dumps(message))
+        for i in range(len(self.connected_clients)):
+            self.connected_clients[i].send(json.dumps(message).encode())
         # and congrats! that should be something of like how we would like to see it. will probably need some polish but
         # that's the "basic" framework that we can expand upon.
 
