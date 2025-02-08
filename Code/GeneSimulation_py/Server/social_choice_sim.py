@@ -1,6 +1,7 @@
 import math
 import random
 import numpy as np
+from sympy.physics.mechanics import inertia
 
 from Node import Node
 
@@ -14,7 +15,7 @@ class Social_Choice_Sim:
         self.causes = self.create_cause_nodes(num_causes)
         self.current_options_matrix = {}
         self.player_nodes = []
-        # np.set_printoptions(legacy='1.25')
+        #np.set_printoptions(legacy='1.25')
         self.all_votes = {}
 
     def create_players(self):
@@ -98,7 +99,18 @@ class Social_Choice_Sim:
         normalized_values = self.normalize(new_values)
         # goes through the normalized heuristic, finds the cpp strongest, and makes them into a seralizable dictionary we can send across.
         return_values = self.make_dict(normalized_values, cpp)
+        return_values = self.make_native_type(return_values)
         return return_values
+
+    def make_native_type(self, return_values):
+        new_dict = {}
+        for key, inner_dict in return_values.items():
+            new_key = key.item() if isinstance(key, np.integer) else key
+            new_inner_dict = {}
+            for item, value in inner_dict.items():
+                new_inner_dict[item] = value.item if isinstance(value, np.generic) else value
+            new_dict[new_key] = new_inner_dict
+        return new_dict
 
 
     def make_dict(self, normalized_values, cpp):

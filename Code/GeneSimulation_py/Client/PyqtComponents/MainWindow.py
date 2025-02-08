@@ -182,6 +182,15 @@ class MainWindow(QMainWindow):
             self.type.append(node["type"])
             self.text.append(node["text"])
 
+        # for player1, related_players in self.round_state.relations.items():
+        #     for player2, strength in related_players.items():
+        #         # Get the coordinates of the two players
+        #         x1, y1 = self.x[player1], self.y[player1]
+        #         x2, y2 = self.x[player2], self.y[player2]
+        #
+        #         # Plot a line between the two players, adjusting the line width based on the strength
+        #         self.ax.plot([x1, x2], [y1, y2], color='gray', alpha=strength, lw=2)
+
         print("here are the self.x and self.y positions, ", self.x, " ", self.y)
         self.ax.scatter(self.x, self.y, marker='o')
         for i, (x_val, y_val) in enumerate(zip(self.x, self.y)):
@@ -198,6 +207,8 @@ class MainWindow(QMainWindow):
                 color='black',
                 weight='bold',
             )
+
+
 
         # Clear the axis spines (the square border)
         self.ax.spines['top'].set_color('none')

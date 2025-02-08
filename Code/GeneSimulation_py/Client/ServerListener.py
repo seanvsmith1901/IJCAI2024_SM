@@ -45,6 +45,7 @@ class ServerListener(QObject):
                         self.round_state.options = json_data["OPTIONS"]
                         self.round_state.nodes = json_data["NODES"]
                         self.round_state.utilities = json_data["UTILITIES"]
+                        #self.round_state.relations = json_data["RELATION_STRENGTH"]
                         self.update_sc_round_signal.emit()
                     elif json_data["ROUND_TYPE"] == "sc_in_progress":
                         pass
