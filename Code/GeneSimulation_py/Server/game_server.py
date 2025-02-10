@@ -32,31 +32,19 @@ class GameServer:
         global total_players
 
         while round <= max_rounds:
+            # This range says how many jhg rounds to play between sc rounds
             for i in range(1):
-                next_round_type = "jhg"
-                if i == 2:
-                    next_round_type = "sc"
-                self.play_jhg_round(round, next_round_type)
+                print("We back")
+                self.play_jhg_round(round)
                 print(f"Played round {round}")
                 round += 1
             self.play_social_choice_round()
+            print("Did things")
 
 
         print("game over")
 
     def play_social_choice_round(self):
-        # before we play the round, lets get the info out to all the players.
-        # influence_matrix = self.jhg_sim.get_influence()
-        # return_values = self.sc_sim.calculate_relation_strength(influence_matrix)
-        #
-        # message = {
-        #     "RELATIONS" : return_values,
-        # }
-        #
-        # for i in range(len(self.connected_clients)):
-        #     self.connected_clients[i].send(json.dumps(message).encode())
-
-
         self.sc_sim.start_round()
         new_influence = self.jhg_sim.get_influence().tolist()
         new_relations = self.sc_sim.calculate_relation_strength(new_influence)
@@ -75,13 +63,6 @@ class GameServer:
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
 
-        # might need to rethink the way that we are taking input in from the client.
-        # because right now they are making those decisions independently, which means that the bots will never be able to lie.
-        # very, very odd. Maybe scramble it somehow?
-        # anyway just try to iron this out for now and come back to this very interesting problem later.
-
-
-        # player_votes = self.get_client_input() # OK how can I make the bots see what the players are voting for and use that appropriately?
         player_votes = {}
         # Keeps listening for client votes until all players have voted
         # TODO: send the displayed vote to the bots so they can interact with the system.
@@ -96,7 +77,7 @@ class GameServer:
 
         bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
 
-        all_votes = bot_votes | player_votes
+        all_votes = {**bot_votes, **player_votes}
         winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
         self.sc_sim.apply_vote(winning_vote)  # once again needs to be done from gameserver, as that is where winning vote is consolidated.
         # aight now you have the winning vote, so what you need to do is export
@@ -110,7 +91,7 @@ class GameServer:
         # and congrats! that should be something of like how we would like to see it. will probably need some polish but
         # that's the "basic" framework that we can expand upon.
 
-    def play_jhg_round(self, round, next_round_type):
+    def play_jhg_round(self, round):
         client_input = self.get_client_input()
         current_popularity = self.jhg_sim.execute_round(client_input, round-1)
 
@@ -125,7 +106,6 @@ class GameServer:
                 "RECEIVED": self.get_received(i, allocations_matrix),
                 "SENT": self.get_sent(i, allocations_matrix),
                 "POPULARITY": list(current_popularity),
-                "NEXT_ROUND_TYPE": next_round_type,
             }
             # Only sends the message to connected clients.
             if i >= self.num_bots:

@@ -13,6 +13,7 @@ import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib as plt
+plt.use("QtAgg")
 
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -22,10 +23,16 @@ from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidg
 from matplotlib.patches import Circle  # Import Circle from matplotlib.patches
 
 from .JhgTab import JhgTab
-# if this is breaking stuff for you garrett, let me know. The imports always break on my end if I don't do this.
-from Code.GeneSimulation_py.Client.RoundState import RoundState
 
-from Code.GeneSimulation_py.Client.ServerListener import ServerListener
+# Sean's imports
+# from Code.GeneSimulation_py.Client.RoundState import RoundState
+#
+# from Code.GeneSimulation_py.Client.ServerListener import ServerListener
+
+# Garrett's imports
+from RoundState import RoundState
+
+from ServerListener import ServerListener
 
 from .SocialChoicePanel import SocialChoicePanel
 
@@ -155,7 +162,6 @@ class MainWindow(QMainWindow):
             "FINAL_VOTE": vote,
         }
         self.client_socket.send(json.dumps(message).encode())
-        print("voted")
 
     def create_graph(self):
         self.fig = Figure(figsize=(5, 4), dpi=100)
@@ -169,30 +175,21 @@ class MainWindow(QMainWindow):
         return self.canvas
 
     def update_graph(self):
-        print("WE ARE Desparately trying to update. ")
-        radius = 5 # i just happen to know this, no clue if we need to make this adjusatable based on server input.
+        radius = 5 # I just happen to know this, no clue if we need to make this adjusatable based on server input.
 
         self.ax.clear()
         self.x = []
         self.y = []
-        self.ax.clear()
+        self.type = []
+        self.text = []
         for node in self.round_state.nodes:
             self.x.append(float(node["x_pos"]))
             self.y.append(float(node["y_pos"]))
             self.type.append(node["type"])
             self.text.append(node["text"])
 
-        # for player1, related_players in self.round_state.relations.items():
-        #     for player2, strength in related_players.items():
-        #         # Get the coordinates of the two players
-        #         x1, y1 = self.x[player1], self.y[player1]
-        #         x2, y2 = self.x[player2], self.y[player2]
-        #
-        #         # Plot a line between the two players, adjusting the line width based on the strength
-        #         self.ax.plot([x1, x2], [y1, y2], color='gray', alpha=strength, lw=2)
-
-        print("here are the self.x and self.y positions, ", self.x, " ", self.y)
         self.ax.scatter(self.x, self.y, marker='o')
+
         for i, (x_val, y_val) in enumerate(zip(self.x, self.y)):
             text = self.text[i]
             if text.startswith("Player"):
@@ -226,19 +223,4 @@ class MainWindow(QMainWindow):
         circle = Circle((0, 0), radius, color='black', fill=False, lw=2)  # Use Circle from patches
         self.ax.add_patch(circle)
 
-        # # Ensure the aspect ratio is equal so the circle appears circular
-        # self.ax.set_aspect('equal', adjustable='box')
-
-
         self.canvas.draw()
-
-        if self.graph_canvas:
-            self.graph_canvas.deleteLater()  # Delete the old canvas if needed
-        self.graph_canvas = FigureCanvas(self.fig)
-
-        # Add the updated graph canvas to the layout (assuming it's part of your UI)
-        graph_layout = QVBoxLayout()  # Replace this with your existing layout if needed
-        graph_layout.addWidget(self.graph_canvas)
-        self.social_choice_tab.layout().addLayout(graph_layout)
-
-

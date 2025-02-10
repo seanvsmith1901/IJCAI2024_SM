@@ -2,10 +2,6 @@
 
 import json
 import socket
-import copy
-
-from matplotlib.backend_tools import ToolQuitAll
-
 from game_server import GameServer
 
 
