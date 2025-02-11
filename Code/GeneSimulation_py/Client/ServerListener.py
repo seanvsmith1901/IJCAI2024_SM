@@ -49,6 +49,10 @@ class ServerListener(QObject):
                         self.round_state.utilities = json_data["UTILITIES"]
                         #self.round_state.relations = json_data["RELATION_STRENGTH"]
                         self.update_sc_round_signal.emit()
+
+                    elif json_data["ROUND_TYPE"] == "sc_vote":
+                        print("here are the potential votes that we have recieved, ", json_data["POTENTIAL_VOTES"])
+
                     elif json_data["ROUND_TYPE"] == "sc_in_progress":
                         pass
 

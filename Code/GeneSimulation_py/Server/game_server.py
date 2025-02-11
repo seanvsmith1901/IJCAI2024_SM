@@ -63,6 +63,7 @@ class GameServer:
             self.connected_clients[i].send(json.dumps(message).encode())
 
         player_votes = {}
+        player_fake_votes = {}
         # Keeps listening for client votes until all players have voted
         # TODO: send the displayed vote to the bots so they can interact with the system.
         while len(player_votes) < len(self.connected_clients):
@@ -72,6 +73,17 @@ class GameServer:
                     print("Final vote received")
                     print(type(received_json["FINAL_VOTE"]))
                     player_votes[received_json["CLIENT_ID"]] = received_json["FINAL_VOTE"]
+                if "POTENTIAL_VOTE" in received_json:
+                    print("potential vote recieved")
+                    player_fake_votes[received_json["CLIENT_ID"]] = received_json["POTENTIAL_VOTE"]
+            # sends out all the potential votes that we have made and redistributes them so that everyone can see them.
+            message = {
+                "ROUND_TYPE" : "sc_vote",
+                "POTENTIAL_VOTES" : player_fake_votes,
+            }
+            for i in range(len(self.connected_clients)):
+                self.connected_clients[i].send(json.dumps(message).encode())
+
 
 
         bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)

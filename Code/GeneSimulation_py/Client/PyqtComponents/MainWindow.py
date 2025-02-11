@@ -36,7 +36,6 @@ from ServerListener import ServerListener
 
 from .SocialChoicePanel import SocialChoicePanel
 
-
 class MainWindow(QMainWindow):
     SC_vote = pyqtSignal()
 
@@ -44,6 +43,9 @@ class MainWindow(QMainWindow):
         self.round_state = RoundState()
         self.client_socket = client_socket
         super().__init__()
+
+        # keep track of current vote
+        self.current_vote = None
 
         # Dynamically updated elements
         self.token_label = QLabel()
@@ -143,7 +145,7 @@ class MainWindow(QMainWindow):
 
         # Create a single "Submit" button below the causes and vote buttons
         submit_button = QPushButton("Submit")
-        #submit_button.clicked.connect(self.submit_action)  # TODO: Connect this to something.
+        submit_button.clicked.connect(self.sc_submit)  # TODO: Connect this to something.
         submit_layout = QHBoxLayout()
         submit_layout.addWidget(submit_button)
         submit_layout.addStretch(1)
@@ -173,9 +175,19 @@ class MainWindow(QMainWindow):
     def sc_vote(self, vote):
         message = {
             "CLIENT_ID": self.round_state.client_id,
-            "FINAL_VOTE": vote,
+            "POTENTIAL_VOTE": vote,
+        }
+        self.current_vote = vote
+        self.client_socket.send(json.dumps(message).encode())
+
+    def sc_submit(self):
+        message = {
+            "CLIENT_ID": self.round_state.client_id,
+            "FINAL_VOTE" : self.current_vote,
         }
         self.client_socket.send(json.dumps(message).encode())
+
+
 
     def create_graph(self):
         self.fig = Figure(figsize=(5, 4), dpi=100)
