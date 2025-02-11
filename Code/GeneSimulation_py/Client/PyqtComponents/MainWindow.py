@@ -36,6 +36,10 @@ from ServerListener import ServerListener
 
 from .SocialChoicePanel import SocialChoicePanel
 
+#          l. blue,   red,       orange,    yellow,    pink,      purple,    black,     teal,      l. green,  d. green,   d. blue,  gray
+COLORS = ["#1e88e4", "#e41e1e", "#f5a115", "#f3e708", "#e919d3", "#a00fb9", "#000000", "#1fedbd", "#82e31e", "#417a06", "#1e437e", "#9b9ea4"]
+
+
 class MainWindow(QMainWindow):
     SC_vote = pyqtSignal()
 
@@ -133,6 +137,8 @@ class MainWindow(QMainWindow):
             else:
                 player_label.setText(f"{player_id}")
 
+            player_label.setStyleSheet("color: " + COLORS[player.id]) # no clue if that will work.
+
             self.player_labels[player_id] = player_label
 
             self.cause_table_layout.addWidget(player_label, int(player_id), 0)
@@ -225,12 +231,17 @@ class MainWindow(QMainWindow):
             self.type.append(node["type"])
             self.text.append(node["text"])
 
-        self.ax.scatter(self.x, self.y, marker='o')
+
+        colors = []
 
         for i, (x_val, y_val) in enumerate(zip(self.x, self.y)):
             text = self.text[i]
             if text.startswith("Player"):
-                text = text[-1]
+                split_string = text.split()
+                text = split_string[1]
+                color = COLORS[int(split_string[1])]
+            else:
+                color = "black"
             self.ax.annotate(
                 text,
                 (x_val, y_val),
@@ -238,9 +249,12 @@ class MainWindow(QMainWindow):
                 xytext=(0, 3),
                 ha='center',
                 fontsize=9,
-                color='black',
+                color=color,
                 weight='bold',
             )
+            colors.append(color)
+
+        self.ax.scatter(self.x, self.y, marker='o', c=colors)
 
 
 
