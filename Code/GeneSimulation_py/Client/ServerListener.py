@@ -51,7 +51,6 @@ class ServerListener(QObject):
                         self.update_sc_round_signal.emit()
 
                     elif json_data["ROUND_TYPE"] == "sc_vote":
-                        print('we should now be updating stuff')
                         self.main_window.update_votes(json_data["POTENTIAL_VOTES"])
 
                     elif json_data["ROUND_TYPE"] == "sc_over": # criss cross!

@@ -32,11 +32,11 @@ class GameServer:
 
         while round <= max_rounds:
             # This range says how many jhg rounds to play between sc rounds
-            for i in range(1):
-                print("We back")
-                self.play_jhg_round(round)
-                print(f"Played round {round}")
-                round += 1
+            # for i in range(1):
+            #     print("We back")
+            #     self.play_jhg_round(round)
+            #     print(f"Played round {round}")
+            #     round += 1
             self.play_social_choice_round()
             print("Did things")
 

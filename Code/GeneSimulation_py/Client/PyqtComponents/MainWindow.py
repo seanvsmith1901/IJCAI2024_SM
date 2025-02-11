@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
 
         # For each cause
         for i in range(self.round_state.num_causes):
-            self.cause_table_layout.addWidget(QLabel(f"Cause #{i}"), 0, i + 1)
+            self.cause_table_layout.addWidget(QLabel(f"Cause #{i+1}"), 0, i + 1)
             self.cause_table_layout.setColumnStretch(i + 1, 1)
             row = []
             for j in range(self.round_state.num_players):
@@ -272,13 +272,12 @@ class MainWindow(QMainWindow):
 
         self.ax.set_aspect('equal', adjustable='box')
 
-        circle = Circle((0, 0), radius, color='black', fill=False, lw=2)  # Use Circle from patches
-        self.ax.add_patch(circle)
+        # circle = Circle((0, 0), radius, color='black', fill=False, lw=2)  # Use Circle from patches
+        # self.ax.add_patch(circle)
 
         self.canvas.draw()
 
     def update_votes(self, potential_votes):
-        print('attempting to update votes')
         for player_id, vote in potential_votes.items():
             print('here is the player_id, ', player_id, " and here is the vote ", vote)
             player_label = self.player_labels.get(str(int(player_id) + 1))  # Adjust ID for zero-indexed list
