@@ -119,12 +119,23 @@ class MainWindow(QMainWindow):
         self.cause_table_layout.addWidget(QLabel("Player"), 0, 0)
         self.cause_table_layout.setColumnStretch(0, 1)
 
+        self.player_labels = {}
+
         for player in self.round_state.players:
-            if str(self.round_state.client_id) == str(player.id):
-                self.cause_table_layout.addWidget(QLabel(f"{player.id + 1} You :)"), player.id + 1, 0)
-            self.cause_table_layout.addWidget(QLabel(str(player.id + 1)), player.id + 1, 0)
+            print("this si the player.id ", player.id)
+            player_id = str(player.id + 1)
+            print('this is the new player id ', player_id)
+            player_label = QLabel(player_id)
 
+            if str(int(self.round_state.client_id) + 1) == str(player_id):
+                print("this is the client_id ", self.round_state.client_id, " and this is the player_ID ", player_id)
+                player_label.setText(f"{player_id} You :)")
+            else:
+                player_label.setText(f"{player_id}")
 
+            self.player_labels[player_id] = player_label
+
+            self.cause_table_layout.addWidget(player_label, int(player_id), 0)
 
         # For each cause
         for i in range(self.round_state.num_causes):
@@ -250,3 +261,15 @@ class MainWindow(QMainWindow):
         self.ax.add_patch(circle)
 
         self.canvas.draw()
+
+    def update_votes(self, potential_votes):
+        print('attempting to update votes')
+        for player_id, vote in potential_votes.items():
+            print('here is the player_id, ', player_id, " and here is the vote ", vote)
+            player_label = self.player_labels.get(str(int(player_id) + 1))  # Adjust ID for zero-indexed list
+            if player_label:
+                if str(int(self.round_state.client_id) + 1) == str(int(player_id)+1):
+                    new_text = str(int(player_id) + 1) + " You :) " + "(" + str(vote) + ")"
+                else:
+                    new_text = str(int(player_id) + 1) + " (" + str(vote) + ")"
+                player_label.setText(new_text)

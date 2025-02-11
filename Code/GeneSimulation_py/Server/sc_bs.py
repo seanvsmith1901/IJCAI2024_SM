@@ -48,6 +48,7 @@ def start_server(host='127.0.0.1', port=12346):
                 "NUM_CAUSES": NUM_CAUSES,
                 "COLORS" : COLORS,
             }
+            print("THIS IS the id that we are supposed to be sending out ", str((len(connected_clients) - 1) + BOT_PLAYERS))
             # Serialize and send the response as JSON
             client_socket.send(json.dumps(response).encode())
         except json.JSONDecodeError:
