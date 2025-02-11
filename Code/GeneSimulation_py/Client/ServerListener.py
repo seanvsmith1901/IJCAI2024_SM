@@ -33,6 +33,8 @@ class ServerListener(QObject):
                     self.main_window.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
                     self.round_state.num_players = json.loads(json_data)["NUM_PLAYERS"]
                     self.round_state.num_causes = json.loads(json_data)["NUM_CAUSES"]
+                    self.colors = json.loads(json_data)["COLORS"]
+                    self.my_color = self.colors
                     self.create_sc_round_signal.emit()
                 if "ROUND_TYPE" in json_data:
                     json_data = json.loads(json_data)

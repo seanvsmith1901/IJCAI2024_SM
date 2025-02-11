@@ -23,7 +23,6 @@ class GameServer:
         self.jhg_sim = JHG_simulator(len(new_clients), total_players) # creates a new JHG simulator object
         self.sc_sim = Social_Choice_Sim(total_players, self.num_causes)
         self.num_bots = num_bots
-
         self.start_game(max_rounds)
 
 
@@ -125,6 +124,14 @@ class GameServer:
             # Check if all clients have provided input
             if len(client_input) == len(self.connected_clients):
                 break
+            # this isn't the most elegant solution, but it means that we can see all submitted votes. I want us to also be able to see unsubmitted votes.
+            else: # we are still playing -- display who is voting for who.
+                message = {
+                    "CURRENT_VOTES" : client_input,
+                }
+                for i in range(len(self.connected_clients)):
+                    self.connected_clients[i].send(json.dumps(message).encode())
+
         return client_input
 
     def get_received(self, id, allocations_matrix):

@@ -122,6 +122,8 @@ class MainWindow(QMainWindow):
                 self.cause_table_layout.addWidget(QLabel(f"{player.id + 1} You :)"), player.id + 1, 0)
             self.cause_table_layout.addWidget(QLabel(str(player.id + 1)), player.id + 1, 0)
 
+
+
         # For each cause
         for i in range(self.round_state.num_causes):
             self.cause_table_layout.addWidget(QLabel(f"Cause #{i}"), 0, i + 1)
@@ -138,6 +140,18 @@ class MainWindow(QMainWindow):
             button_layout.addWidget(vote_button)
             button_layout.addStretch(1)
             self.cause_table_layout.addLayout(button_layout, self.round_state.num_players + 2, i + 1)
+
+        # Create a single "Submit" button below the causes and vote buttons
+        submit_button = QPushButton("Submit")
+        #submit_button.clicked.connect(self.submit_action)  # TODO: Connect this to something.
+        submit_layout = QHBoxLayout()
+        submit_layout.addWidget(submit_button)
+        submit_layout.addStretch(1)
+
+        # Add submit button layout at the bottom left of the vote buttons
+        self.cause_table_layout.addLayout(submit_layout, self.round_state.num_players + 2, 0, 1,
+                                          self.round_state.num_causes)
+
 
         # Now add the graph to the layout
         graph_layout = QVBoxLayout()  # Create a new layout for the graph
