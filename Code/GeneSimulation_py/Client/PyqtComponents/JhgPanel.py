@@ -6,6 +6,10 @@ from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QWidg
 
 from .SubmitButton import SubmitButton
 
+#          l. blue,   red,       orange,    yellow,    pink,      purple,    black,     teal,      l. green,  d. green,   d. blue,  gray
+COLORS = ["#1e88e4", "#e41e1e", "#f5a115", "#f3e708", "#e919d3", "#a00fb9", "#000000", "#1fedbd", "#82e31e", "#417a06", "#1e437e", "#9b9ea4"]
+
+
 class JhgPanel(QVBoxLayout):
     def __init__(self, round_state, client_socket, token_counter):
         super().__init__()
@@ -35,6 +39,7 @@ class JhgPanel(QVBoxLayout):
         # that player the last round. Also adds the elements to allow for token allocations
         for i in range(0, 11):
             player_panel.addWidget(round_state.players[i].id_label, i + 1, 0)         # Player ID
+            round_state.players[i].id_label.setStyleSheet(f"color: " + COLORS[i])
             player_panel.addWidget(round_state.players[i].popularity_label, i + 1, 1) # Popularity at the start of this round
             player_panel.addWidget(round_state.players[i].sent_label, i + 1, 2)       # Tokens client sent to this player last round
             player_panel.addWidget(round_state.players[i].received_label, i + 1, 3)   # Tokens received by the client from this player last round

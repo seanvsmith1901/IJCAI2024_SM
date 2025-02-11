@@ -106,7 +106,8 @@ class MainWindow(QMainWindow):
             self.round_state.players[i].popularity_label.setText(str(round(self.round_state.message["POPULARITY"][i])))
             self.round_state.players[i].popularity_over_time.append(self.round_state.message["POPULARITY"][i])
             self.round_state.players[i].allocation_box.setText("0")
-            self.jhg_plot.plot(self.round_state.players[i].popularity_over_time)
+            pen = pg.mkPen(COLORS[i])
+            self.jhg_plot.plot(self.round_state.players[i].popularity_over_time, pen=pen)
 
     def create_sc_labels(self):
         self.utility_qlabels.clear()
@@ -162,7 +163,7 @@ class MainWindow(QMainWindow):
 
         # Create a single "Submit" button below the causes and vote buttons
         submit_button = QPushButton("Submit")
-        submit_button.clicked.connect(self.sc_submit)  # TODO: Connect this to something.
+        submit_button.clicked.connect(self.sc_submit)
         submit_layout = QHBoxLayout()
         submit_layout.addWidget(submit_button)
         submit_layout.addStretch(1)
