@@ -95,7 +95,8 @@ class GameServer:
         # 1. the winning vote, 2. the new utility of each player, and yeah that's pretty much it
         message = {
             "WINNING_VOTE" : winning_vote,
-            "NEW_UTILITY" : self.sc_sim.get_player_utility()
+            "NEW_UTILITY" : self.sc_sim.get_player_utility(),
+            "ROUND_TYPE" : "sc_over",
         }
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
@@ -103,6 +104,7 @@ class GameServer:
         # that's the "basic" framework that we can expand upon.
 
     def play_jhg_round(self, round):
+        print("WE ARE GOING ON A ROADTRIP BABY")
         client_input = self.get_client_input()
         current_popularity = self.jhg_sim.execute_round(client_input, round-1)
 

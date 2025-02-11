@@ -53,6 +53,9 @@ class ServerListener(QObject):
                     elif json_data["ROUND_TYPE"] == "sc_vote":
                         print("here are the potential votes that we have recieved, ", json_data["POTENTIAL_VOTES"])
 
+                    elif json_data["ROUND_TYPE"] == "sc_over": # criss cross!
+                        self.tabs.setCurrentIndex(0)
+
                     elif json_data["ROUND_TYPE"] == "sc_in_progress":
                         pass
 
@@ -61,7 +64,8 @@ class ServerListener(QObject):
     # Prepares the client for the next round by updating self.round_state and the gui
     def update_jhg_state(self, json_data):
         self.round_state.message = json_data
-        self.round_state.received = json_data["RECEIVED"]
+        if "RECEIVED" in json_data:
+            self.round_state.received = json_data["RECEIVED"]
         self.round_state.sent = json_data["SENT"]
         self.round_state.round_number = int(json_data["ROUND"])
         self.round_state.tokens = self.round_state.num_players * 2
