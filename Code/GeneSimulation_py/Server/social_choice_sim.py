@@ -39,9 +39,9 @@ class Social_Choice_Sim:
         return self.options_matrix # because why not
 
     def create_cause_nodes(self, num_causes):
-        displacement = (2 * math.pi) / (num_causes + 1) # need an additional "0" cause.
+        displacement = (2 * math.pi) / (num_causes) # need an additional "0" cause.
         causes = []
-        for i in range(num_causes + 1):
+        for i in range(num_causes):
             new_x = math.cos(displacement * i) * self.rad
             new_y = math.sin(displacement * i) * self.rad
             causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1)))
