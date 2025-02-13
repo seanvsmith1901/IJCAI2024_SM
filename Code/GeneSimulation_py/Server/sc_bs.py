@@ -8,7 +8,7 @@ from game_server import GameServer
 
 # Set to 1 for testing purposes
 HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up.
-TOTAL_PLAYERS = 11
+TOTAL_PLAYERS = 2
 BOT_PLAYERS = TOTAL_PLAYERS - HUMAN_PLAYERS
 NUM_CAUSES = 3
 
@@ -55,7 +55,7 @@ def start_server(host='127.0.0.1', port=12346):
             pass # don't do anything but still handle the exception
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
-            GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS, BOT_PLAYERS, NUM_CAUSES) # might need to make a copy and overwrite connected clients
+            GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS, BOT_PLAYERS, NUM_CAUSES, TOTAL_PLAYERS) # might need to make a copy and overwrite connected clients
             # readies for another game maybe possibly. who knows. will prolly never test.
             connected_clients.clear()
             client_id_dict.clear()

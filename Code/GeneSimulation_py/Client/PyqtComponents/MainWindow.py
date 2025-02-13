@@ -99,7 +99,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(tabs)
 
     def update_jhg_labels(self):
-        for i in range(11):
+        print("this is the len of stuff ", self.round_state.num_players)
+        for i in range(self.round_state.num_players):
+            print("this is our i ", i)
             self.round_state.allocations[i] = 0
             self.round_state.players[i].received_label.setText(str(int(self.round_state.received[i])))
             self.round_state.players[i].sent_label.setText(str(int(self.round_state.sent[i])))
@@ -126,9 +128,9 @@ class MainWindow(QMainWindow):
 
         self.player_labels = {}
 
-        for player in self.round_state.players:
-            print("this si the player.id ", player.id)
-            player_id = str(player.id + 1)
+        print("this is the len of players ", len(self.round_state.players))
+        for i in range(self.round_state.num_players):
+            player_id = str(i + 1)
             print('this is the new player id ', player_id)
             player_label = QLabel(player_id)
 
@@ -138,7 +140,7 @@ class MainWindow(QMainWindow):
             else:
                 player_label.setText(f"{player_id}")
 
-            player_label.setStyleSheet("color: " + COLORS[player.id]) # no clue if that will work.
+            player_label.setStyleSheet("color: " + COLORS[i]) # no clue if that will work.
 
             self.player_labels[player_id] = player_label
 
@@ -235,7 +237,9 @@ class MainWindow(QMainWindow):
 
         colors = []
 
+
         for i, (x_val, y_val) in enumerate(zip(self.x, self.y)):
+            print("this is our i ", i)
             text = self.text[i]
             if text.startswith("Player"):
                 split_string = text.split()

@@ -32,6 +32,7 @@ class ServerListener(QObject):
                     self.round_state.client_id = json.loads(json_data)["ID"]
                     self.main_window.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
                     self.round_state.num_players = json.loads(json_data)["NUM_PLAYERS"]
+                    print("This is the number of players we are expecting ", self.round_state.num_players)
                     self.round_state.num_causes = json.loads(json_data)["NUM_CAUSES"]
                     self.colors = json.loads(json_data)["COLORS"]
                     self.my_color = self.colors
