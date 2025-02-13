@@ -37,7 +37,7 @@ class JhgPanel(QVBoxLayout):
 
         # Creates a row in the gui for each player to display the popularity, tokens sent to, and tokens received from
         # that player the last round. Also adds the elements to allow for token allocations
-        for i in range(0, 11):
+        for i in range(round_state.num_players):
             player_panel.addWidget(round_state.players[i].id_label, i + 1, 0)         # Player ID
             round_state.players[i].id_label.setStyleSheet(f"color: " + COLORS[i])
             player_panel.addWidget(round_state.players[i].popularity_label, i + 1, 1) # Popularity at the start of this round

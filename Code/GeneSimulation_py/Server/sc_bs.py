@@ -7,8 +7,8 @@ from game_server import GameServer
 
 
 # Set to 1 for testing purposes
-HUMAN_PLAYERS = 2 # how many players need to join before things start to blow up.
-TOTAL_PLAYERS = 11
+HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up.
+TOTAL_PLAYERS = 4
 BOT_PLAYERS = TOTAL_PLAYERS - HUMAN_PLAYERS
 NUM_CAUSES = 3
 
@@ -40,19 +40,18 @@ def start_server(host='127.0.0.1', port=12346):
         client_id_dict[client_socket] = len(connected_clients)
         data = client_socket.recv(4096)
 
-        try:
-            # Create a response
-            response = {
-                "ID": (str((len(connected_clients) - 1) + BOT_PLAYERS)),
-                "NUM_PLAYERS": TOTAL_PLAYERS,
-                "NUM_CAUSES": NUM_CAUSES,
-                "COLORS" : COLORS,
-            }
-            print("THIS IS the id that we are supposed to be sending out ", str((len(connected_clients) - 1) + BOT_PLAYERS))
-            # Serialize and send the response as JSON
-            client_socket.send(json.dumps(response).encode())
-        except json.JSONDecodeError:
-            pass # don't do anything but still handle the exception
+        if data:
+            json_data = json.dumps(json.loads(data.decode()))
+            if "NEW_INPUT" in json_data:
+                response = {
+                    "ID": (str((len(connected_clients) - 1) + BOT_PLAYERS)),
+                    "NUM_PLAYERS": TOTAL_PLAYERS,
+                    "NUM_CAUSES": NUM_CAUSES,
+                }
+                # Serialize and send the response as JSON
+                client_socket.send(json.dumps(response).encode())
+
+
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
             GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS, BOT_PLAYERS, NUM_CAUSES) # might need to make a copy and overwrite connected clients

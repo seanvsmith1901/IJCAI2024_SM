@@ -43,10 +43,19 @@ COLORS = ["#1e88e4", "#e41e1e", "#f5a115", "#f3e708", "#e919d3", "#a00fb9", "#00
 class MainWindow(QMainWindow):
     SC_vote = pyqtSignal()
 
-    def __init__(self, client_socket):
-        self.round_state = RoundState()
-        self.client_socket = client_socket
+    def __init__(self, client_socket, num_players, num_causes, id):
         super().__init__()
+        # This window is very dependent on things happening in the correct order. Just know if you mess with it, you
+        # might break a lot of things. It has been broken up into blocks below to try to mitigate that
+
+    #1# Block one: Sets up the round_state and client socket. Must be the first thing done
+        self.round_state = RoundState(id, num_players, num_causes)
+    #/1#
+
+    #2# Block two: Creates the elements that will be passed to the server listener for dynamic updating. Must happen before the server listener is created
+        self.client_socket = client_socket
+
+        self.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
 
         # keep track of current vote
         self.current_vote = None
@@ -71,18 +80,22 @@ class MainWindow(QMainWindow):
         round_counter_font.setPointSize(20)
         round_counter.setFont(round_counter_font)
         headerLayout.addWidget(round_counter)
+    #/2#
 
+    #3# Block three: Sets up the server listener, which depends on blocks 1&2.
         # Server Listener setup
         self.ServerListener = ServerListener(self, client_socket, self.round_state, round_counter, self.token_label, self.jhg_plot, tabs, self.utility_qlabels)
         self.ServerListener_thread = QThread()
         self.ServerListener.moveToThread(self.ServerListener_thread)
 
         self.ServerListener.update_jhg_round_signal.connect(self.update_jhg_labels)
-        self.ServerListener.create_sc_round_signal.connect(self.create_sc_labels)
         self.ServerListener.update_sc_round_signal.connect(self.update_sc_labels)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
         self.ServerListener_thread.start()
+    #/3#
 
+    #4# Block four: Finishes setting up the client, especially the JHG and SC tabs. Dependent on blocks 1&2
+        self.create_sc_labels()
         # JHG tab setup
         jhg_tab = JhgTab(self.round_state, client_socket, self.token_label, self.jhg_plot)
         JHG_tab = QWidget()
@@ -97,9 +110,10 @@ class MainWindow(QMainWindow):
 
         # Set the central widget to the tabs widget
         self.setCentralWidget(tabs)
+    #/4#
 
     def update_jhg_labels(self):
-        for i in range(11):
+        for i in range(self.round_state.num_players):
             self.round_state.allocations[i] = 0
             self.round_state.players[i].received_label.setText(str(int(self.round_state.received[i])))
             self.round_state.players[i].sent_label.setText(str(int(self.round_state.sent[i])))
@@ -110,6 +124,8 @@ class MainWindow(QMainWindow):
             self.jhg_plot.plot(self.round_state.players[i].popularity_over_time, pen=pen)
 
     def create_sc_labels(self):
+        print(self.round_state.num_players)
+        print("we here")
         self.utility_qlabels.clear()
 
         # Create the QWidget for the social choice tab if not already created
@@ -278,9 +294,7 @@ class MainWindow(QMainWindow):
         self.canvas.draw()
 
     def update_votes(self, potential_votes):
-        print('attempting to update votes')
         for player_id, vote in potential_votes.items():
-            print('here is the player_id, ', player_id, " and here is the vote ", vote)
             player_label = self.player_labels.get(str(int(player_id) + 1))  # Adjust ID for zero-indexed list
             if player_label:
                 if str(int(self.round_state.client_id) + 1) == str(int(player_id)+1):

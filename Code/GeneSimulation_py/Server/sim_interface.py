@@ -115,7 +115,6 @@ class JHG_simulator():
             if plyr.getType() == "Human":
                 T[i] = allocations[str(i)] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
             else:
-                print(type(round))
                 T[i] = plyr.play_round(
                     i,  # player index
                     round,  # round

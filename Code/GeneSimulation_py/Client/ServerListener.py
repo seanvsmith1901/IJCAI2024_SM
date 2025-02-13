@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import QLabel
 class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
     update_sc_round_signal = pyqtSignal()
-    create_sc_round_signal = pyqtSignal()
     def __init__(self, main_window, client_socket, round_state, round_counter, token_label, jhg_plot, tabs, utility_qlabels):
         super().__init__()
         self.client_socket = client_socket
@@ -27,15 +26,6 @@ class ServerListener(QObject):
             data = self.client_socket.recv(4096)
             if data:
                 json_data = json.dumps(json.loads(data.decode()))
-                # The server sends a packet with "ID" the first time that the client connects. Set up the client based on the passed ID
-                if "ID" in json_data:
-                    self.round_state.client_id = json.loads(json_data)["ID"]
-                    self.main_window.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
-                    self.round_state.num_players = json.loads(json_data)["NUM_PLAYERS"]
-                    self.round_state.num_causes = json.loads(json_data)["NUM_CAUSES"]
-                    self.colors = json.loads(json_data)["COLORS"]
-                    self.my_color = self.colors
-                    self.create_sc_round_signal.emit()
                 if "ROUND_TYPE" in json_data:
                     json_data = json.loads(json_data)
                     if json_data["ROUND_TYPE"] == "jhg":
@@ -47,11 +37,10 @@ class ServerListener(QObject):
                         self.round_state.options = json_data["OPTIONS"]
                         self.round_state.nodes = json_data["NODES"]
                         self.round_state.utilities = json_data["UTILITIES"]
-                        #self.round_state.relations = json_data["RELATION_STRENGTH"]
+                        print("about to update")
                         self.update_sc_round_signal.emit()
 
                     elif json_data["ROUND_TYPE"] == "sc_vote":
-                        print('we should now be updating stuff')
                         self.main_window.update_votes(json_data["POTENTIAL_VOTES"])
 
                     elif json_data["ROUND_TYPE"] == "sc_over": # criss cross!

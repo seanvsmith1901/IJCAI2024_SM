@@ -18,8 +18,22 @@ if __name__ == "__main__":
     message = {"NEW_INPUT": "new_input"}
     client_socket.send(json.dumps(message).encode())
 
+    while True:
+        data = client_socket.recv(4096)
+        if data:
+            json_data = json.dumps(json.loads(data.decode()))
+            if "ID" in json_data:
+                num_players = json.loads(json_data)["NUM_PLAYERS"]
+                num_causes = json.loads(json_data)["NUM_CAUSES"]
+                id = json.loads(json_data)["ID"]
+
+                break
+
+    message = {"INIT": "init"}
+    client_socket.send(json.dumps(message).encode())
+
     app = QApplication(sys.argv)
     # This is the entrance to the gui
-    window = MainWindow(client_socket)
+    window = MainWindow(client_socket, num_players, num_causes, id)
     window.show()
     app.exec()

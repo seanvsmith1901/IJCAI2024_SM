@@ -4,7 +4,6 @@ from Player import Player
 
 
 class RoundState:
-    num_players = 0
     players = []
     client_id = -1 # look at JHG panel for debugging stuff.
     round_number = 0
@@ -18,17 +17,17 @@ class RoundState:
 
 
     # Stuff for sc
-    num_causes = 0
     options = []
     nodes = []
     utilities = []
 
-    def __init__(self):
-        self.client_player = Player(10)
+    def __init__(self, id, num_players, num_causes):
+        self.num_players = num_players
+        self.client_id = id
+        self.num_causes = num_causes
 
-        for i in range(10):
+        for i in range(num_players):
             self.players.append(Player(i))
-        self.players.append(self.client_player)
 
     def state_to_JSON(self):
         self.allocations[int(self.client_id)] = self.tokens

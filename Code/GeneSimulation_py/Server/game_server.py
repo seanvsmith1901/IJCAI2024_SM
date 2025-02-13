@@ -33,12 +33,10 @@ class GameServer:
         while round <= max_rounds:
             # This range says how many jhg rounds to play between sc rounds
             for i in range(1):
-                print("We back")
                 self.play_jhg_round(round)
                 print(f"Played round {round}")
                 round += 1
             self.play_social_choice_round()
-            print("Did things")
 
 
         print("game over")
@@ -70,11 +68,11 @@ class GameServer:
             data = self.get_client_data()
             for client, received_json in data.items():
                 if "FINAL_VOTE" in received_json:
-                    print("Final vote received")
-                    print(type(received_json["FINAL_VOTE"]))
+                    # print("Final vote received")
+                    # print(type(received_json["FINAL_VOTE"]))
                     player_votes[received_json["CLIENT_ID"]] = received_json["FINAL_VOTE"]
                 if "POTENTIAL_VOTE" in received_json:
-                    print("potential vote recieved")
+                    # print("potential vote recieved")
                     player_fake_votes[received_json["CLIENT_ID"]] = received_json["POTENTIAL_VOTE"]
             # sends out all the potential votes that we have made and redistributes them so that everyone can see them.
             message = {
@@ -104,7 +102,6 @@ class GameServer:
         # that's the "basic" framework that we can expand upon.
 
     def play_jhg_round(self, round):
-        print("WE ARE GOING ON A ROADTRIP BABY")
         client_input = self.get_client_input()
         current_popularity = self.jhg_sim.execute_round(client_input, round-1)
 
