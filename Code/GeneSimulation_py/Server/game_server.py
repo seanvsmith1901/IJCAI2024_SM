@@ -5,8 +5,6 @@ import json
 from sim_interface import JHG_simulator
 from social_choice_sim import Social_Choice_Sim
 
-total_players = 11
-
 class ReceivedData:
     def __init__(self, client_id, allocations):
         self.client_id = client_id
@@ -14,21 +12,20 @@ class ReceivedData:
 
 
 class GameServer:
-    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes):
+    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players):
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.client_usernames = client_usernames
         self.current_round = 0
         self.num_causes = num_causes
-        self.jhg_sim = JHG_simulator(len(new_clients), total_players) # creates a new JHG simulator object
-        self.sc_sim = Social_Choice_Sim(total_players, self.num_causes)
+        self.jhg_sim = JHG_simulator(len(new_clients), num_players) # creates a new JHG simulator object
+        self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
         self.num_bots = num_bots
         self.start_game(max_rounds)
 
 
     def start_game(self, max_rounds):
         round = 1
-        global total_players
 
         while round <= max_rounds:
             # This range says how many jhg rounds to play between sc rounds

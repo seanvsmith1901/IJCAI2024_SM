@@ -54,7 +54,7 @@ def start_server(host='127.0.0.1', port=12346):
 
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
-            GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS, BOT_PLAYERS, NUM_CAUSES) # might need to make a copy and overwrite connected clients
+            GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS, BOT_PLAYERS, NUM_CAUSES, TOTAL_PLAYERS) # might need to make a copy and overwrite connected clients
             # readies for another game maybe possibly. who knows. will prolly never test.
             connected_clients.clear()
             client_id_dict.clear()
