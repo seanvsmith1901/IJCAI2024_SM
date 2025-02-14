@@ -251,7 +251,7 @@ class MainWindow(QMainWindow):
             if text.startswith("Player"):
                 split_string = text.split()
                 text = split_string[1]
-                color = COLORS[int(split_string[1])]
+                color = COLORS[int(split_string[1]) - 1]
             else:
                 color = "black"
             self.ax.annotate(
