@@ -45,6 +45,7 @@ class ServerListener(QObject):
 
                     elif json_data["ROUND_TYPE"] == "sc_init":
                         self.tabs.setCurrentIndex(1)
+                        #self.main_window.create_sc_labels() # should reset the buffer.
                         self.round_state.options = json_data["OPTIONS"]
                         self.round_state.nodes = json_data["NODES"]
                         self.round_state.utilities = json_data["UTILITIES"]
@@ -55,7 +56,9 @@ class ServerListener(QObject):
                         self.main_window.update_votes(json_data["POTENTIAL_VOTES"])
 
                     elif json_data["ROUND_TYPE"] == "sc_over": # criss cross!
-                        self.tabs.setCurrentIndex(0)
+                        self.main_window.update_graph(json_data["WINNING_VOTE"])
+                        self.main_window.update_win(json_data["WINNING_VOTE"])
+                        #self.tabs.setCurrentIndex(0) # put this back in when we swapped to mixed mediums again
 
                     elif json_data["ROUND_TYPE"] == "sc_in_progress":
                         pass

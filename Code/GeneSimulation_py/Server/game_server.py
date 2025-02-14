@@ -1,3 +1,4 @@
+import time
 from collections import Counter
 
 import select
@@ -45,8 +46,8 @@ class GameServer:
 
     def play_social_choice_round(self):
         self.sc_sim.start_round()
-        new_influence = self.jhg_sim.get_influence().tolist()
-        new_relations = self.sc_sim.calculate_relation_strength(new_influence)
+        #new_influence = self.jhg_sim.get_influence().tolist()
+        #new_relations = self.sc_sim.calculate_relation_strength(new_influence)
         current_options_matrix = self.sc_sim.get_current_options_matrix()
         player_nodes = self.sc_sim.get_player_nodes()
         causes = self.sc_sim.get_causes()
@@ -89,7 +90,13 @@ class GameServer:
         bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
 
         all_votes = {**bot_votes, **player_votes}
+        total_votes = len(all_votes)
+        winning_vote_count = Counter(all_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
+
+        if not (winning_vote_count > total_votes // 2):
+            winning_vote = -1
+
         self.sc_sim.apply_vote(winning_vote)  # once again needs to be done from gameserver, as that is where winning vote is consolidated.
         # aight now you have the winning vote, so what you need to do is export
         # 1. the winning vote, 2. the new utility of each player, and yeah that's pretty much it
@@ -100,6 +107,7 @@ class GameServer:
         }
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
+        time.sleep(2) # force the fetcher to sleep for a little bit so we know which vote has won.
         # and congrats! that should be something of like how we would like to see it. will probably need some polish but
         # that's the "basic" framework that we can expand upon.
 

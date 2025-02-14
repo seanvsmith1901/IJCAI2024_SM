@@ -1,5 +1,7 @@
 import json
+import time
 from functools import partial
+from collections import Counter
 
 import pyqtgraph as pg
 
@@ -99,9 +101,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(tabs)
 
     def update_jhg_labels(self):
-        print("this is the len of stuff ", self.round_state.num_players)
         for i in range(self.round_state.num_players):
-            print("this is our i ", i)
             self.round_state.allocations[i] = 0
             self.round_state.players[i].received_label.setText(str(int(self.round_state.received[i])))
             self.round_state.players[i].sent_label.setText(str(int(self.round_state.sent[i])))
@@ -127,15 +127,13 @@ class MainWindow(QMainWindow):
         self.cause_table_layout.setColumnStretch(0, 1)
 
         self.player_labels = {}
+        self.cause_labels = {}
 
-        print("this is the len of players ", len(self.round_state.players))
         for i in range(self.round_state.num_players):
             player_id = str(i + 1)
-            print('this is the new player id ', player_id)
             player_label = QLabel(player_id)
 
             if str(int(self.round_state.client_id) + 1) == str(player_id):
-                print("this is the client_id ", self.round_state.client_id, " and this is the player_ID ", player_id)
                 player_label.setText(f"{player_id} You :)")
             else:
                 player_label.setText(f"{player_id}")
@@ -148,8 +146,11 @@ class MainWindow(QMainWindow):
 
         # For each cause
         for i in range(self.round_state.num_causes):
-            self.cause_table_layout.addWidget(QLabel(f"Cause #{i+1}"), 0, i + 1)
+            cause_label = QLabel(f"Cause #{i+1}")
+            self.cause_table_layout.addWidget(cause_label, 0, i + 1)
             self.cause_table_layout.setColumnStretch(i + 1, 1)
+            self.cause_labels[i] = cause_label
+
             row = []
             for j in range(self.round_state.num_players):
                 row.append(QLabel("0"))
@@ -207,6 +208,31 @@ class MainWindow(QMainWindow):
         }
         self.client_socket.send(json.dumps(message).encode())
 
+    def sc_display_winning_vote(self, winning_vote):
+        x_val = -1
+        y_val = -1
+        text = ""
+        color = "#e41e1e"
+        for node in self.round_state.nodes:
+            if node["text"] == "Cause " + str(int(winning_vote)+1):
+                x_val = node["x_pos"]
+                y_val = node["y_pos"]
+                text = node["text"]
+
+
+        self.ax.annotate(
+            text,
+            (x_val, y_val),
+            textcoords="offset points",
+            xytext=(0, 3),
+            ha='center',
+            fontsize=9,
+            color=color,
+            weight='bold',
+        )
+
+        self.canvas.draw()
+        time.sleep(1) # show it red for 3 seconds
 
 
     def create_graph(self):
@@ -220,7 +246,7 @@ class MainWindow(QMainWindow):
         self.text = []
         return self.canvas
 
-    def update_graph(self):
+    def update_graph(self, winning_vote=None):
         radius = 5 # I just happen to know this, no clue if we need to make this adjusatable based on server input.
 
         self.ax.clear()
@@ -239,12 +265,13 @@ class MainWindow(QMainWindow):
 
 
         for i, (x_val, y_val) in enumerate(zip(self.x, self.y)):
-            print("this is our i ", i)
             text = self.text[i]
             if text.startswith("Player"):
                 split_string = text.split()
                 text = split_string[1]
-                color = COLORS[int(split_string[1])]
+                color = COLORS[int(split_string[1])-1]
+            elif text == "Cause " + str(winning_vote):
+                color = "#e41e1e"
             else:
                 color = "black"
             self.ax.annotate(
@@ -281,13 +308,47 @@ class MainWindow(QMainWindow):
 
         self.canvas.draw()
 
+
+
+    def update_win(self, winning_vote):
+
+        for i in range(len(self.cause_labels)):
+            if winning_vote == i:
+                new_string = "WE WON!"
+            else:
+                new_string = "Cause #" + str(i+1) + " (" + str(winning_vote+1) + ")"
+            self.cause_labels[i].setText(new_string)
+
+
     def update_votes(self, potential_votes):
+        for i in range(len(self.player_labels)):
+            player_label = self.player_labels.get(str(int(i) + 1))
+            if str(int(self.round_state.client_id) + 1) == str(int(i) + 1):
+                new_text = str(int(i) + 1) + " You :) "
+            else:
+                new_text = str(int(i) + 1)
+            player_label.setText(new_text)
+
+
         for player_id, vote in potential_votes.items():
-            print('here is the player_id, ', player_id, " and here is the vote ", vote)
             player_label = self.player_labels.get(str(int(player_id) + 1))  # Adjust ID for zero-indexed list
             if player_label:
                 if str(int(self.round_state.client_id) + 1) == str(int(player_id)+1):
-                    new_text = str(int(player_id) + 1) + " You :) " + "(" + str(vote) + ")"
+                    new_text = str(int(player_id) + 1) + " You :) " + "(" + str(vote+1) + ")"
                 else:
-                    new_text = str(int(player_id) + 1) + " (" + str(vote) + ")"
+                    new_text = str(int(player_id) + 1) + " (" + str(vote+1) + ")"
                 player_label.setText(new_text)
+        total_votes = Counter(potential_votes.values()).most_common(len(self.cause_labels)) # take the second element of the tuple or something
+
+        for i in range(len(self.cause_labels)):
+            new_string = "Cause #" + str(i+1) + " (0)"
+            self.cause_labels[i].setText(new_string)
+
+        for i in range(len(total_votes)):
+            print("this is the tuple ", total_votes[i])
+            new_string = "Cause #" + str(total_votes[i][0]+1) + " (" + str(total_votes[i][1]) + ")"
+            self.cause_labels[int(total_votes[i][0])].setText(new_string)
+
+
+
+
