@@ -100,6 +100,8 @@ class MainWindow(QMainWindow):
         # Set the central widget to the tabs widget
         self.setCentralWidget(tabs)
 
+        self.nodes_dict = {}
+
     def update_jhg_labels(self):
         for i in range(self.round_state.num_players):
             self.round_state.allocations[i] = 0
@@ -255,6 +257,12 @@ class MainWindow(QMainWindow):
         self.type = []
         self.text = []
         for node in self.round_state.nodes:
+            mini_dict = {}
+            mini_dict["x_pos"] = float(node["x_pos"])
+            mini_dict["y_pos"] = float(node["y_pos"])
+
+            self.nodes_dict[node["text"]] = mini_dict
+
             self.x.append(float(node["x_pos"]))
             self.y.append(float(node["y_pos"]))
             self.type.append(node["type"])
