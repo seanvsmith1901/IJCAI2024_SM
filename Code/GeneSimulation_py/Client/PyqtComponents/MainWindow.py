@@ -250,6 +250,8 @@ class MainWindow(QMainWindow):
 
     def update_graph(self, winning_vote=None):
         radius = 5 # I just happen to know this, no clue if we need to make this adjusatable based on server input.
+        if winning_vote:
+            winning_vote += 1
 
         self.ax.clear()
         self.x = []
