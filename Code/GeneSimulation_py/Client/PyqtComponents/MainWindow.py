@@ -49,7 +49,8 @@ class MainWindow(QMainWindow):
         # might break a lot of things. It has been broken up into blocks below to try to mitigate that
 
     #1# Block one: Sets up the round_state and client socket. Must be the first thing done
-        self.round_state = RoundState(id, num_players, num_causes)
+        self.jhg_buttons = []
+        self.round_state = RoundState(id, num_players, num_causes, self.jhg_buttons)
     #/1#
 
     #2# Block two: Creates the elements that will be passed to the server listener for dynamic updating. Must happen before the server listener is created
@@ -88,16 +89,23 @@ class MainWindow(QMainWindow):
         self.ServerListener_thread = QThread()
         self.ServerListener.moveToThread(self.ServerListener_thread)
 
+        # pyqt signal hook-ups
         self.ServerListener.update_jhg_round_signal.connect(self.update_jhg_labels)
         self.ServerListener.update_sc_round_signal.connect(self.update_sc_labels)
+        self.ServerListener.disable_sc_buttons_signal.connect(self.disable_sc_buttons)
+        self.ServerListener.enable_sc_buttons_signal.connect(self.enable_sc_buttons)
+        self.ServerListener.disable_jhg_buttons_signal.connect(self.disable_jhg_buttons)
+        self.ServerListener.enable_jhg_buttons_signal.connect(self.enable_jhg_buttons)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
+
+
         self.ServerListener_thread.start()
     #/3#
 
     #4# Block four: Finishes setting up the client, especially the JHG and SC tabs. Dependent on blocks 1&2
         self.create_sc_labels()
         # JHG tab setup
-        jhg_tab = JhgTab(self.round_state, client_socket, self.token_label, self.jhg_plot)
+        jhg_tab = JhgTab(self.round_state, client_socket, self.token_label, self.jhg_plot, self.jhg_buttons)
         JHG_tab = QWidget()
         JHG_layout = QVBoxLayout()
         JHG_layout.addLayout(headerLayout)
@@ -155,6 +163,7 @@ class MainWindow(QMainWindow):
 
             self.cause_table_layout.addWidget(player_label, int(player_id), 0)
 
+        self.sc_buttons = []
         # For each cause
         for i in range(self.round_state.num_causes):
             self.cause_table_layout.addWidget(QLabel(f"Cause #{i}"), 0, i + 1)
@@ -166,6 +175,8 @@ class MainWindow(QMainWindow):
             self.utility_qlabels.append(row)
 
             vote_button = QPushButton("Vote")
+            vote_button.setEnabled(False)
+            self.sc_buttons.append(vote_button)
             vote_button.clicked.connect(partial(self.sc_vote, i))
             button_layout = QHBoxLayout()
             button_layout.addWidget(vote_button)
@@ -174,7 +185,9 @@ class MainWindow(QMainWindow):
 
         # Create a single "Submit" button below the causes and vote buttons
         submit_button = QPushButton("Submit")
+        submit_button.setEnabled(False)
         submit_button.clicked.connect(self.sc_submit)
+        self.sc_buttons.append(submit_button)
         submit_layout = QHBoxLayout()
         submit_layout.addWidget(submit_button)
         submit_layout.addStretch(1)
@@ -297,3 +310,25 @@ class MainWindow(QMainWindow):
                 else:
                     new_text = str(int(player_id) + 1) + " (" + str(vote) + ")"
                 player_label.setText(new_text)
+
+    def disable_sc_buttons(self):
+        for button in self.sc_buttons:
+            button.setEnabled(False)
+
+        for i in range(len(self.player_labels)):
+            if i == int(self.round_state.client_id):
+                self.player_labels[str(i + 1)].setText(f"{i + 1} You :)")
+            else:
+                self.player_labels[str(i + 1)].setText(f"{i + 1}")
+
+    def enable_sc_buttons(self):
+        for button in self.sc_buttons:
+            button.setEnabled(True)
+
+    def disable_jhg_buttons(self):
+        for button in self.jhg_buttons:
+            button.setEnabled(False)
+
+    def enable_jhg_buttons(self):
+        for button in self.jhg_buttons:
+            button.setEnabled(True)
