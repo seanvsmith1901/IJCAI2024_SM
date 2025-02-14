@@ -18,6 +18,7 @@ class GameServer:
         self.client_usernames = client_usernames
         self.current_round = 0
         self.num_causes = num_causes
+        self.num_players = num_players
         self.jhg_sim = JHG_simulator(len(new_clients), num_players) # creates a new JHG simulator object
         self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
         self.num_bots = num_bots
@@ -106,7 +107,7 @@ class GameServer:
         allocations_matrix = self.jhg_sim.get_T()
 
         # Sends a list containing
-        for i in range(11):
+        for i in range(self.num_players):
             message = {
                 "ROUND_TYPE": "jhg",
                 "ROUND": round,
@@ -143,15 +144,15 @@ class GameServer:
         return client_input
 
     def get_received(self, id, allocations_matrix):
-        received = [0 for _ in range(11)]
-        for j in range(11):
+        received = [0 for _ in range(self.num_players)]
+        for j in range(self.num_players):
             received[j] = allocations_matrix[j][id]
 
         return received
 
     def get_sent(self, id, allocations_matrix):
-        sent = [0 for _ in range(11)]
-        for j in range(11):
+        sent = [0 for _ in range(self.num_players)]
+        for j in range(self.num_players):
             sent[j] = allocations_matrix[id][j]
 
         return sent

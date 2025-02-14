@@ -124,8 +124,6 @@ class MainWindow(QMainWindow):
             self.jhg_plot.plot(self.round_state.players[i].popularity_over_time, pen=pen)
 
     def create_sc_labels(self):
-        print(self.round_state.num_players)
-        print("we here")
         self.utility_qlabels.clear()
 
         # Create the QWidget for the social choice tab if not already created
@@ -143,13 +141,10 @@ class MainWindow(QMainWindow):
         self.player_labels = {}
 
         for player in self.round_state.players:
-            print("this si the player.id ", player.id)
             player_id = str(player.id + 1)
-            print('this is the new player id ', player_id)
             player_label = QLabel(player_id)
 
             if str(int(self.round_state.client_id) + 1) == str(player_id):
-                print("this is the client_id ", self.round_state.client_id, " and this is the player_ID ", player_id)
                 player_label.setText(f"{player_id} You :)")
             else:
                 player_label.setText(f"{player_id}")
