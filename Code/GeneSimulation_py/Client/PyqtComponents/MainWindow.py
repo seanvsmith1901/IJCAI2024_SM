@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
         self.ServerListener_thread.start()
 
-        # JHG tab setup
+        #JHG tab setup
         jhg_tab = JhgTab(self.round_state, client_socket, self.token_label, self.jhg_plot)
         JHG_tab = QWidget()
         JHG_layout = QVBoxLayout()
@@ -99,6 +99,7 @@ class MainWindow(QMainWindow):
 
         # Set the central widget to the tabs widget
         self.setCentralWidget(tabs)
+        tabs.setTabEnabled(0, False)
 
         self.nodes_dict = {}
 
@@ -264,7 +265,6 @@ class MainWindow(QMainWindow):
             mini_dict["y_pos"] = float(node["y_pos"])
 
             self.nodes_dict[node["text"]] = mini_dict
-
             self.x.append(float(node["x_pos"]))
             self.y.append(float(node["y_pos"]))
             self.type.append(node["type"])
