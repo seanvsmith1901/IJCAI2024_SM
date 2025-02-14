@@ -7,6 +7,11 @@ from PyQt6.QtWidgets import QLabel
 class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
     update_sc_round_signal = pyqtSignal()
+    disable_sc_buttons_signal = pyqtSignal()
+    enable_sc_buttons_signal = pyqtSignal()
+    enable_jhg_buttons_signal = pyqtSignal()
+    disable_jhg_buttons_signal = pyqtSignal()
+
     def __init__(self, main_window, client_socket, round_state, round_counter, token_label, jhg_plot, tabs, utility_qlabels):
         super().__init__()
         self.client_socket = client_socket
@@ -38,12 +43,16 @@ class ServerListener(QObject):
                         self.round_state.nodes = json_data["NODES"]
                         self.round_state.utilities = json_data["UTILITIES"]
                         self.update_sc_round_signal.emit()
+                        self.enable_sc_buttons_signal.emit()
+                        self.disable_jhg_buttons_signal.emit()
 
                     elif json_data["ROUND_TYPE"] == "sc_vote":
                         self.main_window.update_votes(json_data["POTENTIAL_VOTES"])
 
                     elif json_data["ROUND_TYPE"] == "sc_over": # criss cross!
                         self.tabs.setCurrentIndex(0)
+                        self.disable_sc_buttons_signal.emit()
+                        self.enable_jhg_buttons_signal.emit()
 
                     elif json_data["ROUND_TYPE"] == "sc_in_progress":
                         pass

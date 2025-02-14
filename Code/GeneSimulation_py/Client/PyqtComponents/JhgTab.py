@@ -3,11 +3,11 @@ from PyQt6.QtWidgets import QHBoxLayout, QStackedLayout
 from .JhgPanel import JhgPanel
 
 class JhgTab(QHBoxLayout):
-    def __init__(self, round_state, client_socket, token_counter, jhg_popularity_plot):
+    def __init__(self, round_state, client_socket, token_counter, jhg_popularity_plot, jhg_buttons):
         super().__init__()
 
         # Where token allocation happens
-        jhg_voting_panel = JhgPanel(round_state, client_socket, token_counter)
+        jhg_voting_panel = JhgPanel(round_state, client_socket, token_counter, jhg_buttons)
 
         # Where the graphs are
         plots_panel = QStackedLayout()

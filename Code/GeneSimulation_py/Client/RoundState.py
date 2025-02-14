@@ -21,7 +21,7 @@ class RoundState:
     nodes = []
     utilities = []
 
-    def __init__(self, id, num_players, num_causes):
+    def __init__(self, id, num_players, num_causes, jhg_buttons):
         self.num_players = num_players
         self.client_id = id
         self.num_causes = num_causes
@@ -35,6 +35,8 @@ class RoundState:
 
         for i in range(num_players):
             self.players.append(Player(i))
+            jhg_buttons.append(self.players[-1].minus_button)
+            jhg_buttons.append(self.players[-1].plus_button)
 
     def state_to_JSON(self):
         self.allocations[int(self.client_id)] = self.tokens

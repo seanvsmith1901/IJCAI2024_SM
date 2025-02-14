@@ -11,7 +11,7 @@ COLORS = ["#1e88e4", "#e41e1e", "#f5a115", "#f3e708", "#e919d3", "#a00fb9", "#00
 
 
 class JhgPanel(QVBoxLayout):
-    def __init__(self, round_state, client_socket, token_counter):
+    def __init__(self, round_state, client_socket, token_counter, jhg_buttons):
         super().__init__()
         while round_state.client_id == -1: # tripping over its own shoelaces.
             pass
@@ -19,6 +19,7 @@ class JhgPanel(QVBoxLayout):
         footer = QHBoxLayout()
         # Needs to go through the SubmitButton class so that the signal and socket works correctly
         submitButton = SubmitButton()
+        jhg_buttons.append(submitButton)
         submitButton.clicked.connect(lambda: submitButton.submit(round_state, client_socket))
         footer.addWidget(submitButton)
         token_counter.setText(f"Tokens: {round_state.tokens}")
