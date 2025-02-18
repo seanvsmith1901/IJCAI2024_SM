@@ -261,7 +261,10 @@ class MainWindow(QMainWindow):
             mini_dict["x_pos"] = float(node["x_pos"])
             mini_dict["y_pos"] = float(node["y_pos"])
 
-            self.nodes_dict[node["text"]] = mini_dict
+            self.nodes_dict[node["text"]] = mini_dict #at nodes dictionary,
+            # mini_dict = self.round_dict["Player " + str(i)]
+            # mini_dict = self.node_dict[Player 1]
+            #new_x = mini_dict["x_pos"]
 
             self.x.append(float(node["x_pos"]))
             self.y.append(float(node["y_pos"]))
