@@ -42,14 +42,18 @@ class JhgPanel(QVBoxLayout):
             player_panel.addWidget(round_state.players[i].id_label, i + 1, 0)         # Player ID
             round_state.players[i].id_label.setStyleSheet(f"color: " + COLORS[i])
             player_panel.addWidget(round_state.players[i].popularity_label, i + 1, 1) # Popularity at the start of this round
-            player_panel.addWidget(round_state.players[i].sent_label, i + 1, 2)       # Tokens client sent to this player last round
-            player_panel.addWidget(round_state.players[i].received_label, i + 1, 3)   # Tokens received by the client from this player last round
 
-            allocations_row = QHBoxLayout()
+
+
             # If the current player is the client, then simply place a QLabel labeling it in the allocations_row
+            allocations_row = QHBoxLayout()
             if i == int(round_state.client_id):
-                allocations_row.addWidget(QLabel("You :)"))
+                # allocations_row.addWidget(QLabel("You :)"))
+                player_panel.addWidget(round_state.players[i].kept_text_label, i + 1, 3)
+                player_panel.addWidget(round_state.players[i].kept_number_label, i + 1, 4)
             else:
+                player_panel.addWidget(round_state.players[i].sent_label, i + 1, 2)  # Tokens client sent to this player last round
+                player_panel.addWidget(round_state.players[i].received_label, i + 1, 3)  # Tokens received by the client from this player last round
                 allocations_row.addWidget(round_state.players[i].minus_button, 2)
                 allocations_row.addWidget(round_state.players[i].allocation_box, 1)
                 allocations_row.addWidget(round_state.players[i].plus_button, 2)

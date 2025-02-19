@@ -122,9 +122,16 @@ class MainWindow(QMainWindow):
 
     def update_jhg_labels(self):
         for i in range(self.round_state.num_players):
+            print(self.round_state.client_id)
+            # If players[i] is the client, show tokens kept. Else, show the received and sent tokens for that player
+            if i == int(self.round_state.client_id):
+                print("self")
+                self.round_state.players[i].kept_number_label.setText(str(int(self.round_state.received[i])))
+            else:
+                self.round_state.players[i].received_label.setText(str(int(self.round_state.received[i])))
+                self.round_state.players[i].sent_label.setText(str(int(self.round_state.sent[i])))
+
             self.round_state.allocations[i] = 0
-            self.round_state.players[i].received_label.setText(str(int(self.round_state.received[i])))
-            self.round_state.players[i].sent_label.setText(str(int(self.round_state.sent[i])))
             self.round_state.players[i].popularity_label.setText(str(round(self.round_state.message["POPULARITY"][i])))
             self.round_state.players[i].popularity_over_time.append(self.round_state.message["POPULARITY"][i])
             self.round_state.players[i].allocation_box.setText("0")
@@ -301,7 +308,7 @@ class MainWindow(QMainWindow):
 
         self.canvas.draw()
 
-    def update_votes(self, potential_votes):
+    def update_potential_sc_votes(self, potential_votes):
         for player_id, vote in potential_votes.items():
             player_label = self.player_labels.get(str(int(player_id) + 1))  # Adjust ID for zero-indexed list
             if player_label:

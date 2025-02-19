@@ -47,7 +47,7 @@ class ServerListener(QObject):
                         self.disable_jhg_buttons_signal.emit()
 
                     elif json_data["ROUND_TYPE"] == "sc_vote":
-                        self.main_window.update_votes(json_data["POTENTIAL_VOTES"])
+                        self.main_window.update_potential_sc_votes(json_data["POTENTIAL_VOTES"])
 
                     elif json_data["ROUND_TYPE"] == "sc_over": # criss cross!
                         self.tabs.setCurrentIndex(0)
