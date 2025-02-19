@@ -49,6 +49,8 @@ class Player:
         self.popularity_label = QLabel(str(self.popularity))
         self.sent_label = QLabel(str(self.received_from_player))
         self.received_label = QLabel(str(self.sent_to_player))
+        self.kept_text_label = QLabel("Tokens kept:")
+        self.kept_number_label = QLabel()
         self.minus_button = MinusButton()
         self.plus_button = PlusButton()
         self.allocation_box = QLabel("0")

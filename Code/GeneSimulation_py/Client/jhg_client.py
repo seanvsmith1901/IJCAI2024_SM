@@ -8,7 +8,7 @@ from PyqtComponents.MainWindow import MainWindow
 
 if __name__ == "__main__":
     host = '127.0.0.1'  # your local host address cause you're working from home.
-    port = 12345  # The port number to connect to
+    port = 12346  # The port number to connect to
     # Create a TCP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Connect to the server
