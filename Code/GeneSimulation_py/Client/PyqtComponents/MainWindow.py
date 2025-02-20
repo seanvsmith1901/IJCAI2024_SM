@@ -97,8 +97,12 @@ class MainWindow(QMainWindow):
         tabs.addTab(JHG_tab, "JHG")
         tabs.addTab(self.social_choice_tab, "Social Choice")
 
+        tabs.setTabEnabled(0, False)  # This disables the JHG tab entirely. remove when no longer testing.
+
         # Set the central widget to the tabs widget
         self.setCentralWidget(tabs)
+
+
 
         self.nodes_dict = {}
 
@@ -336,6 +340,9 @@ class MainWindow(QMainWindow):
             else:
                 new_text = str(int(i) + 1)
             player_label.setText(new_text)
+
+        # how hard is it gonna be to draw the arrows, like realistically.
+
 
 
         for player_id, vote in potential_votes.items():
