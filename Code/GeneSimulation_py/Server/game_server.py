@@ -75,15 +75,16 @@ class GameServer:
             data = self.get_client_data()
             for client, received_json in data.items():
                 if "FINAL_VOTE" in received_json:
-                    print("Final vote received")
-                    print(type(received_json["FINAL_VOTE"]))
-                    player_votes[received_json["CLIENT_ID"]] = received_json["FINAL_VOTE"]
+                    if received_json["FINAL_VOTE"] not in player_votes or player_votes[received_json["FINAL_VOTE"]] != received_json["FINAL_VOTE"]:
+                        print("NEW FINAL VOTE RECEIVED")
+                        player_votes[received_json["CLIENT_ID"]] = received_json["FINAL_VOTE"]
+                        self.append_stuff_big(player_fake_votes, "FINAL_VOTE")
                 if "POTENTIAL_VOTE" in received_json:
-                    print("potential vote recieved")
                     # if there are no votes or if the vote is different, update and pass it down.
                     if received_json["CLIENT_ID"] not in player_fake_votes or player_fake_votes[received_json["CLIENT_ID"]] != received_json["POTENTIAL_VOTE"]:
+                        print("NEW POTENTIAL VOTE RECEIVED")
                         player_fake_votes[received_json["CLIENT_ID"]] = received_json["POTENTIAL_VOTE"]
-                        self.append_stuff_big(player_fake_votes)
+                        self.append_stuff_big(player_fake_votes, "POTENTIAL_VOTE")
             # sends out all the potential votes that we have made and redistributes them so that everyone can see them.
             message = {
                 "ROUND_TYPE" : "sc_vote",
@@ -203,12 +204,13 @@ class GameServer:
         if self.current_round not in self.save_dict:
             self.save_dict[self.current_round] = all_votes
 
-    def append_stuff_big(self, new_potential_votes):
+    def append_stuff_big(self, new_potential_votes, potential_or_final):
         print("we have appended stuff here ", new_potential_votes, " make sure it saves correctly. ")
         if self.current_round not in self.big_dict:
             self.big_dict[self.current_round] = {} # initalize an empty round
         index = len(self.big_dict[self.current_round])+1
-        self.big_dict[self.current_round][index] = new_potential_votes.copy() # it is imperitave that this be a copy. IDK why. 
+        self.big_dict[self.current_round][index] = {} # new index, slap the potnetial or final in there.
+        self.big_dict[self.current_round][index][potential_or_final] = new_potential_votes.copy() # it is imperitave that this be a copy. IDK why.
 
     def save_stuff_big(self):
         desktop_path = os.path.expanduser("~/Desktop")

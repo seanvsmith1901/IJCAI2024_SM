@@ -36,6 +36,8 @@ from RoundState import RoundState
 
 from ServerListener import ServerListener
 
+from .Arrow import Arrow
+
 from .SocialChoicePanel import SocialChoicePanel
 
 #          l. blue,   red,       orange,    yellow,    pink,      purple,    black,     teal,      l. green,  d. green,   d. blue,  gray
@@ -105,6 +107,7 @@ class MainWindow(QMainWindow):
 
 
         self.nodes_dict = {}
+        self.arrows = {}
 
     def update_jhg_labels(self):
         for i in range(self.round_state.num_players):
@@ -252,7 +255,7 @@ class MainWindow(QMainWindow):
         self.text = []
         return self.canvas
 
-    def update_graph(self, winning_vote=None):
+    def update_graph(self, potential_votes=None, winning_vote=None):
         radius = 5 # I just happen to know this, no clue if we need to make this adjusatable based on server input.
 
         self.ax.clear()
@@ -341,10 +344,6 @@ class MainWindow(QMainWindow):
                 new_text = str(int(i) + 1)
             player_label.setText(new_text)
 
-        # how hard is it gonna be to draw the arrows, like realistically.
-
-
-
         for player_id, vote in potential_votes.items():
             player_label = self.player_labels.get(str(int(player_id) + 1))  # Adjust ID for zero-indexed list
             if player_label:
@@ -360,9 +359,37 @@ class MainWindow(QMainWindow):
             self.cause_labels[i].setText(new_string)
 
         for i in range(len(total_votes)):
-            print("this is the tuple ", total_votes[i])
             new_string = "Cause #" + str(total_votes[i][0]+1) + " (" + str(total_votes[i][1]) + ")"
             self.cause_labels[int(total_votes[i][0])].setText(new_string)
+
+        print('here are the potential votes ', potential_votes)
+        self.update_arrows(potential_votes)
+
+
+    def update_arrows(self, potential_votes):
+        print('attempting to update arrows')
+        print("here are the potential votes ", potential_votes)
+
+        # checks for existing arrows, and removes them.
+        for arrow in self.arrows: # if there is anythign in there.
+            arrow.remove()
+
+        self.arrows = [] # clean the arrows array.
+        for key in potential_votes:
+            player_name = "Player " + str(int(key)+1)
+            start_x = self.nodes_dict[player_name]["x_pos"]
+            start_y = self.nodes_dict[player_name]["y_pos"]
+            cause_name = "Cause " + str(int(potential_votes[key])+1)
+            end_x = self.nodes_dict[cause_name]["x_pos"]
+            end_y = self.nodes_dict[cause_name]["y_pos"]
+
+            new_arrow = Arrow((start_x, start_y), (end_x, end_y), color=COLORS[int(key)])
+            self.arrows.append(new_arrow)
+
+        for arrow in self.arrows:
+            arrow.draw(self.ax)
+
+        self.canvas.draw()
 
 
 

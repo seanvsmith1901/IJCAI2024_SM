@@ -27,7 +27,6 @@ class ServerListener(QObject):
             data = self.client_socket.recv(4096)
             json_data = None
             if data:
-                print("Decoded data:", data.decode())  # This will help see the JSON structure
                 try:
                     json_data = json.dumps(json.loads(data.decode()))
                 except:
