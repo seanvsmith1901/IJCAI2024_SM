@@ -259,6 +259,7 @@ class MainWindow(QMainWindow):
         radius = 5 # I just happen to know this, no clue if we need to make this adjusatable based on server input.
 
         self.ax.clear()
+        self.arrows.clear() # we can either do this or manually change the node that has the winning vote. your call.
         self.x = []
         self.y = []
         self.type = []
@@ -367,29 +368,28 @@ class MainWindow(QMainWindow):
 
 
     def update_arrows(self, potential_votes):
-        print('attempting to update arrows')
-        print("here are the potential votes ", potential_votes)
-
         # checks for existing arrows, and removes them.
-        for arrow in self.arrows: # if there is anythign in there.
-            arrow.remove()
+        print("this is the size of arrows ", len(self.arrows))
+        if potential_votes: # only run this if there are actual potentialvotes.
+            for arrow in self.arrows: # if there is anythign in there.
+                arrow.remove()
 
-        self.arrows = [] # clean the arrows array.
-        for key in potential_votes:
-            player_name = "Player " + str(int(key)+1)
-            start_x = self.nodes_dict[player_name]["x_pos"]
-            start_y = self.nodes_dict[player_name]["y_pos"]
-            cause_name = "Cause " + str(int(potential_votes[key])+1)
-            end_x = self.nodes_dict[cause_name]["x_pos"]
-            end_y = self.nodes_dict[cause_name]["y_pos"]
+            self.arrows = [] # clean the arrows array.
+            for key in potential_votes:
+                player_name = "Player " + str(int(key)+1)
+                start_x = self.nodes_dict[player_name]["x_pos"]
+                start_y = self.nodes_dict[player_name]["y_pos"]
+                cause_name = "Cause " + str(int(potential_votes[key])+1)
+                end_x = self.nodes_dict[cause_name]["x_pos"]
+                end_y = self.nodes_dict[cause_name]["y_pos"]
 
-            new_arrow = Arrow((start_x, start_y), (end_x, end_y), color=COLORS[int(key)])
-            self.arrows.append(new_arrow)
+                new_arrow = Arrow((start_x, start_y), (end_x, end_y), color=COLORS[int(key)])
+                self.arrows.append(new_arrow)
 
-        for arrow in self.arrows:
-            arrow.draw(self.ax)
+            for arrow in self.arrows:
+                arrow.draw(self.ax)
 
-        self.canvas.draw()
+            self.canvas.draw()
 
 
 
