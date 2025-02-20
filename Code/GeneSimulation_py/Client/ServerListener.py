@@ -61,6 +61,7 @@ class ServerListener(QObject):
                             self.main_window.update_votes(json_data["POTENTIAL_VOTES"])
 
                         elif json_data["ROUND_TYPE"] == "sc_over": # criss cross!
+                            print("DO we get a signal on the winning vote?")
                             self.main_window.update_graph(json_data["WINNING_VOTE"])
                             self.main_window.update_win(json_data["WINNING_VOTE"])
                             #self.tabs.setCurrentIndex(0) # put this back in when we swapped to mixed mediums again

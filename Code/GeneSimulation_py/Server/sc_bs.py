@@ -22,7 +22,7 @@ WIDTH = 3
 client_id_dict = {}
 hunters = []
 # Set very high for testing purposes
-MAX_ROUNDS = 2
+MAX_ROUNDS = 4
 round = 1
 
 #          l. blue,  red,      orange,   yellow,   pink,     purple,   black,    white,   l. green,  d. green, d. blue,  gray

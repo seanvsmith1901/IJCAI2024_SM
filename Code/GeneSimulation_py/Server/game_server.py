@@ -82,7 +82,6 @@ class GameServer:
                 if "POTENTIAL_VOTE" in received_json:
                     # if there are no votes or if the vote is different, update and pass it down.
                     if received_json["CLIENT_ID"] not in player_fake_votes or player_fake_votes[received_json["CLIENT_ID"]] != received_json["POTENTIAL_VOTE"]:
-                        print("NEW POTENTIAL VOTE RECEIVED")
                         player_fake_votes[received_json["CLIENT_ID"]] = received_json["POTENTIAL_VOTE"]
                         self.append_stuff_big(player_fake_votes, "POTENTIAL_VOTE")
             # sends out all the potential votes that we have made and redistributes them so that everyone can see them.
@@ -92,6 +91,7 @@ class GameServer:
             }
             for i in range(len(self.connected_clients)):
                 self.connected_clients[i].send(json.dumps(message).encode())
+            time.sleep(0.1) # lets see if this helps. 
 
 
 
@@ -108,6 +108,7 @@ class GameServer:
         self.sc_sim.apply_vote(winning_vote)  # once again needs to be done from gameserver, as that is where winning vote is consolidated.
         # aight now you have the winning vote, so what you need to do is export
         # 1. the winning vote, 2. the new utility of each player, and yeah that's pretty much it
+        print("THERE WAS A WINNING VOTE !", winning_vote)
         message = {
             "WINNING_VOTE" : winning_vote,
             "NEW_UTILITY" : self.sc_sim.get_player_utility(),
@@ -115,6 +116,7 @@ class GameServer:
         }
 
         self.append_save_dict(player_votes, winning_vote)
+
 
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
@@ -205,7 +207,6 @@ class GameServer:
             self.save_dict[self.current_round] = all_votes
 
     def append_stuff_big(self, new_potential_votes, potential_or_final):
-        print("we have appended stuff here ", new_potential_votes, " make sure it saves correctly. ")
         if self.current_round not in self.big_dict:
             self.big_dict[self.current_round] = {} # initalize an empty round
         index = len(self.big_dict[self.current_round])+1

@@ -255,11 +255,22 @@ class MainWindow(QMainWindow):
         self.text = []
         return self.canvas
 
-    def update_graph(self, potential_votes=None, winning_vote=None):
+    def update_graph(self, winning_vote=None):
         radius = 5 # I just happen to know this, no clue if we need to make this adjusatable based on server input.
 
+        if winning_vote != None:
+            if winning_vote == -1:
+                print("NO ONE WON! NO RED.")
+            else:
+                print("WE HAVE A WINNING VOTE! ITS ", winning_vote)
+                winning_vote += 1
+        else:
+            self.arrows.clear()
+
         self.ax.clear()
-        self.arrows.clear() # we can either do this or manually change the node that has the winning vote. your call.
+        for arrow in self.arrows:
+            arrow.draw(self.ax) # redraw the arrows if there are any, if there is a winnig vote we erase them.
+
         self.x = []
         self.y = []
         self.type = []
@@ -285,9 +296,9 @@ class MainWindow(QMainWindow):
             if text.startswith("Player"):
                 split_string = text.split()
                 text = split_string[1]
-                color = COLORS[int(split_string[1])-1]
+                color = COLORS[int(split_string[1]) - 1]
             elif text == "Cause " + str(winning_vote):
-                color = "#e41e1e"
+                color = "#e41e1e"  # red haha.
             else:
                 color = "black"
             self.ax.annotate(
@@ -363,13 +374,11 @@ class MainWindow(QMainWindow):
             new_string = "Cause #" + str(total_votes[i][0]+1) + " (" + str(total_votes[i][1]) + ")"
             self.cause_labels[int(total_votes[i][0])].setText(new_string)
 
-        print('here are the potential votes ', potential_votes)
         self.update_arrows(potential_votes)
 
 
     def update_arrows(self, potential_votes):
         # checks for existing arrows, and removes them.
-        print("this is the size of arrows ", len(self.arrows))
         if potential_votes: # only run this if there are actual potentialvotes.
             for arrow in self.arrows: # if there is anythign in there.
                 arrow.remove()
