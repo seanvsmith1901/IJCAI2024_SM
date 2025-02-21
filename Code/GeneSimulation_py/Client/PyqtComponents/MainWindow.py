@@ -122,10 +122,8 @@ class MainWindow(QMainWindow):
 
     def update_jhg_labels(self):
         for i in range(self.round_state.num_players):
-            print(self.round_state.client_id)
             # If players[i] is the client, show tokens kept. Else, show the received and sent tokens for that player
             if i == int(self.round_state.client_id):
-                print("self")
                 self.round_state.players[i].kept_number_label.setText(str(int(self.round_state.received[i])))
             else:
                 self.round_state.players[i].received_label.setText(str(int(self.round_state.received[i])))

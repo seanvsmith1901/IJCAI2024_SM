@@ -66,11 +66,8 @@ class GameServer:
             data = self.get_client_data()
             for client, received_json in data.items():
                 if "FINAL_VOTE" in received_json:
-                    # print("Final vote received")
-                    # print(type(received_json["FINAL_VOTE"]))
                     player_votes[received_json["CLIENT_ID"]] = received_json["FINAL_VOTE"]
                 if "POTENTIAL_VOTE" in received_json:
-                    # print("potential vote recieved")
                     player_fake_votes[received_json["CLIENT_ID"]] = received_json["POTENTIAL_VOTE"]
             # sends out all the potential votes that we have made and redistributes them so that everyone can see them.
             message = {
@@ -96,8 +93,7 @@ class GameServer:
         }
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
-        # and congrats! that should be something of like how we would like to see it. will probably need some polish but
-        # that's the "basic" framework that we can expand upon.
+
 
     def play_jhg_round(self, round):
         client_input = self.get_client_input()
@@ -105,6 +101,7 @@ class GameServer:
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
         allocations_matrix = self.jhg_sim.get_T()
+        print(allocations_matrix)
 
         # Sends a list containing
         for i in range(self.num_players):
