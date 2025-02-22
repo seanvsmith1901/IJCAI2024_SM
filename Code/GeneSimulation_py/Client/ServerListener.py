@@ -1,4 +1,5 @@
 import json
+import time
 
 from PyQt6.QtCore import QObject, pyqtSignal
 from PyQt6.QtWidgets import QLabel
@@ -24,41 +25,44 @@ class ServerListener(QObject):
         self.utility_qlabels = utility_qlabels
 
     # Once connected to the server, this method is called on a threaded object. Once the thread calls it, it
-    # continuously listens for data from the server. This is the entrance point for all functionality based off of
+    # continuously listens for data from the server. This is the entrance point for all functionality based on
     # receiving data from the server. Kinda a switch board of sorts
     def start_listening(self):
         while True:
             data = self.client_socket.recv(4096)
             json_data = None
             if data:
-                json_data = json.dumps(json.loads(data.decode()))
-                if "ROUND_TYPE" in json_data:
-                    json_data = json.loads(json_data)
-                    if json_data["ROUND_TYPE"] == "jhg":
+                try:
+                    json_data = json.dumps(json.loads(data.decode()))
+                    if "ROUND_TYPE" in json_data:
+                        json_data = json.loads(json_data)
+                        if json_data["ROUND_TYPE"] == "jhg":
+                            self.tabs.setCurrentIndex(0)
+                            self.update_jhg_state(json_data)
+
+                        elif json_data["ROUND_TYPE"] == "sc_init":
+                            self.tabs.setCurrentIndex(1)
+                            self.round_state.options = json_data["OPTIONS"]
+                            self.round_state.nodes = json_data["NODES"]
+                            self.round_state.utilities = json_data["UTILITIES"]
+                            self.update_sc_round_signal.emit()
+                            self.enable_sc_buttons_signal.emit()
+                            self.disable_jhg_buttons_signal.emit()
+
+                        elif json_data["ROUND_TYPE"] == "sc_vote":
+                            self.main_window.update_potential_sc_votes(json_data["POTENTIAL_VOTES"])
+
+                        elif json_data["ROUND_TYPE"] == "sc_over": # cris-cross!
+                            self.disable_sc_buttons_signal.emit()
+                            self.main_window.update_graph(json_data["WINNING_VOTE"])
+                            self.main_window.update_win(json_data["WINNING_VOTE"])
+                        elif json_data["ROUND_TYPE"] == "sc_in_progress":
+                            pass
+                    elif "SWITCH_ROUND" in json_data:
                         self.tabs.setCurrentIndex(0)
-                        self.update_jhg_state(json_data)
-
-                    elif json_data["ROUND_TYPE"] == "sc_init":
-                        self.tabs.setCurrentIndex(1)
-                        self.round_state.options = json_data["OPTIONS"]
-                        self.round_state.nodes = json_data["NODES"]
-                        self.round_state.utilities = json_data["UTILITIES"]
-                        self.update_sc_round_signal.emit()
-                        self.enable_sc_buttons_signal.emit()
-                        self.disable_jhg_buttons_signal.emit()
-
-                    elif json_data["ROUND_TYPE"] == "sc_vote":
-                        self.main_window.update_potential_sc_votes(json_data["POTENTIAL_VOTES"])
-
-                    elif json_data["ROUND_TYPE"] == "sc_over": # criss cross!
-                        self.tabs.setCurrentIndex(0)
-                        self.disable_sc_buttons_signal.emit()
                         self.enable_jhg_buttons_signal.emit()
-                        self.main_window.update_graph(json_data["WINNING_VOTE"])
-                        self.main_window.update_win(json_data["WINNING_VOTE"])
-
-                    elif json_data["ROUND_TYPE"] == "sc_in_progress":
-                        pass
+                except:
+                    pass
 
 
 

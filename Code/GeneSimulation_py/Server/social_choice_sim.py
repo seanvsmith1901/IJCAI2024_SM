@@ -1,7 +1,6 @@
 import math
 import random
 import numpy as np
-from sympy.physics.mechanics import inertia
 
 from Node import Node
 
@@ -15,7 +14,6 @@ class Social_Choice_Sim:
         self.causes = self.create_cause_nodes(num_causes)
         self.current_options_matrix = {}
         self.player_nodes = []
-        #np.set_printoptions(legacy='1.25')
         self.all_votes = {}
 
     def create_players(self):
@@ -36,7 +34,7 @@ class Social_Choice_Sim:
         return self.options_matrix # because why not
 
     def create_cause_nodes(self, num_causes):
-        displacement = (2 * math.pi) / (num_causes) # need an additional "0" cause.
+        displacement = (2 * math.pi) / num_causes # need an additional "0" cause.
         causes = []
         for i in range(num_causes):
             new_x = math.cos(displacement * i) * self.rad
@@ -78,19 +76,19 @@ class Social_Choice_Sim:
         return self.players
 
     def start_round(self):
-        # options may change but the cuases themselves don't so we can generate them in init functionality.
+        # options may change, but the causes themselves don't, so we can generate them in init functionality.
         self.current_options_matrix = self.create_options_matrix()
         self.player_nodes = self.create_player_nodes()
         # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
 
-    # takes in the influence matrix, and then spits out the 3 strongest caluclated relations for every player.
+    # takes in the influence matrix, and then spits out the 3 strongest calculated relations for every player.
     def calculate_relation_strength(self, new_relations):
         cpp = self.cpp # how many closest personal promises each player has or something.
-        # this is where I had to decide how I wanted to gauge strength of relations
+        # this is where I had to decide how I wanted to gauge the strength of relations
         new_values = self.apply_heuristic(new_relations)
         # specialized bc of negative values and possible stealing.
         normalized_values = self.normalize(new_values)
-        # goes through the normalized heuristic, finds the cpp strongest, and makes them into a seralizable dictionary we can send across.
+        # goes through the normalized heuristic, finds the cpp strongest, and makes them into a serializable dictionary we can send across.
         return_values = self.make_dict(normalized_values, cpp)
         return_values = self.make_native_type(return_values)
         return return_values
@@ -123,7 +121,7 @@ class Social_Choice_Sim:
     def normalize(self, new_values):
         normalized_matrix = np.array(new_values)
         if normalized_matrix.min() < 0: # for negative values - likely doesn't work.
-            for element in normalized_matrix.flat: # literally no freakin clue if this will work.
+            for element in normalized_matrix.flat: # literally no freaking clue if this works.
                 if element > 0:
                     normalized_matrix[element] = element / (normalized_matrix.max())
                 elif element < 0:
@@ -141,13 +139,14 @@ class Social_Choice_Sim:
         relation_strengths = [[0] * self.num_players for _ in range(self.num_players)]
         for i in range(len(new_relations)):
             for j in range(len(new_relations)):
-                if i == j: # This way we don't consider self relations - just remove them from matrix.
+                if i == j: # This way we don't consider self-relations - just remove them from the matrix.
                     new_relations[i][j] = 0
                 if new_relations[i][j] != 0 and new_relations[j][i] != 0:
                     new_value = (new_relations[i][j] + new_relations[j][i]) / 2
                     relation_strengths[i][j] = new_value
                     relation_strengths[j][i] = new_value
                 elif new_relations[i][j] == 0 and new_relations[j][i] != 0:
+                    print(new_relations[j][i])
                     new_value = math.sqrt(new_relations[j][i])
                     relation_strengths[j][i] = new_value
                     relation_strengths[i][j] = new_value
@@ -161,6 +160,6 @@ class Social_Choice_Sim:
         return relation_strengths
 
     def add_votes(self, round, votes):
-        # we gotta put em all somewhere and here works as good as anywhere else. Not sure if we will need it.
+        # We have to put them all somewhere and here works as good as anywhere else. Not sure if we will need it.
         self.all_votes[round] = votes
 

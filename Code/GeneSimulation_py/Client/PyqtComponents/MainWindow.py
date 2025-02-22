@@ -156,7 +156,7 @@ class MainWindow(QMainWindow):
             else:
                 player_label.setText(f"{player_id}")
 
-            player_label.setStyleSheet("color: " + COLORS[i]) # no clue if that will work.
+            player_label.setStyleSheet("color: " + COLORS[player.id]) # no clue if that will work.
 
             self.player_labels[player_id] = player_label
 
@@ -359,7 +359,7 @@ class MainWindow(QMainWindow):
             self.cause_labels[i].setText(new_string)
 
 
-    def update_votes(self, potential_votes):
+    def update_potential_sc_votes(self, potential_votes):
         for i in range(len(self.player_labels)):
             player_label = self.player_labels.get(str(int(i) + 1))
             if str(int(self.round_state.client_id) + 1) == str(int(i) + 1):
@@ -413,23 +413,19 @@ class MainWindow(QMainWindow):
 
             self.canvas.draw()
 
-
-
-
-
     def disable_sc_buttons(self):
         for button in self.sc_buttons:
             button.setEnabled(False)
+
+    def enable_sc_buttons(self):
+        for button in self.sc_buttons:
+            button.setEnabled(True)
 
         for i in range(len(self.player_labels)):
             if i == int(self.round_state.client_id):
                 self.player_labels[str(i + 1)].setText(f"{i + 1} You :)")
             else:
                 self.player_labels[str(i + 1)].setText(f"{i + 1}")
-
-    def enable_sc_buttons(self):
-        for button in self.sc_buttons:
-            button.setEnabled(True)
 
     def disable_jhg_buttons(self):
         for button in self.jhg_buttons:

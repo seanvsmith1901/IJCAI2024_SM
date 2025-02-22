@@ -18,11 +18,12 @@ class GameServer:
     def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players):
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
+        self.num_players = num_players
         self.client_usernames = client_usernames
         self.current_round = 0
         self.num_causes = num_causes
-        self.jhg_sim = JHG_simulator(len(new_clients), total_players) # creates a new JHG simulator object
-        self.sc_sim = Social_Choice_Sim(total_players, self.num_causes)
+        self.jhg_sim = JHG_simulator(len(new_clients), num_players) # creates a new JHG simulator object
+        self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
         self.num_bots = num_bots
         self.save_dict = {}
         self.big_dict = {}
@@ -38,6 +39,7 @@ class GameServer:
                 self.play_jhg_round(round)
                 print(f"Played round {round}")
                 round += 1
+                print("New round")
             self.play_social_choice_round()
 
         self.save_stuff_small()
@@ -57,7 +59,7 @@ class GameServer:
             "OPTIONS" : current_options_matrix,
             "NODES" : [node.to_json() for node in all_nodes],
             "UTILITIES" : current_options_matrix,
-            #"RELATION_STRENGTH" : new_relations,
+            #"RELATION_STRENGTH": new_relations,
         }
 
         for i in range(len(self.connected_clients)):
@@ -88,17 +90,19 @@ class GameServer:
             for i in range(len(self.connected_clients)):
                 self.connected_clients[i].send(json.dumps(message).encode())
 
-
-
-
         bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
+
+        all_votes = {**bot_votes, **player_votes}
+        total_votes = len(all_votes)
+        winning_vote_count = Counter(all_votes.values()).most_common(1)[0][1]
+        winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
 
         if not (winning_vote_count > total_votes // 2):
             winning_vote = -1
 
         self.sc_sim.apply_vote(winning_vote)  # once again needs to be done from gameserver, as that is where winning vote is consolidated.
         # aight now you have the winning vote, so what you need to do is export
-        # 1. the winning vote, 2. the new utility of each player, and yeah that's pretty much it
+        # 1. the winning vote, 2. the new utility of each player, and yeah, that's pretty much it
         message = {
             "WINNING_VOTE" : winning_vote,
             "NEW_UTILITY" : self.sc_sim.get_player_utility(),
@@ -109,9 +113,16 @@ class GameServer:
 
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
-        time.sleep(2) # force the fetcher to sleep for a little bit so we know which vote has won.
-        # and congrats! that should be something of like how we would like to see it. will probably need some polish but
-        # that's the "basic" framework that we can expand upon.
+
+        time.sleep(2) # Force the fetcher to sleep for a little bit so we know which vote has won. And congrats!
+
+        message = {
+            "SWITCH_ROUND": "jhg",
+        }
+        for i in range(len(self.connected_clients)):
+            self.connected_clients[i].send(json.dumps(message).encode())
+        # That should be something like how we would like to see it.
+        # Will probably need some polish, but that's the "basic" framework that we can expand upon.
 
     def play_jhg_round(self, round):
         client_input = self.get_client_input()
@@ -148,7 +159,7 @@ class GameServer:
             if len(client_input) == len(self.connected_clients):
                 break
             # this isn't the most elegant solution, but it means that we can see all submitted votes. I want us to also be able to see unsubmitted votes.
-            else: # we are still playing -- display who is voting for who.
+            else: # we are still playing -- display who is voting for whom.
                 message = {
                     "CURRENT_VOTES" : client_input,
                 }
@@ -181,7 +192,7 @@ class GameServer:
                 while True:  # Accumulate data until the full message is received
                     chunk = client.recv(4096).decode()
                     msg += chunk
-                    if len(chunk) < 4096:  # End of message
+                    if len(chunk) < 4096:  # End of the message
                         break
                 if msg:
                     data[client] = json.loads(msg)
@@ -196,16 +207,16 @@ class GameServer:
 
     def append_stuff_big(self, new_potential_votes, potential_or_final):
         if self.current_round not in self.big_dict:
-            self.big_dict[self.current_round] = {} # initalize an empty round
+            self.big_dict[self.current_round] = {} # initialize an empty round
         index = len(self.big_dict[self.current_round])+1
-        self.big_dict[self.current_round][index] = {} # new index, slap the potnetial or final in there.
-        self.big_dict[self.current_round][index][potential_or_final] = new_potential_votes.copy() # it is imperitave that this be a copy. IDK why.
+        self.big_dict[self.current_round][index] = {} # new index, slap the potential or final in there.
+        self.big_dict[self.current_round][index][potential_or_final] = new_potential_votes.copy() # it is imperative that this be a copy. IDK why.
 
     def save_stuff_big(self):
         desktop_path = os.path.expanduser("~/Desktop")
         folder_path = os.path.join(desktop_path, "sc_sim_jsons", "low_level_jsons")
         low_level_path = "sc_sim_low_level.json"
-        # if not os.path.exists(folder_path): # folder should already be guranteed to exist. don't worry about it.
+        # if not os.path.exists(folder_path): # folder should already be guaranteed to exist. don't worry about it.
         #     os.makedirs(folder_path)
 
         file_path_2 = os.path.join(folder_path, low_level_path)

@@ -1,13 +1,15 @@
-# this fetcher just holds connections and instantiates game servers when we have enough people, think 12. do NOT hold all connections, delete them after passign them down to gameServer
+# this fetcher just holds connections and instantiates game servers when we have enough people, think 12. do NOT hold all connections, delete them after passing them down to gameServer
 
 import json
 import socket
+from time import sleep
+
 from game_server import GameServer
 
 
 
 # Set to 1 for testing purposes
-HUMAN_PLAYERS = 2 # how many players need to join before things start to blow up.
+HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up?
 TOTAL_PLAYERS = 11
 BOT_PLAYERS = TOTAL_PLAYERS - HUMAN_PLAYERS
 NUM_CAUSES = 3
@@ -23,10 +25,10 @@ hunters = []
 MAX_ROUNDS = 4
 round = 1
 
-#          l. blue,  red,      orange,   yellow,   pink,     purple,   black,    white,   l. green,  d. green, d. blue,  gray
+#          l. blue,  red,      orange,   yellow,   pink,     purple,   black,    white,   l. green,  d. green, d. blue,    gray
 COLORS = ["1e88e4", "#e41e1e", "f5a115", "f3e708", "e919d3", "a00fb9", "000000", "ffffff", "82e31e", "417a06", "1e437e", "9b9ea4"]
 
-def start_server(host='127.0.0.1', port=12346):
+def start_server(host='127.0.0.1', port=12348):
     # Create a TCP socket
     #     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -57,7 +59,7 @@ def start_server(host='127.0.0.1', port=12346):
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
             GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS, BOT_PLAYERS, NUM_CAUSES, TOTAL_PLAYERS) # might need to make a copy and overwrite connected clients
-            # readies for another game maybe possibly. who knows. will prolly never test.
+            # Readies for another game maybe possibly. Who knows. Will probably never test.
             connected_clients.clear()
             client_id_dict.clear()
             client_usernames.clear()
