@@ -1,39 +1,27 @@
 import json
+import time
 from functools import partial
-
+from collections import Counter
 import pyqtgraph as pg
-
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QStackedLayout, QTabWidget, \
     QGridLayout, QPushButton, QSizePolicy
-
 import pyqtgraph as pg
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib as plt
 plt.use("QtAgg")
-
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QStackedLayout, QTabWidget, \
     QGridLayout, QPushButton, QSizePolicy
-
 from matplotlib.patches import Circle  # Import Circle from matplotlib.patches
-
 from .JhgTab import JhgTab
-
-# Sean's imports
-# from Code.GeneSimulation_py.Client.RoundState import RoundState
-#
-# from Code.GeneSimulation_py.Client.ServerListener import ServerListener
-
-# Garrett's imports
 from RoundState import RoundState
-
 from ServerListener import ServerListener
-
+from .Arrow import Arrow
 from .SocialChoicePanel import SocialChoicePanel
 
 #          l. blue,   red,       orange,    yellow,    pink,      purple,    black,     teal,      l. green,  d. green,   d. blue,  gray
@@ -120,6 +108,11 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(tabs)
     #/4#
 
+
+
+        self.nodes_dict = {}
+        self.arrows = {}
+
     def update_jhg_labels(self):
         for i in range(self.round_state.num_players):
             # If players[i] is the client, show tokens kept. Else, show the received and sent tokens for that player
@@ -152,6 +145,7 @@ class MainWindow(QMainWindow):
         self.cause_table_layout.setColumnStretch(0, 1)
 
         self.player_labels = {}
+        self.cause_labels = {}
 
         for player in self.round_state.players:
             player_id = str(player.id + 1)
@@ -162,7 +156,7 @@ class MainWindow(QMainWindow):
             else:
                 player_label.setText(f"{player_id}")
 
-            player_label.setStyleSheet("color: " + COLORS[player.id]) # no clue if that will work.
+            player_label.setStyleSheet("color: " + COLORS[i]) # no clue if that will work.
 
             self.player_labels[player_id] = player_label
 
@@ -171,8 +165,11 @@ class MainWindow(QMainWindow):
         self.sc_buttons = []
         # For each cause
         for i in range(self.round_state.num_causes):
-            self.cause_table_layout.addWidget(QLabel(f"Cause #{i}"), 0, i + 1)
+            cause_label = QLabel(f"Cause #{i+1}")
+            self.cause_table_layout.addWidget(cause_label, 0, i + 1)
             self.cause_table_layout.setColumnStretch(i + 1, 1)
+            self.cause_labels[i] = cause_label
+
             row = []
             for j in range(self.round_state.num_players):
                 row.append(QLabel("0"))
@@ -234,6 +231,31 @@ class MainWindow(QMainWindow):
         }
         self.client_socket.send(json.dumps(message).encode())
 
+    def sc_display_winning_vote(self, winning_vote):
+        x_val = -1
+        y_val = -1
+        text = ""
+        color = "#e41e1e"
+        for node in self.round_state.nodes:
+            if node["text"] == "Cause " + str(int(winning_vote)+1):
+                x_val = node["x_pos"]
+                y_val = node["y_pos"]
+                text = node["text"]
+
+
+        self.ax.annotate(
+            text,
+            (x_val, y_val),
+            textcoords="offset points",
+            xytext=(0, 3),
+            ha='center',
+            fontsize=9,
+            color=color,
+            weight='bold',
+        )
+
+        self.canvas.draw()
+        time.sleep(1) # show it red for 3 seconds
 
 
     def create_graph(self):
@@ -247,15 +269,33 @@ class MainWindow(QMainWindow):
         self.text = []
         return self.canvas
 
-    def update_graph(self):
+    def update_graph(self, winning_vote=None):
         radius = 5 # I just happen to know this, no clue if we need to make this adjusatable based on server input.
 
+        if winning_vote != None:
+            if winning_vote == -1:
+                print("NO ONE WON! NO RED.")
+            else:
+                print("WE HAVE A WINNING VOTE! ITS ", winning_vote)
+                winning_vote += 1
+        else:
+            self.arrows.clear()
+
         self.ax.clear()
+        for arrow in self.arrows:
+            arrow.draw(self.ax) # redraw the arrows if there are any, if there is a winnig vote we erase them.
+
         self.x = []
         self.y = []
         self.type = []
         self.text = []
         for node in self.round_state.nodes:
+            mini_dict = {}
+            mini_dict["x_pos"] = float(node["x_pos"])
+            mini_dict["y_pos"] = float(node["y_pos"])
+
+            self.nodes_dict[node["text"]] = mini_dict
+
             self.x.append(float(node["x_pos"]))
             self.y.append(float(node["y_pos"]))
             self.type.append(node["type"])
@@ -270,6 +310,8 @@ class MainWindow(QMainWindow):
                 split_string = text.split()
                 text = split_string[1]
                 color = COLORS[int(split_string[1]) - 1]
+            elif text == "Cause " + str(winning_vote):
+                color = "#e41e1e"  # red haha.
             else:
                 color = "black"
             self.ax.annotate(
@@ -301,13 +343,33 @@ class MainWindow(QMainWindow):
 
         self.ax.set_aspect('equal', adjustable='box')
 
-        circle = Circle((0, 0), radius, color='black', fill=False, lw=2)  # Use Circle from patches
-        self.ax.add_patch(circle)
 
         self.canvas.draw()
 
-    def update_potential_sc_votes(self, potential_votes):
+    # def update_potential_sc_votes(self, potential_votes):
+
+
+    def update_win(self, winning_vote):
+
+        for i in range(len(self.cause_labels)):
+            if winning_vote == i:
+                new_string = "WE WON!"
+            else:
+                new_string = "Cause #" + str(i+1) + " (" + str(winning_vote+1) + ")"
+            self.cause_labels[i].setText(new_string)
+
+
+    def update_votes(self, potential_votes):
+        for i in range(len(self.player_labels)):
+            player_label = self.player_labels.get(str(int(i) + 1))
+            if str(int(self.round_state.client_id) + 1) == str(int(i) + 1):
+                new_text = str(int(i) + 1) + " You :) "
+            else:
+                new_text = str(int(i) + 1)
+            player_label.setText(new_text)
+
         for player_id, vote in potential_votes.items():
+            print('here is the player_id, ', player_id, " and here is the vote ", vote)
             player_label = self.player_labels.get(str(int(player_id) + 1))  # Adjust ID for zero-indexed list
             if player_label:
                 if str(int(self.round_state.client_id) + 1) == str(int(player_id)+1):
@@ -315,6 +377,45 @@ class MainWindow(QMainWindow):
                 else:
                     new_text = str(int(player_id) + 1) + " (" + str(vote) + ")"
                 player_label.setText(new_text)
+        total_votes = Counter(potential_votes.values()).most_common(len(self.cause_labels)) # take the second element of the tuple or something
+
+        for i in range(len(self.cause_labels)):
+            new_string = "Cause #" + str(i+1) + " (0)"
+            self.cause_labels[i].setText(new_string)
+
+        for i in range(len(total_votes)):
+            new_string = "Cause #" + str(total_votes[i][0]+1) + " (" + str(total_votes[i][1]) + ")"
+            self.cause_labels[int(total_votes[i][0])].setText(new_string)
+
+        self.update_arrows(potential_votes)
+
+
+    def update_arrows(self, potential_votes):
+        # checks for existing arrows, and removes them.
+        if potential_votes: # only run this if there are actual potentialvotes.
+            for arrow in self.arrows: # if there is anythign in there.
+                arrow.remove()
+
+            self.arrows = [] # clean the arrows array.
+            for key in potential_votes:
+                player_name = "Player " + str(int(key)+1)
+                start_x = self.nodes_dict[player_name]["x_pos"]
+                start_y = self.nodes_dict[player_name]["y_pos"]
+                cause_name = "Cause " + str(int(potential_votes[key])+1)
+                end_x = self.nodes_dict[cause_name]["x_pos"]
+                end_y = self.nodes_dict[cause_name]["y_pos"]
+
+                new_arrow = Arrow((start_x, start_y), (end_x, end_y), color=COLORS[int(key)])
+                self.arrows.append(new_arrow)
+
+            for arrow in self.arrows:
+                arrow.draw(self.ax)
+
+            self.canvas.draw()
+
+
+
+
 
     def disable_sc_buttons(self):
         for button in self.sc_buttons:

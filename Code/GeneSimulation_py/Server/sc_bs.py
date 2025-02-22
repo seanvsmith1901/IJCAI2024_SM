@@ -2,15 +2,13 @@
 
 import json
 import socket
-from time import sleep
-
 from game_server import GameServer
 
 
 
 # Set to 1 for testing purposes
-HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up.
-TOTAL_PLAYERS = 3
+HUMAN_PLAYERS = 2 # how many players need to join before things start to blow up.
+TOTAL_PLAYERS = 11
 BOT_PLAYERS = TOTAL_PLAYERS - HUMAN_PLAYERS
 NUM_CAUSES = 3
 
@@ -22,13 +20,13 @@ WIDTH = 3
 client_id_dict = {}
 hunters = []
 # Set very high for testing purposes
-MAX_ROUNDS = 100
+MAX_ROUNDS = 4
 round = 1
 
 #          l. blue,  red,      orange,   yellow,   pink,     purple,   black,    white,   l. green,  d. green, d. blue,  gray
-COLORS = ["1e88e4", "e41e1e", "f5a115", "f3e708", "e919d3", "a00fb9", "000000", "ffffff", "82e31e", "417a06", "1e437e", "9b9ea4"]
+COLORS = ["1e88e4", "#e41e1e", "f5a115", "f3e708", "e919d3", "a00fb9", "000000", "ffffff", "82e31e", "417a06", "1e437e", "9b9ea4"]
 
-def start_server(host='127.0.0.1', port=12345):
+def start_server(host='127.0.0.1', port=12346):
     # Create a TCP socket
     #     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

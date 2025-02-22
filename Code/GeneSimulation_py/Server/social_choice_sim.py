@@ -36,7 +36,7 @@ class Social_Choice_Sim:
         return self.options_matrix # because why not
 
     def create_cause_nodes(self, num_causes):
-        displacement = (2 * math.pi) / num_causes
+        displacement = (2 * math.pi) / (num_causes) # need an additional "0" cause.
         causes = []
         for i in range(num_causes):
             new_x = math.cos(displacement * i) * self.rad
@@ -52,12 +52,8 @@ class Social_Choice_Sim:
             for cause_index in range(self.num_causes):
                 # get the strength of the new vectors
                 position_x, position_y = self.causes[cause_index].get_x(), self.causes[cause_index].get_y()
-                if self.options_matrix[i][cause_index] >= 0:
-                    position_x = (position_x * self.options_matrix[i][cause_index]) / (2 * self.rad)
-                    position_y = (position_y * self.options_matrix[i][cause_index]) / (2 * self.rad)
-                else: # ignore negative numbers. too many headaches.
-                    position_x = 0
-                    position_y = 0
+                position_x = (position_x * self.options_matrix[i][cause_index]) / (2 * self.rad)
+                position_y = (position_y * self.options_matrix[i][cause_index]) / (2 * self.rad)
 
                 current_x += position_x
                 current_y += position_y

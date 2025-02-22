@@ -29,6 +29,7 @@ class ServerListener(QObject):
     def start_listening(self):
         while True:
             data = self.client_socket.recv(4096)
+            json_data = None
             if data:
                 json_data = json.dumps(json.loads(data.decode()))
                 if "ROUND_TYPE" in json_data:
@@ -53,6 +54,8 @@ class ServerListener(QObject):
                         self.tabs.setCurrentIndex(0)
                         self.disable_sc_buttons_signal.emit()
                         self.enable_jhg_buttons_signal.emit()
+                        self.main_window.update_graph(json_data["WINNING_VOTE"])
+                        self.main_window.update_win(json_data["WINNING_VOTE"])
 
                     elif json_data["ROUND_TYPE"] == "sc_in_progress":
                         pass
