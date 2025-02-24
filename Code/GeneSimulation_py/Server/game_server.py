@@ -90,7 +90,9 @@ class GameServer:
             for i in range(len(self.connected_clients)):
                 self.connected_clients[i].send(json.dumps(message).encode())
 
-        bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
+
+        #bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix) # this will still yeild a very basic greedy vote. want to make it better.
+        bot_votes = self.sc_sim.get_votes()
 
         all_votes = {**bot_votes, **player_votes}
         total_votes = len(all_votes)

@@ -163,3 +163,36 @@ class Social_Choice_Sim:
         # We have to put them all somewhere and here works as good as anywhere else. Not sure if we will need it.
         self.all_votes[round] = votes
 
+    def get_votes(self):
+        # aight so what we need to do here
+        pass
+        # we first need to assemble what likelehood we have of everyone switching.
+        # how can we model this? I don't really know.
+        # see I want a probablility of switches and then just evaluate some of them
+        # i might have to do more trig.
+        # or I could evalute the distance from each node given the nodes, evalutae that distance, put it in a 2d array
+        # then convert that into something I can use.
+        # sure why note
+        distance_array = [[0 for cause in self.num_causes] for player in self.num_players]
+        for player in range(len(self.options_matrix)):
+            for cause in range(len(self.options_matrix[player])):
+                dist = [player] - current_cause_node
+
+        # pull out the most likely ones, put it in a format we can use
+        # from there, evalute all possible
+
+
+        # this is the portion I don't understand - not sure the best way to brute force it without just blowing up my computer haha.
+        # like I understand that some swaps are more likely than others but like
+        # I don't understand how I should force swaps to be considered
+        # we should do this even if there is a majority, just to check to see if there is a better nash equilibrium that is somewhat likely
+        # i am NOT sure how to evalute how likely a swap is, likely using a multiplicaiton of distance
+        # but given that, I am not sure how high that needs to be in order to conisder siwtching
+        # obviously if we are at a favorible nash equilibrium, is it even worth considering a swap?
+        # idk. THose are questions for future sean bc this project might get hairy.
+        # could be mad fun though, I am looking forward to it.
+        # for swap in swaps (ordered from most likely to least likely, likely with a max limiter)
+            # if w/ swap there is a majority
+                # save swap as a nash equilibria
+
+
