@@ -57,3 +57,6 @@ class Player:
 
         self.minus_button.setMinimumWidth(self.minus_button.fontMetrics().horizontalAdvance("-") + 20)
         self.plus_button.setMinimumWidth(self.plus_button.fontMetrics().horizontalAdvance("+") + 20)
+
+        # Label to display total utilities
+        self.utility_label = QLabel("0")

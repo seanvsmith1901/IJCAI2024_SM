@@ -16,12 +16,15 @@ class ReceivedData:
 
 class GameServer:
     def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players):
+        self.utilities = None
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.num_players = num_players
         self.client_usernames = client_usernames
         self.current_round = 0
         self.num_causes = num_causes
+        self.options_history = {}
+        self.options_votes_history = {}
         self.jhg_sim = JHG_simulator(len(new_clients), num_players) # creates a new JHG simulator object
         self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
         self.num_bots = num_bots
@@ -32,6 +35,8 @@ class GameServer:
 
     def start_game(self, max_rounds):
         round = 1
+        sc_round = 0
+        self.utilities = {i: 0 for i in range(self.num_players)}
 
         while self.current_round <= max_rounds:
             # This range says how many jhg rounds to play between sc rounds
@@ -40,17 +45,20 @@ class GameServer:
                 print(f"Played round {round}")
                 round += 1
                 print("New round")
-            self.play_social_choice_round()
+            self.play_social_choice_round(sc_round)
+            sc_round += 1
+            print("New round")
 
         self.save_stuff_small()
         self.save_stuff_big()
         print("game over")
 
-    def play_social_choice_round(self):
+    def play_social_choice_round(self, round):
         self.sc_sim.start_round()
         new_influence = self.jhg_sim.get_influence().tolist()
         new_relations = self.sc_sim.calculate_relation_strength(new_influence)
         current_options_matrix = self.sc_sim.get_current_options_matrix()
+        self.options_history[round] = current_options_matrix
         player_nodes = self.sc_sim.get_player_nodes()
         causes = self.sc_sim.get_causes()
         all_nodes = causes + player_nodes
@@ -93,6 +101,9 @@ class GameServer:
         bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
 
         all_votes = {**bot_votes, **player_votes}
+        self.options_votes_history[round] = all_votes # Saves the history of votes
+
+
         total_votes = len(all_votes)
         winning_vote_count = Counter(all_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
@@ -103,9 +114,13 @@ class GameServer:
         self.sc_sim.apply_vote(winning_vote)  # once again needs to be done from gameserver, as that is where winning vote is consolidated.
         # aight now you have the winning vote, so what you need to do is export
         # 1. the winning vote, 2. the new utility of each player, and yeah, that's pretty much it
+
+        new_utilities = self.sc_sim.get_player_utility()
+
+
         message = {
             "WINNING_VOTE" : winning_vote,
-            "NEW_UTILITY" : self.sc_sim.get_player_utility(),
+            "NEW_UTILITIES" : new_utilities,
             "ROUND_TYPE" : "sc_over",
         }
 

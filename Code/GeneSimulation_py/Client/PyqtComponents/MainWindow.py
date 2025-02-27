@@ -142,6 +142,7 @@ class MainWindow(QMainWindow):
 
         # Add the player id column
         self.cause_table_layout.addWidget(QLabel("Player"), 0, 0)
+        self.cause_table_layout.addWidget(QLabel("Utility"), 0, 1)
         self.cause_table_layout.setColumnStretch(0, 1)
 
         self.player_labels = {}
@@ -156,24 +157,26 @@ class MainWindow(QMainWindow):
             else:
                 player_label.setText(f"{player_id}")
 
-            player_label.setStyleSheet("color: " + COLORS[player.id]) # no clue if that will work.
+            player_label.setStyleSheet("color: " + COLORS[player.id])
 
             self.player_labels[player_id] = player_label
+            utilities_label = player.utility_label
 
             self.cause_table_layout.addWidget(player_label, int(player_id), 0)
+            self.cause_table_layout.addWidget(utilities_label, int(player_id), 1)
 
         self.sc_buttons = []
         # For each cause
         for i in range(self.round_state.num_causes):
             cause_label = QLabel(f"Cause #{i+1}")
-            self.cause_table_layout.addWidget(cause_label, 0, i + 1)
+            self.cause_table_layout.addWidget(cause_label, 0, i + 2)
             self.cause_table_layout.setColumnStretch(i + 1, 1)
             self.cause_labels[i] = cause_label
 
             row = []
             for j in range(self.round_state.num_players):
                 row.append(QLabel("0"))
-                self.cause_table_layout.addWidget(row[j], j + 1, i + 1)
+                self.cause_table_layout.addWidget(row[j], j + 1, i + 2)
             self.utility_qlabels.append(row)
 
             vote_button = QPushButton("Vote")
@@ -183,7 +186,7 @@ class MainWindow(QMainWindow):
             button_layout = QHBoxLayout()
             button_layout.addWidget(vote_button)
             button_layout.addStretch(1)
-            self.cause_table_layout.addLayout(button_layout, self.round_state.num_players + 2, i + 1)
+            self.cause_table_layout.addLayout(button_layout, self.round_state.num_players + 2, i + 2)
 
         # Create a single "Submit" button below the causes and vote buttons
         submit_button = QPushButton("Submit")
@@ -215,6 +218,10 @@ class MainWindow(QMainWindow):
             for j in range(self.round_state.num_players):
                 self.utility_qlabels[i][j].setText(str(self.round_state.utilities[j][i]))
         self.update_graph()
+
+    def update_utilities_labels(self, new_utilities):
+        for i in range(self.round_state.num_players):
+            self.round_state.players[i].utility_label.setText(str(new_utilities[str(i)]))
 
     def sc_vote(self, vote):
         message = {
