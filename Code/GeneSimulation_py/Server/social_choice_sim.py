@@ -145,15 +145,22 @@ class Social_Choice_Sim:
                     new_value = (new_relations[i][j] + new_relations[j][i]) / 2
                     relation_strengths[i][j] = new_value
                     relation_strengths[j][i] = new_value
-                elif new_relations[i][j] == 0 and new_relations[j][i] != 0:
-                    print(new_relations[j][i])
+                elif new_relations[i][j] == 0 and new_relations[j][i] != 0 and new_relations[j][i] > 0:
                     new_value = math.sqrt(new_relations[j][i])
                     relation_strengths[j][i] = new_value
                     relation_strengths[i][j] = new_value
-                elif new_relations[j][i] == 0 and new_relations[i][j] != 0:
+                elif new_relations[i][j] == 0 and new_relations[j][i] != 0 and new_relations[j][i] < 0:
+                    new_value = math.sqrt(abs(new_relations[j][i])) # make it positive and then negative again
+                    relation_strengths[j][i] = -new_value
+                    relation_strengths[i][j] = -new_value
+                elif new_relations[j][i] == 0 and new_relations[i][j] != 0 and new_relations [i][j] > 0:
                     new_value = math.sqrt(new_relations[i][j])
                     relation_strengths[i][j] = new_value
                     relation_strengths[j][i] = new_value
+                elif new_relations[j][i] == 0 and new_relations[i][j] != 0 and new_relations[i][j] <0:
+                    new_value = math.sqrt(abs(new_relations[i][j]))
+                    relation_strengths[i][j] = -new_value
+                    relation_strengths[j][i] = -new_value
                 else:
                     relation_strengths[i][j] = 0
                     relation_strengths[j][i] = 0
