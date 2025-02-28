@@ -50,6 +50,7 @@ class GameServer:
         self.sc_sim.start_round()
         new_influence = self.jhg_sim.get_influence().tolist()
         new_relations = self.sc_sim.calculate_relation_strength(new_influence)
+        print("here are teh new relations")
         current_options_matrix = self.sc_sim.get_current_options_matrix()
         player_nodes = self.sc_sim.get_player_nodes()
         causes = self.sc_sim.get_causes()

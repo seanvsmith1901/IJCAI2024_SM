@@ -123,7 +123,7 @@ class JHG_simulator():
                     self.sim.get_influence(),  # influence
                     self.sim.get_extra_data(i)  # could NOT tell you waht this is.
                 )
-                print(T[i])
+                #print(T[i])
 
         self.sim.play_round(T)
         self.T = T

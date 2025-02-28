@@ -1,6 +1,8 @@
+import copy
 import math
 import random
 import numpy as np
+from networkx import normalized_cut_size
 
 from Node import Node
 
@@ -120,19 +122,22 @@ class Social_Choice_Sim:
 
     def normalize(self, new_values):
         normalized_matrix = np.array(new_values)
-        if normalized_matrix.min() < 0: # for negative values - likely doesn't work.
-            for element in normalized_matrix.flat: # literally no freaking clue if this works.
-                if element > 0:
-                    normalized_matrix[element] = element / (normalized_matrix.max())
-                elif element < 0:
-                    normalized_matrix[element] = element / (normalized_matrix.min())
-                # otherwise its 0 and we don't have to do anything.
+        new_matrix = copy.deepcopy(normalized_matrix)
+
+        if normalized_matrix.min() < 0: # if we contain negative values.
+            for i, row in enumerate(normalized_matrix):
+                for j, element in enumerate(row):
+                    if element > 0:
+                        element = element / normalized_matrix.max()
+                    elif element < 0:
+                        element = element / normalized_matrix.min()
+                    new_matrix[i][j] = element
 
         else: # all positive values, so we can normalize this the easy way.
-            normalized_matrix = (normalized_matrix - normalized_matrix.min()) / (normalized_matrix.max() - normalized_matrix.min())
+            new_matrix = (normalized_matrix - normalized_matrix.min()) / (normalized_matrix.max() - normalized_matrix.min())
 
-        normalized_matrix = np.round(normalized_matrix, decimals=2) # reduce size.
-        return normalized_matrix
+        new_matrix = np.round(new_matrix, decimals=2) # reduce size.
+        return new_matrix
 
     def apply_heuristic(self, new_relations):
         # I GOT IT FINALLY! This line structure has been messing with me for a while now.
