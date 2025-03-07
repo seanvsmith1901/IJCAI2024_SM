@@ -1,9 +1,5 @@
 import json
-import time
-
 from PyQt6.QtCore import QObject, pyqtSignal
-from PyQt6.QtWidgets import QLabel
-
 
 class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
@@ -30,7 +26,6 @@ class ServerListener(QObject):
     def start_listening(self):
         while True:
             data = self.client_socket.recv(4096)
-            json_data = None
             if data:
                 try:
                     json_data = json.dumps(json.loads(data.decode()))
@@ -54,16 +49,18 @@ class ServerListener(QObject):
 
                         elif json_data["ROUND_TYPE"] == "sc_over": # cris-cross!
                             self.disable_sc_buttons_signal.emit()
-                            self.main_window.update_graph(json_data["WINNING_VOTE"])
+                            self.main_window.update_nodes_graph(json_data["WINNING_VOTE"])
                             self.main_window.update_win(json_data["WINNING_VOTE"])
                             new_utilities = json.loads(json.dumps(json_data["NEW_UTILITIES"]))
                             self.main_window.update_utilities_labels(new_utilities)
+                            self.main_window.update_tornado_graph(json_data["POSITIVE_VOTE_EFFECTS"], json_data["NEGATIVE_VOTE_EFFECTS"])
                         elif json_data["ROUND_TYPE"] == "sc_in_progress":
                             pass
                     elif "SWITCH_ROUND" in json_data:
                         self.tabs.setCurrentIndex(0)
                         self.enable_jhg_buttons_signal.emit()
                 except:
+                    print("An error occurred in server listener")
                     pass
 
 

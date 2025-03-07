@@ -3,11 +3,6 @@ import time
 from functools import partial
 from collections import Counter
 import pyqtgraph as pg
-from PyQt6.QtCore import QThread, pyqtSignal
-from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QStackedLayout, QTabWidget, \
-    QGridLayout, QPushButton, QSizePolicy
-import pyqtgraph as pg
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -15,28 +10,33 @@ import matplotlib as plt
 plt.use("QtAgg")
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QStackedLayout, QTabWidget, \
-    QGridLayout, QPushButton, QSizePolicy
-from matplotlib.patches import Circle  # Import Circle from matplotlib.patches
+from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QTabWidget, QGridLayout, QPushButton
 from .JhgTab import JhgTab
 from RoundState import RoundState
 from ServerListener import ServerListener
 from .Arrow import Arrow
-from .SocialChoicePanel import SocialChoicePanel
 
 #          l. blue,   red,       orange,    yellow,    pink,      purple,    black,     teal,      l. green,  d. green,   d. blue,  gray
-COLORS = ["#1e88e4", "#e41e1e", "#f5a115", "#f3e708", "#e919d3", "#a00fb9", "#000000", "#1fedbd", "#82e31e", "#417a06", "#1e437e", "#9b9ea4"]
-
+# COLORS = ["#1e88e4", "#e41e1e", "#f5a115", "#f3e708", "#e919d3", "#a00fb9", "#000000", "#1fedbd", "#82e31e", "#417a06", "#1e437e", "#9b9ea4"]
+COLORS = ["#FF9191", "#D15C5E", "#965875", "#FFF49F", "#B1907D", "#FFAFD8", "#C9ADE9", "#fdbf6f"]
 
 class MainWindow(QMainWindow):
     SC_vote = pyqtSignal()
 
     def __init__(self, client_socket, num_players, num_causes, id):
         super().__init__()
-        # This window is very dependent on things happening in the correct order. Just know if you mess with it, you
-        # might break a lot of things. It has been broken up into blocks below to try to mitigate that
+        # self.setStyleSheet("background-color: #FF171717;")
+        self.setStyleSheet("color: #FFEBEBEB; background-color: #FF171717;")
+        # This window is very dependent on things happening in the correct order.
+        # If you mess with it, you might break a lot of things.
+        # It has been broken up into blocks below to try to mitigate that
 
     #1# Block one: Sets up the round_state and client socket. Must be the first thing done
+        self.tornado_ax = None
+        self.tornado_canvas = None
+        self.graph_canvas = None
+        self.player_labels = {}
+        self.cause_labels = {}
         self.jhg_buttons = []
         self.round_state = RoundState(id, num_players, num_causes, self.jhg_buttons)
     #/1#
@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
 
-        # keep track of current vote
+        # keep track of the current vote
         self.current_vote = None
 
         # Dynamically updated elements
@@ -136,7 +136,7 @@ class MainWindow(QMainWindow):
         if not self.social_choice_tab.layout():
             self.social_choice_tab.setLayout(QVBoxLayout())
 
-        # Clear the previous table layout and setup a fresh one
+        # Clear the previous table layout and set up a fresh one
         self.cause_table_layout = QGridLayout()
         self.utility_qlabels.clear()
 
@@ -203,13 +203,16 @@ class MainWindow(QMainWindow):
 
 
         # Now add the graph to the layout
-        graph_layout = QVBoxLayout()  # Create a new layout for the graph
-        self.graph_canvas = self.create_graph()  # Call the create_graph method
-        graph_layout.addWidget(self.graph_canvas)  # Add the graph widget to the layout
+        graphs_layout = QVBoxLayout()
+        self.graph_canvas = self.create_nodes_graph()  # Call the create_graph method
+        self.tornado_canvas = self.create_tornado_graph()
 
-        # Add the graph layout to the social choice tab
-        self.social_choice_tab.layout().addLayout(graph_layout)  # Add graph to the social choice tab layout
+        sc_graph_tabs = QTabWidget()
+        sc_graph_tabs.addTab(self.graph_canvas, "Nodes Graph")
+        sc_graph_tabs.addTab(self.tornado_canvas, "Effect of past votes")
+        graphs_layout.addWidget(sc_graph_tabs)
 
+        self.social_choice_tab.layout().addLayout(graphs_layout)
         # Set the layout for the cause table in the social choice tab
         self.social_choice_tab.layout().addLayout(self.cause_table_layout)
 
@@ -217,7 +220,7 @@ class MainWindow(QMainWindow):
         for i in range(self.round_state.num_causes):
             for j in range(self.round_state.num_players):
                 self.utility_qlabels[i][j].setText(str(self.round_state.utilities[j][i]))
-        self.update_graph()
+        self.update_nodes_graph()
 
     def update_utilities_labels(self, new_utilities):
         for i in range(self.round_state.num_players):
@@ -250,7 +253,7 @@ class MainWindow(QMainWindow):
                 text = node["text"]
 
 
-        self.ax.annotate(
+        self.nodes_ax.annotate(
             text,
             (x_val, y_val),
             textcoords="offset points",
@@ -261,23 +264,89 @@ class MainWindow(QMainWindow):
             weight='bold',
         )
 
-        self.canvas.draw()
+        self.nodes_canvas.draw()
         time.sleep(1) # show it red for 3 seconds
 
 
-    def create_graph(self):
-        self.fig = Figure(figsize=(5, 4), dpi=100)
-        self.ax = self.fig.add_subplot(111)
-        self.x = np.linspace(0, 10, 100)
-        self.y = np.sin(self.x)
-        self.ax.plot(self.x, self.y)
-        self.canvas = FigureCanvas(self.fig)
-        self.type = []
-        self.text = []
-        return self.canvas
+    def create_nodes_graph(self):
+        self.nodes_fig = Figure(figsize=(5, 4), dpi=100)
+        self.nodes_ax = self.nodes_fig.add_subplot(111)
+        self.nodes_x = np.linspace(0, 10, 100)
+        self.nodes_y = np.sin(self.nodes_x)
+        self.nodes_ax.plot(self.nodes_x, self.nodes_y)
+        self.nodes_canvas = FigureCanvas(self.nodes_fig)
+        self.nodes_type = []
+        self.nodes_text = []
 
-    def update_graph(self, winning_vote=None):
-        radius = 5 # I just happen to know this, no clue if we need to make this adjusatable based on server input.
+        self.nodes_fig.patch.set_facecolor("#282828ff")
+        self.nodes_ax.set_facecolor("#282828ff")
+        self.nodes_ax.tick_params(colors="#EBEBEB")
+        self.nodes_ax.tick_params(colors="#EBEBEB")
+        for spine in self.nodes_ax.spines.values():
+            spine.set_color("#EBEBEB")
+        return self.nodes_canvas
+
+    def create_tornado_graph(self):
+        self.tornado_fig = Figure(figsize=(5, 4), dpi=100)
+        self.tornado_y = np.arange(self.round_state.num_players)
+        self.tornado_ax = self.tornado_fig.add_subplot(111)
+
+        self.tornado_ax.barh(self.tornado_y, [0 for _ in range(self.round_state.num_players)], color='red', label='Decrease Impact')
+        self.tornado_ax.barh(self.tornado_y, [0 for _ in range(self.round_state.num_players)], color='green', label='Increase Impact')
+
+        self.tornado_fig.patch.set_facecolor("#282828ff")
+        self.tornado_ax.set_facecolor("#282828ff")
+        self.tornado_ax.tick_params(colors="#EBEBEB")
+        self.tornado_ax.tick_params(colors="#EBEBEB")
+        for spine in self.tornado_ax.spines.values():
+            spine.set_color("#EBEBEB")
+
+        return FigureCanvas(self.tornado_fig)
+
+    def update_tornado_graph(self, positive_vote_effects, negative_vote_effects):
+        self.tornado_ax.cla()  # Clear the axes
+
+        num_players = self.round_state.num_players
+        y_positions = np.arange(num_players)[::-1]  # Reverse order so Player 1 is on top
+
+        # Initialize stacking positions
+        left_neg = np.zeros(num_players)  # For negative impacts
+        left_pos = np.zeros(num_players)  # For positive impacts
+
+        max_extent = 0  # To determine symmetric x-axis limits
+
+        for i in range(num_players):
+            # player_index = num_players - 1 - i  # Reverse player order
+            positive_votes = [positive_vote_effects[j][i] for j in range(num_players)]
+            negative_votes = [negative_vote_effects[j][i] for j in range(num_players)]
+
+            # Plot negative votes (extending left from zero)
+            for j, negative_vote in enumerate(negative_votes):
+                if negative_vote != 0:
+                    self.tornado_ax.barh(y_positions[i], negative_vote, left=left_neg[i], color=COLORS[j])
+                    left_neg[i] += negative_vote  # Update stacking position
+
+            # Plot positive votes (extending right from zero)
+            for j, positive_vote in enumerate(positive_votes):
+                if positive_vote != 0:
+                    self.tornado_ax.barh(y_positions[i], positive_vote, left=left_pos[i], color=COLORS[j])
+                    left_pos[i] += positive_vote  # Update stacking position
+
+            # Update max extent for symmetric x-axis
+            max_extent = max(max_extent, abs(left_neg[i]), abs(left_pos[i]))
+
+        # Set symmetric x-axis limits
+        self.tornado_ax.set_xlim(-max_extent, max_extent)
+
+        # Set labels and title
+        self.tornado_ax.set_yticks(y_positions)
+        self.tornado_ax.set_yticklabels([f"Player {i + 1}" for i in range(num_players)])
+
+        self.tornado_ax.axvline(0, color='#EBEBEB', linewidth=2, linestyle='-')
+        self.tornado_ax.figure.canvas.draw_idle()  # Redraw the figure
+
+    def update_nodes_graph(self, winning_vote=None):
+        radius = 5 # I just happen to know this, no clue if we need to make this adjustable based on server input.
 
         if winning_vote != None:
             if winning_vote == -1:
@@ -288,31 +357,29 @@ class MainWindow(QMainWindow):
         else:
             self.arrows.clear()
 
-        self.ax.clear()
+        self.nodes_ax.clear()
         for arrow in self.arrows:
-            arrow.draw(self.ax) # redraw the arrows if there are any, if there is a winnig vote we erase them.
+            arrow.draw(self.nodes_ax) # Redraw the arrows if there are any. If there is a winning vote, we erase them.
 
-        self.x = []
-        self.y = []
-        self.type = []
-        self.text = []
+        self.nodes_x = []
+        self.nodes_y = []
+        self.nodes_type = []
+        self.nodes_text = []
         for node in self.round_state.nodes:
-            mini_dict = {}
-            mini_dict["x_pos"] = float(node["x_pos"])
-            mini_dict["y_pos"] = float(node["y_pos"])
+            mini_dict = {"x_pos": float(node["x_pos"]), "y_pos": float(node["y_pos"])}
 
             self.nodes_dict[node["text"]] = mini_dict
 
-            self.x.append(float(node["x_pos"]))
-            self.y.append(float(node["y_pos"]))
-            self.type.append(node["type"])
-            self.text.append(node["text"])
+            self.nodes_x.append(float(node["x_pos"]))
+            self.nodes_y.append(float(node["y_pos"]))
+            self.nodes_type.append(node["type"])
+            self.nodes_text.append(node["text"])
 
 
         colors = []
 
-        for i, (x_val, y_val) in enumerate(zip(self.x, self.y)):
-            text = self.text[i]
+        for i, (x_val, y_val) in enumerate(zip(self.nodes_x, self.nodes_y)):
+            text = self.nodes_text[i]
             if text.startswith("Player"):
                 split_string = text.split()
                 text = split_string[1]
@@ -320,8 +387,8 @@ class MainWindow(QMainWindow):
             elif text == "Cause " + str(winning_vote):
                 color = "#e41e1e"  # red haha.
             else:
-                color = "black"
-            self.ax.annotate(
+                color = "#EBEBEB"
+            self.nodes_ax.annotate(
                 text,
                 (x_val, y_val),
                 textcoords="offset points",
@@ -333,31 +400,26 @@ class MainWindow(QMainWindow):
             )
             colors.append(color)
 
-        self.ax.scatter(self.x, self.y, marker='o', c=colors)
+        self.nodes_ax.scatter(self.nodes_x, self.nodes_y, marker='o', c=colors)
 
 
 
         # Clear the axis spines (the square border)
-        self.ax.spines['top'].set_color('none')
-        self.ax.spines['right'].set_color('none')
-        self.ax.spines['left'].set_color('none')
-        self.ax.spines['bottom'].set_color('none')
+        self.nodes_ax.spines['top'].set_color('none')
+        self.nodes_ax.spines['right'].set_color('none')
+        self.nodes_ax.spines['left'].set_color('none')
+        self.nodes_ax.spines['bottom'].set_color('none')
 
-        self.ax.set_xticks([])  # Remove x-axis ticks
-        self.ax.set_yticks([])  # Remove y-axis ticks
-        self.ax.set_xticklabels([])  # Optionally remove x-axis labels
-        self.ax.set_yticklabels([])  # Optionally remove y-axis labels
+        self.nodes_ax.set_xticks([])  # Remove x-axis ticks
+        self.nodes_ax.set_yticks([])  # Remove y-axis ticks
+        self.nodes_ax.set_xticklabels([])  # Optionally remove x-axis labels
+        self.nodes_ax.set_yticklabels([])  # Optionally remove y-axis labels
 
-        self.ax.set_aspect('equal', adjustable='box')
+        self.nodes_ax.set_aspect('equal', adjustable='box')
 
-
-        self.canvas.draw()
-
-    # def update_potential_sc_votes(self, potential_votes):
-
+        self.nodes_canvas.draw()
 
     def update_win(self, winning_vote):
-
         for i in range(len(self.cause_labels)):
             if winning_vote == i:
                 new_string = "WE WON!"
@@ -376,7 +438,6 @@ class MainWindow(QMainWindow):
             player_label.setText(new_text)
 
         for player_id, vote in potential_votes.items():
-            print('here is the player_id, ', player_id, " and here is the vote ", vote)
             player_label = self.player_labels.get(str(int(player_id) + 1))  # Adjust ID for zero-indexed list
             if player_label:
                 if str(int(self.round_state.client_id) + 1) == str(int(player_id)+1):
@@ -399,8 +460,8 @@ class MainWindow(QMainWindow):
 
     def update_arrows(self, potential_votes):
         # checks for existing arrows, and removes them.
-        if potential_votes: # only run this if there are actual potentialvotes.
-            for arrow in self.arrows: # if there is anythign in there.
+        if potential_votes: # only run this if there are actual potential votes.
+            for arrow in self.arrows: # if there is anything in there.
                 arrow.remove()
 
             self.arrows = [] # clean the arrows array.
@@ -416,9 +477,9 @@ class MainWindow(QMainWindow):
                 self.arrows.append(new_arrow)
 
             for arrow in self.arrows:
-                arrow.draw(self.ax)
+                arrow.draw(self.nodes_ax)
 
-            self.canvas.draw()
+            self.nodes_canvas.draw()
 
     def disable_sc_buttons(self):
         for button in self.sc_buttons:

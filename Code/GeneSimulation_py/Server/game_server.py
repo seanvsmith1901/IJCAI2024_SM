@@ -16,20 +16,27 @@ class ReceivedData:
 
 class GameServer:
     def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players):
-        self.utilities = None
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.num_players = num_players
         self.client_usernames = client_usernames
         self.current_round = 0
         self.num_causes = num_causes
-        self.options_history = {}
-        self.options_votes_history = {}
         self.jhg_sim = JHG_simulator(len(new_clients), num_players) # creates a new JHG simulator object
         self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
         self.num_bots = num_bots
         self.save_dict = {}
         self.big_dict = {}
+
+        # Tracking the SC game over time
+        self.utilities = None
+        self.options_history = {}
+        self.options_votes_history = {}
+        self.vote_effects = []  # Tracks how the vote of every player would have affected each player had that cause passed
+        self.vote_effects_history = {}
+        self.positive_vote_effects_history = []  # Tracks every positive vote effect by the ith player on the jth player
+        self.negative_vote_effects_history = []  # Tracks every negative vote effect by the ith player on the jth player
+
         self.start_game(max_rounds)
 
 
@@ -37,6 +44,9 @@ class GameServer:
         round = 1
         sc_round = 0
         self.utilities = {i: 0 for i in range(self.num_players)}
+        self.vote_effects = [[0 for _ in range(self.num_players)] for _ in range(self.num_players)]
+        self.positive_vote_effects_history = [[0 for _ in range(self.num_players)] for _ in range(self.num_players)]
+        self.negative_vote_effects_history = [[0 for _ in range(self.num_players)] for _ in range(self.num_players)]
 
         while self.current_round <= max_rounds:
             # This range says how many jhg rounds to play between sc rounds
@@ -104,6 +114,8 @@ class GameServer:
         all_votes = {**bot_votes, **player_votes}
         self.options_votes_history[round] = all_votes # Saves the history of votes
 
+        # Tracks the effects of each player's vote on everyone else
+        self.update_vote_effects(all_votes, current_options_matrix, round)
 
         total_votes = len(all_votes)
         winning_vote_count = Counter(all_votes.values()).most_common(1)[0][1]
@@ -118,11 +130,13 @@ class GameServer:
 
         new_utilities = self.sc_sim.get_player_utility()
 
-
         message = {
-            "WINNING_VOTE" : winning_vote,
-            "NEW_UTILITIES" : new_utilities,
-            "ROUND_TYPE" : "sc_over",
+            "ROUND_TYPE": "sc_over",
+            "WINNING_VOTE": winning_vote,
+            "NEW_UTILITIES": new_utilities,
+            "VOTE_EFFECTS": self.vote_effects,
+            "POSITIVE_VOTE_EFFECTS": self.positive_vote_effects_history,
+            "NEGATIVE_VOTE_EFFECTS": self.negative_vote_effects_history,
         }
 
         self.append_save_dict(player_votes, winning_vote)
@@ -263,3 +277,19 @@ class GameServer:
             while os.path.exists(f"{base}_{counter}{extension}"):
                 counter += 1
             return f"{base}_{counter}{extension}"
+
+    def update_vote_effects(self, all_votes, current_options_matrix, round):
+        round_vote_effects = [[0 for _ in range(self.num_players)] for _ in
+                              range(self.num_players)]  # The effects of just this round
+        for i in range(self.num_players):
+            selected_vote = all_votes[str(i)]  # Which option the ith player voted for
+            for j in range(self.num_players):
+                vote_effect = current_options_matrix[j][selected_vote]
+                self.vote_effects[j][i] += vote_effect  # The effect of the ith players vote on the jth player
+                round_vote_effects[i][j] = vote_effect
+
+                if vote_effect > 0:
+                    self.positive_vote_effects_history[i][j] += vote_effect
+                elif vote_effect < 0:
+                    self.negative_vote_effects_history[i][j] += vote_effect
+        self.vote_effects_history[str(round)] = round_vote_effects
