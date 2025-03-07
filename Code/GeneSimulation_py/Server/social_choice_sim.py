@@ -4,6 +4,7 @@ import random
 import numpy as np
 from networkx import normalized_cut_size
 
+from Code.GeneSimulation_py.Server.options_creation import generate_two_plus_one_groups_options_best_of_three
 from Node import Node
 
 class Social_Choice_Sim:
@@ -29,11 +30,10 @@ class Social_Choice_Sim:
         for i in range(self.num_players):
             self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
 
-    def create_options_matrix(self):
-        #self.options_matrix = [[10,-10,-10]]
-        #return self.options_matrix
-        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.num_players)]
+    def create_options_matrix(self, groups):
+        self.options_matrix = generate_two_plus_one_groups_options_best_of_three(groups)
         return self.options_matrix # because why not
+        # self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.num_players)]
 
     def create_cause_nodes(self, num_causes):
         displacement = (2 * math.pi) / num_causes # need an additional "0" cause.
@@ -77,9 +77,9 @@ class Social_Choice_Sim:
     def get_player_utility(self):
         return self.players
 
-    def start_round(self):
+    def start_round(self, groups):
         # options may change, but the causes themselves don't, so we can generate them in init functionality.
-        self.current_options_matrix = self.create_options_matrix()
+        self.current_options_matrix = self.create_options_matrix(groups)
         self.player_nodes = self.create_player_nodes()
         # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
 

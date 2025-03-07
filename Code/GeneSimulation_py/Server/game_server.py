@@ -4,6 +4,8 @@ from collections import Counter
 
 import select
 import json
+
+from options_creation import generate_two_plus_one_groups
 from sim_interface import JHG_simulator
 from social_choice_sim import Social_Choice_Sim
 
@@ -15,21 +17,27 @@ class ReceivedData:
 
 
 class GameServer:
-    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players):
+    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players, group_sizes_option):
+        #General
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.num_players = num_players
         self.client_usernames = client_usernames
+
+        # JHG
         self.current_round = 0
-        self.num_causes = num_causes
         self.jhg_sim = JHG_simulator(len(new_clients), num_players) # creates a new JHG simulator object
-        self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
         self.num_bots = num_bots
+
+        # SC
+        self.num_causes = num_causes
         self.save_dict = {}
         self.big_dict = {}
+        self.utilities = self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
+
+        self.sc_groups = generate_two_plus_one_groups(num_players, group_sizes_option)
 
         # Tracking the SC game over time
-        self.utilities = None
         self.options_history = {}
         self.options_votes_history = {}
         self.vote_effects = []  # Tracks how the vote of every player would have affected each player had that cause passed
@@ -64,10 +72,9 @@ class GameServer:
         print("game over")
 
     def play_social_choice_round(self, round):
-        self.sc_sim.start_round()
+        self.sc_sim.start_round(self.sc_groups)
         new_influence = self.jhg_sim.get_influence().tolist()
         new_relations = self.sc_sim.calculate_relation_strength(new_influence)
-        print("here are teh new relations")
         current_options_matrix = self.sc_sim.get_current_options_matrix()
         self.options_history[round] = current_options_matrix
         player_nodes = self.sc_sim.get_player_nodes()
