@@ -339,8 +339,10 @@ class MainWindow(QMainWindow):
         self.tornado_ax.set_xlim(-max_extent, max_extent)
 
         # Set labels and title
-        self.tornado_ax.set_yticks(y_positions)
-        self.tornado_ax.set_yticklabels([f"Player {i + 1}" for i in range(num_players)])
+        self.tornado_ax.set_yticklabels([])
+        for i, y_pos in enumerate(y_positions):
+            self.tornado_ax.text(-max_extent * 1.05, y_pos, f"Player {i + 1}",
+                                 va='center', ha='right', fontsize=10, color=COLORS[i])
 
         self.tornado_ax.axvline(0, color='#EBEBEB', linewidth=2, linestyle='-')
         self.tornado_ax.figure.canvas.draw_idle()  # Redraw the figure
