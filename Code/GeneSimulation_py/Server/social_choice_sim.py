@@ -1,12 +1,20 @@
 import math
 import random
+from collections import Counter
+
 import numpy as np
 
+from Bots import Pareto
+from Code.GeneSimulation_py.Server.Bots.Pareto import ParetoBot
+from Code.GeneSimulation_py.Server.Bots.Greedy import GreedyBot
 from Node import Node
 
 class Social_Choice_Sim:
-    def __init__(self, num_players, num_causes):
-        self.num_players = num_players
+    def __init__(self, total_players, num_causes, num_humans, type_bot):
+        self.total_players = total_players
+        self.num_humans = num_humans
+        self.num_bots = total_players - num_humans
+        self.type_bot = type_bot
         self.players = self.create_players()
         self.cpp = 3
         self.rad = 5  # hardcoded just work with me here
@@ -15,22 +23,41 @@ class Social_Choice_Sim:
         self.current_options_matrix = {}
         self.player_nodes = []
         self.all_votes = {}
+        self.organized_distance_dict = [] # set it to an empty dict for now
+        self.default_greedy = [] # len = num players, contains the current cuase that they are voting for.
+        self.bots = self.create_bots()
+        self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
+        # but like when we add players I want the bots to be able to change thier strategy based on player input. maybe.
+
+
+    def create_bots(self):
+        bots_array = []
+        for i in range(self.num_bots):
+            if self.type_bot == 1:  # pareto optimal bots for now
+                bots_array.append(ParetoBot(i))
+            if self.type_bot == 2:
+                bots_array.append(GreedyBot(i))
+            # TODO: Implement other types of bots. We also have a default greedy one that I could implement as well.
+
+
+        return bots_array
+
 
     def create_players(self):
         players = {}
-        for i in range(self.num_players):
+        for i in range(self.num_humans):
             players[str(i)] = 0
         return players
         # creates a 0 dict for all the players at some list i. I could not do that, but this feels safer.
 
     def apply_vote(self, winning_vote):
-        for i in range(self.num_players):
+        for i in range(self.total_players):
             self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
 
     def create_options_matrix(self):
         #self.options_matrix = [[10,-10,-10]]
         #return self.options_matrix
-        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.num_players)]
+        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.total_players)]
         return self.options_matrix # because why not
 
     def create_cause_nodes(self, num_causes):
@@ -44,7 +71,7 @@ class Social_Choice_Sim:
 
     def create_player_nodes(self):
         player_nodes = []
-        for i in range(self.num_players): # i is the player index
+        for i in range(self.num_humans): # i is the player index
             current_x = 0 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
             current_y = 0
             for cause_index in range(self.num_causes):
@@ -136,7 +163,7 @@ class Social_Choice_Sim:
 
     def apply_heuristic(self, new_relations):
         # I GOT IT FINALLY! This line structure has been messing with me for a while now.
-        relation_strengths = [[0] * self.num_players for _ in range(self.num_players)]
+        relation_strengths = [[0] * self.total_players for _ in range(self.total_players)]
         for i in range(len(new_relations)):
             for j in range(len(new_relations)):
                 if i == j: # This way we don't consider self-relations - just remove them from the matrix.
@@ -163,23 +190,47 @@ class Social_Choice_Sim:
         # We have to put them all somewhere and here works as good as anywhere else. Not sure if we will need it.
         self.all_votes[round] = votes
 
-    def get_votes(self):
-        # aight so what we need to do here
-        pass
-        # we first need to assemble what likelehood we have of everyone switching.
-        # how can we model this? I don't really know.
-        # see I want a probablility of switches and then just evaluate some of them
-        # i might have to do more trig.
-        # or I could evalute the distance from each node given the nodes, evalutae that distance, put it in a 2d array
-        # then convert that into something I can use.
-        # sure why note
-        distance_array = [[0 for cause in self.num_causes] for player in self.num_players]
-        for player in range(len(self.options_matrix)):
-            for cause in range(len(self.options_matrix[player])):
-                dist = [player] - current_cause_node
+    def compile_nodes(self):
+        player_nodes = self.get_player_nodes()
+        causes = self.get_causes()
+        all_nodes = causes + player_nodes
+        return all_nodes
 
-        # pull out the most likely ones, put it in a format we can use
-        # from there, evalute all possible
+    def get_votes(self):
+        bot_votes = {}
+        for i, bot in enumerate(self.bots):
+            bot_votes[i] = bot.get_vote(self.current_options_matrix)
+        # there is a lot goign on here but most of it relates to my idea of solving the nash equilibrium. Not sure
+        # gonna implement the pareto bot firs.t
+
+        # distance_array = []
+        # player_array = []
+        # cause_array = []
+        # organized_dict = {}
+        # for player in range(len(self.options_matrix)):
+        #     organized_dict[player] = {}
+        #     for cause in range(len(self.options_matrix[player])):
+        #         organized_dict[player][cause] = 0
+        #         # lets use x1 as player and x2 as cause.
+        #         current_distance = (math.sqrt(((self.causes[cause].get_x() + self.player_nodes[player].get_x()) ** 2) + (self.causes[cause].get_y() + self.player_nodes[player].get_y()) ** 2))
+        #         distance_array.append(current_distance)
+        #         player_array.append(player)
+        #         cause_array.append(cause)
+        #         organized_dict[player][cause] = current_distance
+        # big_boy_array = list(zip(distance_array, player_array, cause_array))
+        # sorted_list = sorted(big_boy_array, key=lambda x: x[0])
+        # self.organized_distance_dict = organized_dict
+        # self.create_default_greedy()
+        #
+        # self.evalute_majority(self.default_greedy)
+        #
+        # for bot_index in len(self.num_bots):
+        #     pass
+        # # so know that we have the most likely swaps
+        # # i need to build a system that can evalute for majorities super quick.
+        # # so lets get everyone's greedy vote and go from there.
+
+
 
 
         # this is the portion I don't understand - not sure the best way to brute force it without just blowing up my computer haha.
@@ -194,5 +245,38 @@ class Social_Choice_Sim:
         # for swap in swaps (ordered from most likely to least likely, likely with a max limiter)
             # if w/ swap there is a majority
                 # save swap as a nash equilibria
+
+        return bot_votes
+
+
+
+    def create_default_greedy(self):
+        default_greedy = []
+        for player in self.organized_distance_dict: # gets me the keys
+            player_dict = self.organized_distance_dict[player]
+            min_key = min(player_dict, key=player_dict.get)
+            default_greedy.append(min_key)
+        self.default_greedy = default_greedy
+
+
+    def evalute_majority(self, current_votes):
+        winning_vote = -1
+        winning_vote_count = Counter(current_votes.values()).most_common(1)[0][1]
+        winning_vote = Counter(current_votes.values()).most_common(1)[0][0]
+
+        if not (winning_vote_count > len(current_votes) // 2):
+            winning_vote = -1
+
+        return winning_vote # if its -1, no majority, else, that is the winning vote.
+
+
+    # current swap needs to be the index, the player and the cause in that order as a list of truples. use the dict to amke sure we hit every player.
+    def get_greedy_vote(self, current_swap): # current_swap is a list of possible swaps that we would like to exectute and then return the greedy vote array
+        greedy_votes = []
+        # get all of hte zero votes
+        #for player in self.organized_distance_dict:
+
+
+
 
 
