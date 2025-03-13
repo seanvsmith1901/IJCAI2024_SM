@@ -10,7 +10,7 @@ from game_server import GameServer
 
 # Set to 1 for testing purposes
 HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up?
-TOTAL_PLAYERS = 3
+TOTAL_PLAYERS = 11
 BOT_PLAYERS = TOTAL_PLAYERS - HUMAN_PLAYERS
 NUM_CAUSES = 3
 

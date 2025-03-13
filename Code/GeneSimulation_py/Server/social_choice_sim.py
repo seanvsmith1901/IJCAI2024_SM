@@ -71,51 +71,81 @@ class Social_Choice_Sim:
 
     def create_player_nodes(self):
         player_nodes = []
-        for i in range(self.total_players): # i is the player index
-            current_x = 0 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
-            current_y = 0
-            curr_negatives = []
+        for i in range(self.total_players):  # i is the player index
+            storage = [[0, 0] for _ in range(self.num_causes)]
             for cause_index in range(self.num_causes):
-                # keep track of negatives
-                if (self.options_matrix[i][cause_index]) < 0:
-                    curr_negatives[i] = 1
-                else:
-                    curr_negatives[i] = 0
-
-                # create the new positions
                 position_x, position_y = self.causes[cause_index].get_x(), self.causes[cause_index].get_y()
+
                 position_x = (position_x * self.options_matrix[i][cause_index]) / (2 * self.rad)
                 position_y = (position_y * self.options_matrix[i][cause_index]) / (2 * self.rad)
 
-                current_x += position_x
-                current_y += position_y
+                current_x, current_y = position_x, position_y
 
-            if sum(curr_negatives) == 0: # if there are no negatives.
-                pass # do nothing, we are in the right spot.
-            if sum(curr_negatives) == 1: # flip over unaffected line
-                pass
-                # find the unaffected points
-                # create a line between them
-                # figure out how to flip over that line
-                # return those values.
-            if sum(curr_negatives) == 2: # flip over unaffectd point
-                pass
-                # find the unaffected point. (1).
-                # find the angle between us and that point, and the magnitude
-                # continue that same line in the opposite direction.
-                # voila you've cooked
-            if sum(curr_negatives) == 3: # flip over origin.
-                pass
-                # this is actually a special case of the above
-                # we can use the above code but just use the point 0,0. neat right?
+                # Define total cause indices
+                total_list = [0, 1, 2]
 
-            player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(i+1)))
+                if self.options_matrix[i][cause_index] < 0:  # Need to flip
+                    new_list = [x for x in total_list if x != cause_index]  # Correct way to remove cause_index
 
+                    # Get points for flipping
+                    point_1_x, point_1_y = self.causes[new_list[0]].get_x(), self.causes[new_list[0]].get_y()
+                    point_2_x, point_2_y = self.causes[new_list[1]].get_x(), self.causes[new_list[1]].get_y()
 
+                    # Flip current position
+                    current_x, current_y = self.flip_point_over_line(position_x, position_y, point_1_x, point_1_y,
+                                                                     point_2_x, point_2_y)
 
+                # Now apply position change
+                storage[cause_index] = [current_x, current_y]
 
+            new_x, new_y = 0, 0
+            for x, y in storage:
+                new_x += x
+                new_y += y
+
+            player_nodes.append(Node(new_x, new_y, "PLAYER", f"Player {i + 1}"))
 
         return player_nodes
+
+
+    def flip_point_over_line(self, point_x, point_y, line_point1_x, line_point1_y, line_point2_x, line_point2_y):
+        m = self.slope(line_point1_x, line_point1_y, line_point2_x, line_point2_y)
+        m_perp = self.perpendicular_slope(m)
+
+        if m == float('inf'):
+            x_intersect = line_point1_x
+            y_intersect = point_y
+        elif m == (0):
+            x_intersect = point_x
+            y_intersect = line_point1_y
+        else:
+            x_intersect = (m * line_point1_x - m_perp * point_x - line_point1_y + point_y) / (m - m_perp)
+            y_intersect = m*(x_intersect - line_point1_x) + line_point1_y
+
+        x_reflected = 2 * x_intersect - point_x
+        y_reflected = 2 * y_intersect - point_y
+
+        return x_reflected, y_reflected
+
+
+    def slope(self, x1, y1, x2, y2):
+        if x2-x1 == 0:
+            return float('inf')
+        return (y2 - y1) / (x2 - x1)
+
+    def perpendicular_slope(self, m):
+        if m == 0:
+            return float('inf')
+        if m == float('inf'):
+            return 0.0
+        else:
+            return -1/m
+
+    # point 1 is the point we want to flip, point 2 is the point we are flipping over
+    def flip_point(self, point_1_x, point_1_y, point_2_x, point_2_y):
+        reflected_x = 2 * point_2_x - point_1_x
+        reflected_y = 2 * point_2_y - point_1_y
+        return reflected_x, reflected_y
 
     def get_causes(self):
         return self.causes

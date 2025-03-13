@@ -23,7 +23,7 @@ class GameServer:
         self.current_round = 0
         self.num_causes = num_causes
         self.jhg_sim = JHG_simulator(len(new_clients), num_players) # creates a new JHG simulator object
-        self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
+        self.sc_sim = Social_Choice_Sim(num_players, self.num_causes, len(new_clients), 0) # i think thats greedy
         self.num_bots = num_bots
         self.save_dict = {}
         self.big_dict = {}
