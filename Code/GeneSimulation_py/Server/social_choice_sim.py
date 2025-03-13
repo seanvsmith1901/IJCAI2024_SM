@@ -71,11 +71,18 @@ class Social_Choice_Sim:
 
     def create_player_nodes(self):
         player_nodes = []
-        for i in range(self.num_humans): # i is the player index
+        for i in range(self.total_players): # i is the player index
             current_x = 0 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
             current_y = 0
+            curr_negatives = []
             for cause_index in range(self.num_causes):
-                # get the strength of the new vectors
+                # keep track of negatives
+                if (self.options_matrix[i][cause_index]) < 0:
+                    curr_negatives[i] = 1
+                else:
+                    curr_negatives[i] = 0
+
+                # create the new positions
                 position_x, position_y = self.causes[cause_index].get_x(), self.causes[cause_index].get_y()
                 position_x = (position_x * self.options_matrix[i][cause_index]) / (2 * self.rad)
                 position_y = (position_y * self.options_matrix[i][cause_index]) / (2 * self.rad)
@@ -83,7 +90,30 @@ class Social_Choice_Sim:
                 current_x += position_x
                 current_y += position_y
 
+            if sum(curr_negatives) == 0: # if there are no negatives.
+                pass # do nothing, we are in the right spot.
+            if sum(curr_negatives) == 1: # flip over unaffected line
+                pass
+                # find the unaffected points
+                # create a line between them
+                # figure out how to flip over that line
+                # return those values.
+            if sum(curr_negatives) == 2: # flip over unaffectd point
+                pass
+                # find the unaffected point. (1).
+                # find the angle between us and that point, and the magnitude
+                # continue that same line in the opposite direction.
+                # voila you've cooked
+            if sum(curr_negatives) == 3: # flip over origin.
+                pass
+                # this is actually a special case of the above
+                # we can use the above code but just use the point 0,0. neat right?
+
             player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(i+1)))
+
+
+
+
 
         return player_nodes
 

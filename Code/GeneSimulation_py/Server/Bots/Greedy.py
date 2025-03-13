@@ -8,33 +8,11 @@ class GreedyBot():
         self.self_id = self_id
 
     def get_vote(self, current_options_matrix):
-        distance_array = []
-        player_array = []
-        cause_array = []
-        organized_dict = {}
-        for player in range(len(current_options_matrix)):
-            organized_dict[player] = {}
-            for cause in range(len(current_options_matrix[player])):
-                organized_dict[player][cause] = 0
-                # lets use x1 as player and x2 as cause.
-                current_distance = (math.sqrt(((self.causes[cause].get_x() + self.player_nodes[player].get_x()) ** 2) + (self.causes[cause].get_y() + self.player_nodes[player].get_y()) ** 2))
-                distance_array.append(current_distance)
-                player_array.append(player)
+        current_row = current_options_matrix[self.self_id]
+        current_vote = current_row.index(max(current_row))
+        if current_row[current_vote] < 0: # if our best option is less than 0, try to make nothing happen.
+            current_vote = -1
+        return current_vote
+        # actually just being able to abstain is a good idea. that way it doesn't muck with anything else.
 
 
-
-
-                cause_array.append(cause)
-                organized_dict[player][cause] = current_distance
-        big_boy_array = list(zip(distance_array, player_array, cause_array))
-        sorted_list = sorted(big_boy_array, key=lambda x: x[0])
-        self.organized_distance_dict = organized_dict
-        self.create_default_greedy()
-
-    def create_default_greedy(self):
-        default_greedy = []
-        for player in self.organized_distance_dict:  # gets me the keys
-            player_dict = self.organized_distance_dict[player]
-            min_key = min(player_dict, key=player_dict.get)
-            default_greedy.append(min_key)
-        self.default_greedy = default_greedy

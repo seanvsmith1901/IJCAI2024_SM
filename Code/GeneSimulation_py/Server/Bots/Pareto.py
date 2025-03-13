@@ -12,7 +12,7 @@ class ParetoBot:
 
         for col in range(len(current_options_matrix[0])): # make the assumption that he is square.
             for row in range(len(current_options_matrix[col])):
-                options[col] += current_options_matrix[col][row]
+                options[col] += current_options_matrix[row][col]
 
 
         cur_max = 0

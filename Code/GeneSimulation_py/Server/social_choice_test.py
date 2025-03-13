@@ -15,8 +15,8 @@ if __name__ == "__main__":
     # we need the total number of players, the number of causes (should never be different than 3), the total numbe4r of players and the type of bot.
     # is the paretro optimal, I'll add more as we go. 0 will proabbly be greedy, etc.
 
-    sim = Social_Choice_Sim(4, 3, 0, 0) # starts the social choice sim, call it whatever you want
-    jhg_sim = JHG_simulator(0, 4) # already done in game_server, so you're chillin
+    sim = Social_Choice_Sim(3, 3, 0, 1) # starts the social choice sim, call it whatever you want
+    jhg_sim = JHG_simulator(0, 3) # already done in game_server, so you're chillin
     sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
     current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
 
