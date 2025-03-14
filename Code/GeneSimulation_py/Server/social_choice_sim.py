@@ -1,3 +1,4 @@
+import copy
 import math
 import random
 from collections import Counter
@@ -55,9 +56,15 @@ class Social_Choice_Sim:
             self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
 
     def create_options_matrix(self):
-        #self.options_matrix = [[10,-10,-10]]
-        #return self.options_matrix
-        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.total_players)]
+        self.options_matrix = self.current_options_matrix = [
+            [-10, -10, -10],
+            [0, 0, 0],
+            [10, -10, -10],
+            [-10, 0, 0],
+            [-1, 5, -4],
+            [-2, 10, -8]
+        ]
+        #self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.total_players)]
         return self.options_matrix # because why not
 
     def create_cause_nodes(self, num_causes):
@@ -70,46 +77,69 @@ class Social_Choice_Sim:
         return causes
 
     def create_player_nodes(self):
+        normalized_current_options_matrix = self.normalize_current_options_matrix()
+
+
         player_nodes = []
-        for i in range(self.total_players):  # i is the player index
-            storage = [[0, 0] for _ in range(self.num_causes)]
+        for i in range(self.total_players): # i is the player index
+            if i == 1:
+                pass
+            player_index = i
+            current_x = 0 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
+            current_y = 0
+            curr_negatives = []
+            for cause_index in range(self.num_causes): # completely populate this fetcher first.
+                # keep track of negatives
+                if (self.options_matrix[i][cause_index]) < 0:
+                    curr_negatives.append(1)
+                else:
+                    curr_negatives.append(0)
+
             for cause_index in range(self.num_causes):
-                position_x, position_y = self.causes[cause_index].get_x(), self.causes[cause_index].get_y()
+                # create the new positions (onyl use teh abs so the flips scale correctly.
+                position_x, position_y = (self.causes[cause_index].get_x()), self.causes[cause_index].get_y() # get the strength based on where they are
+                # take the absolute value of the strength, we will flip it later. maybe.
+                position_x = ((position_x * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
+                position_y = ((position_y * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
 
-                position_x = (position_x * self.options_matrix[i][cause_index]) / (2 * self.rad)
-                position_y = (position_y * self.options_matrix[i][cause_index]) / (2 * self.rad)
+                current_x += position_x
+                current_y += position_y
 
-                current_x, current_y = position_x, position_y
+            # so this should sum everything up.
+            # lets make a novel edge case and test it from there.
 
-                # Define total cause indices
-                total_list = [0, 1, 2]
+            if sum(curr_negatives) == 0: # if there are no negatives.
+                pass # do nothing, we are in the right spot.
 
-                if self.options_matrix[i][cause_index] < 0:  # Need to flip
-                    new_list = [x for x in total_list if x != cause_index]  # Correct way to remove cause_index
+            if sum(curr_negatives) == 1: # flip over unaffected line
+                dots_of_interest = []
+                for i, value in enumerate(curr_negatives):
+                    if value == 0:
+                        dots_of_interest.append(i) # need the index, might have to do a range thing.
+                point_1_x, point_1_y = round(self.causes[dots_of_interest[0]].get_x(), 2), round(self.causes[dots_of_interest[0]].get_y(), 2)
+                point_2_x, point_2_y = round(self.causes[dots_of_interest[1]].get_x(), 2), round(self.causes[dots_of_interest[1]].get_y(), 2)
+                current_x, current_y = self.flip_point_over_line(current_x, current_y, point_1_x, point_1_y, point_2_x, point_2_y)
 
-                    # Get points for flipping
-                    point_1_x, point_1_y = self.causes[new_list[0]].get_x(), self.causes[new_list[0]].get_y()
-                    point_2_x, point_2_y = self.causes[new_list[1]].get_x(), self.causes[new_list[1]].get_y()
+            if sum(curr_negatives) == 2: # flip over unaffectd point
+                pass
+                dot_of_interest = [i for i, value in enumerate(curr_negatives) if value == 0][0]
 
-                    # Flip current position
-                    current_x, current_y = self.flip_point_over_line(position_x, position_y, point_1_x, point_1_y,
-                                                                     point_2_x, point_2_y)
+                point_x, point_y = self.causes[dot_of_interest].get_x(), self.causes[dot_of_interest].get_y()
+                current_x, current_y = self.flip_point(current_x, current_y, point_x, point_y)
 
-                # Now apply position change
-                storage[cause_index] = [current_x, current_y]
+            if sum(curr_negatives) == 3: # flip over origin.
+                current_x, current_y = self.flip_point(current_x, current_y, 0, 0) # we just flip over teh origin.
 
-            new_x, new_y = 0, 0
-            for x, y in storage:
-                new_x += x
-                new_y += y
+            player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(player_index+1)))
 
-            player_nodes.append(Node(new_x, new_y, "PLAYER", f"Player {i + 1}"))
+
 
         return player_nodes
 
 
     def flip_point_over_line(self, point_x, point_y, line_point1_x, line_point1_y, line_point2_x, line_point2_y):
         m = self.slope(line_point1_x, line_point1_y, line_point2_x, line_point2_y)
+        print("this is the slope: ", m)
         m_perp = self.perpendicular_slope(m)
 
         if m == float('inf'):
@@ -146,6 +176,15 @@ class Social_Choice_Sim:
         reflected_x = 2 * point_2_x - point_1_x
         reflected_y = 2 * point_2_y - point_1_y
         return reflected_x, reflected_y
+
+    def normalize_current_options_matrix(self):
+        new_options = copy.deepcopy(self.current_options_matrix)
+        for i, row in enumerate(new_options):
+            new_sum = sum([abs(value) for value in row])
+            if new_sum != 0:
+                for j in range(len(row)):
+                    new_options[i][j] /= new_sum
+        return new_options
 
     def get_causes(self):
         return self.causes
