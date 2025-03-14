@@ -56,15 +56,15 @@ class Social_Choice_Sim:
             self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
 
     def create_options_matrix(self):
-        self.options_matrix = self.current_options_matrix = [
-            [-10, -10, -10],
-            [0, 0, 0],
-            [10, -10, -10],
-            [-10, 0, 0],
-            [-1, 5, -4],
-            [-2, 10, -8]
-        ]
-        #self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.total_players)]
+        # self.options_matrix = self.current_options_matrix = [
+        #     [-10, -10, -10],
+        #     [0, 0, 0],
+        #     [10, -10, -10],
+        #     [-10, 0, 0],
+        #     [-1, 5, -4],
+        #     [-2, 10, -8]
+        # ]
+        self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.total_players)]
         return self.options_matrix # because why not
 
     def create_cause_nodes(self, num_causes):
@@ -77,7 +77,8 @@ class Social_Choice_Sim:
         return causes
 
     def create_player_nodes(self):
-        normalized_current_options_matrix = self.normalize_current_options_matrix()
+        #normalized_current_options_matrix = self.normalize_current_options_matrix()
+        normalized_current_options_matrix = self.current_options_matrix
 
 
         player_nodes = []
@@ -99,7 +100,9 @@ class Social_Choice_Sim:
                 # create the new positions (onyl use teh abs so the flips scale correctly.
                 position_x, position_y = (self.causes[cause_index].get_x()), self.causes[cause_index].get_y() # get the strength based on where they are
                 # take the absolute value of the strength, we will flip it later. maybe.
+                #position_x = (position_x * abs(normalized_current_options_matrix[i][cause_index])) # normalize it to the circle
                 position_x = ((position_x * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
+                #position_y = (position_y * abs(normalized_current_options_matrix[i][cause_index])) # normalize it to the circleposition_x = ((position_x * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
                 position_y = ((position_y * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
 
                 current_x += position_x
@@ -139,7 +142,6 @@ class Social_Choice_Sim:
 
     def flip_point_over_line(self, point_x, point_y, line_point1_x, line_point1_y, line_point2_x, line_point2_y):
         m = self.slope(line_point1_x, line_point1_y, line_point2_x, line_point2_y)
-        print("this is the slope: ", m)
         m_perp = self.perpendicular_slope(m)
 
         if m == float('inf'):
@@ -178,12 +180,21 @@ class Social_Choice_Sim:
         return reflected_x, reflected_y
 
     def normalize_current_options_matrix(self):
+        print("This si the current options matrix \n", self.current_options_matrix)
         new_options = copy.deepcopy(self.current_options_matrix)
         for i, row in enumerate(new_options):
-            new_sum = sum([abs(value) for value in row])
+            new_sum = sum(abs(value) for value in row)
             if new_sum != 0:
                 for j in range(len(row)):
                     new_options[i][j] /= new_sum
+
+        print("these are the new options before multiplying \n", new_options)
+
+        # for i in range(len(new_options)):
+        #     for j in range(len(new_options[i])):
+        #         new_options[i][j] *= 2 # make them sum up to 10. IG.
+
+        print("these are the new options \n", new_options)
         return new_options
 
     def get_causes(self):
@@ -272,7 +283,7 @@ class Social_Choice_Sim:
                     relation_strengths[i][j] = new_value
                     relation_strengths[j][i] = new_value
                 elif new_relations[i][j] == 0 and new_relations[j][i] != 0:
-                    print(new_relations[j][i])
+                    #print(new_relations[j][i])
                     new_value = math.sqrt(new_relations[j][i])
                     relation_strengths[j][i] = new_value
                     relation_strengths[i][j] = new_value
