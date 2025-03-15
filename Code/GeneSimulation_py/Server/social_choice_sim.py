@@ -4,7 +4,7 @@ import random
 import numpy as np
 from networkx import normalized_cut_size
 
-from Code.GeneSimulation_py.Server.options_creation import generate_two_plus_one_groups_options_best_of_three
+from options_creation import generate_two_plus_one_groups_options_best_of_three
 from Node import Node
 
 class Social_Choice_Sim:

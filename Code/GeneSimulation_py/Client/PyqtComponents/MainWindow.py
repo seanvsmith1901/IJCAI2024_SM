@@ -7,6 +7,9 @@ import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib as plt
+
+from StudyScripts.network import NodeNetwork
+
 plt.use("QtAgg")
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QFont
@@ -23,7 +26,7 @@ COLORS = ["#FF9191", "#D15C5E", "#965875", "#FFF49F", "#B1907D", "#FFAFD8", "#C9
 class MainWindow(QMainWindow):
     SC_vote = pyqtSignal()
 
-    def __init__(self, client_socket, num_players, num_causes, id):
+    def __init__(self, client_socket, num_players, num_causes, id, max_rounds):
         super().__init__()
         # self.setStyleSheet("background-color: #FF171717;")
         self.setStyleSheet("color: #FFEBEBEB; background-color: #FF171717;")
@@ -38,7 +41,7 @@ class MainWindow(QMainWindow):
         self.player_labels = {}
         self.cause_labels = {}
         self.jhg_buttons = []
-        self.round_state = RoundState(id, num_players, num_causes, self.jhg_buttons)
+        self.round_state = RoundState(id, num_players, num_causes, self.jhg_buttons, max_rounds)
     #/1#
 
     #2# Block two: Creates the elements that will be passed to the server listener for dynamic updating. Must happen before the server listener is created
@@ -52,6 +55,7 @@ class MainWindow(QMainWindow):
         # Dynamically updated elements
         self.token_label = QLabel()
         self.jhg_plot = pg.PlotWidget()
+        self.jhg_network = pg.PlotWidget()
         tabs = QTabWidget()
 
         # Initialize the social choice tab
@@ -84,7 +88,9 @@ class MainWindow(QMainWindow):
         self.ServerListener.enable_sc_buttons_signal.connect(self.enable_sc_buttons)
         self.ServerListener.disable_jhg_buttons_signal.connect(self.disable_jhg_buttons)
         self.ServerListener.enable_jhg_buttons_signal.connect(self.enable_jhg_buttons)
+        self.ServerListener.update_jhg_network_graph.connect(self.create_jhg_network_graph)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
+
 
 
         self.ServerListener_thread.start()
@@ -93,9 +99,14 @@ class MainWindow(QMainWindow):
     #4# Block four: Finishes setting up the client, especially the JHG and SC tabs. Dependent on blocks 1&2
         self.create_sc_labels()
         # JHG tab setup
-        jhg_tab = JhgTab(self.round_state, client_socket, self.token_label, self.jhg_plot, self.jhg_buttons)
+        self.create_jhg_network_graph()
+        jhg_tab = JhgTab(self.round_state, client_socket, self.token_label, self.jhg_plot, self.jhg_network, self.jhg_buttons)
         JHG_tab = QWidget()
         JHG_layout = QVBoxLayout()
+
+        JHG_graph_tabs = QWidget()
+
+
         JHG_layout.addLayout(headerLayout)
         JHG_layout.addLayout(jhg_tab)
         JHG_tab.setLayout(JHG_layout)
@@ -267,6 +278,73 @@ class MainWindow(QMainWindow):
         self.nodes_canvas.draw()
         time.sleep(1) # show it red for 3 seconds
 
+    def create_jhg_network_graph(self):
+        if self.round_state.round_number == 0:
+            current_popularity = np.full((self.round_state.num_players, self.round_state.num_players), 100)
+        else:
+            current_popularity = np.array(self.round_state.current_popularities)
+
+        # Create the node network and initialize with current popularity
+        net = NodeNetwork()
+        net.setupPlayers([f"{i}" for i in range(np.shape(current_popularity)[0])])
+        net.initNodes(init_pops=current_popularity)
+
+        # Update the network with the influence matrix and current popularity
+        net.update(self.round_state.influence_mat, current_popularity)
+
+        # Set up the graph in the PyQtGraph widget
+        self.jhg_network.clear()  # Clear any existing items
+
+        # Create a scatter plot for the nodes
+        node_positions = np.array([node.position[0] for node in net.nodes])  # Assuming node.position is a (x, y) tuple
+
+        spots = []
+        for i, (x, y) in enumerate(node_positions):
+            color = COLORS[i % len(COLORS)]  # Cycle through colors if there are more nodes than colors
+            spots.append({'pos': (x, y), 'size': 10, 'brush': pg.mkBrush(color), 'pen': None})
+
+        scatter = pg.ScatterPlotItem()
+        scatter.addPoints(spots)  # Add all nodes with individual colors
+        self.jhg_network.addItem(scatter)
+
+        # Normalize the influence weights for color mapping and opacity
+        min_weight = np.min(self.round_state.influence_mat)
+        max_weight = np.max(self.round_state.influence_mat)
+
+        def get_edge_color_and_opacity(weight):
+            """Map influence weight to color and opacity."""
+            # Normalize the weight to a 0-1 range
+            normalized = (weight - min_weight) / (max_weight - min_weight) if max_weight != min_weight else 0
+
+            # Green for positive, Red for negative
+            if weight > 0:
+                color = (0, 255, 0)  # Green for positive
+            else:
+                color = (255, 0, 0)  # Red for negative
+
+            # Opacity scales with connection strength (stronger = more opaque)
+            opacity = int(255 * normalized)  # Full opacity (255) for strong connections, 0 for weak/no connection
+
+            return color, opacity
+
+        # Now, create edges based on the influence matrix
+        for i, node in enumerate(net.nodes):
+            for j, weight in enumerate(self.round_state.influence_mat[i]):
+                if weight != 0:
+                    edge_color, opacity = get_edge_color_and_opacity(weight)
+
+                    # Explicitly create the pen with the color and alpha
+                    pen = pg.mkPen(color=edge_color + (opacity,), width=2)  # Use a 4-tuple for (r, g, b, alpha)
+
+                    # Create edge (PlotDataItem)
+                    line = pg.PlotDataItem([node_positions[i, 0], node_positions[j, 0]],
+                                           [node_positions[i, 1], node_positions[j, 1]],
+                                           pen=pen)  # Apply color and opacity
+
+                    line.setZValue(-1)  # Ensure edges are below the nodes
+                    self.jhg_network.addItem(line)
+
+        self.jhg_network.scene().update()  # Force refresh
 
     def create_nodes_graph(self):
         self.nodes_fig = Figure(figsize=(5, 4), dpi=100)

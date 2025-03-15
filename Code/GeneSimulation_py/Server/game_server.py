@@ -74,18 +74,20 @@ class GameServer:
     def play_social_choice_round(self, round):
         self.sc_sim.start_round(self.sc_groups)
         new_influence = self.jhg_sim.get_influence().tolist()
-        new_relations = self.sc_sim.calculate_relation_strength(new_influence)
+        # new_relations = self.sc_sim.calculate_relation_strength(new_influence)
         current_options_matrix = self.sc_sim.get_current_options_matrix()
         self.options_history[round] = current_options_matrix
         player_nodes = self.sc_sim.get_player_nodes()
         causes = self.sc_sim.get_causes()
         all_nodes = causes + player_nodes
+
         message = {
             "ROUND_TYPE" : "sc_init",
             "OPTIONS" : current_options_matrix,
             "NODES" : [node.to_json() for node in all_nodes],
             "UTILITIES" : current_options_matrix,
-            #"RELATION_STRENGTH": new_relations,
+            "INFLUENCE_MAT": new_influence,
+            # "RELATION_STRENGTH": new_relations,
         }
 
         for i in range(len(self.connected_clients)):

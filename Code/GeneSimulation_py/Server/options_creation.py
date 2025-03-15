@@ -59,7 +59,10 @@ def generate_two_plus_one_groups_options_best_of_three(groups):
             max_index = generated_options.index(max(generated_options))
             # Swap the highest value with the groups column
             generated_options[max_index], generated_options[group_col] = generated_options[group_col], generated_options[max_index]
+            for i in range(len(generated_options)):
+                generated_options[i] += randint(-2,2)
             options[player - 1] = generated_options
+
     return options
 
 if __name__ == "__main__":

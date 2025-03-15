@@ -1,4 +1,6 @@
 import json
+
+import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal
 
 class ServerListener(QObject):
@@ -8,6 +10,7 @@ class ServerListener(QObject):
     enable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
     disable_jhg_buttons_signal = pyqtSignal()
+    update_jhg_network_graph = pyqtSignal()
 
     def __init__(self, main_window, client_socket, round_state, round_counter, token_label, jhg_plot, tabs, utility_qlabels):
         super().__init__()
@@ -25,43 +28,66 @@ class ServerListener(QObject):
     # receiving data from the server. Kinda a switch board of sorts
     def start_listening(self):
         while True:
-            data = self.client_socket.recv(4096)
-            if data:
-                try:
-                    json_data = json.dumps(json.loads(data.decode()))
-                    if "ROUND_TYPE" in json_data:
-                        json_data = json.loads(json_data)
-                        if json_data["ROUND_TYPE"] == "jhg":
+            try:
+                # Receive data in chunks
+                data = self.client_socket.recv(4096)
+                if data:
+                    try:
+                        # Attempt to decode and load JSON data
+                        json_data = json.loads(data.decode())
+
+                        # Check if "ROUND_TYPE" exists in the parsed JSON data
+                        if "ROUND_TYPE" in json_data:
+                            if json_data["ROUND_TYPE"] == "jhg":
+                                self.tabs.setCurrentIndex(0)
+                                self.update_jhg_state(json_data)
+
+                            elif json_data["ROUND_TYPE"] == "sc_init":
+                                self.tabs.setCurrentIndex(1)
+                                self.round_state.options = json_data["OPTIONS"]
+                                self.round_state.nodes = json_data["NODES"]
+                                self.round_state.utilities = json_data["UTILITIES"]
+                                self.round_state.influence_mat = np.array(json_data["INFLUENCE_MAT"])
+                                # self.round_state.relationships_mat = np.array(json_data["RELATION_STRENGTH"])
+                                self.update_sc_round_signal.emit()
+                                self.enable_sc_buttons_signal.emit()
+                                self.disable_jhg_buttons_signal.emit()
+                                self.update_jhg_network_graph.emit()
+
+                            elif json_data["ROUND_TYPE"] == "sc_vote":
+                                self.main_window.update_potential_sc_votes(json_data["POTENTIAL_VOTES"])
+
+                            elif json_data["ROUND_TYPE"] == "sc_over":  # cris-cross!
+                                self.disable_sc_buttons_signal.emit()
+                                self.main_window.update_nodes_graph(json_data["WINNING_VOTE"])
+                                self.main_window.update_win(json_data["WINNING_VOTE"])
+                                new_utilities = json.loads(json.dumps(json_data["NEW_UTILITIES"]))
+                                self.main_window.update_utilities_labels(new_utilities)
+                                self.main_window.update_tornado_graph(json_data["POSITIVE_VOTE_EFFECTS"],
+                                                                      json_data["NEGATIVE_VOTE_EFFECTS"])
+
+                            elif json_data["ROUND_TYPE"] == "sc_in_progress":
+                                pass
+
+                        # Handle other cases like SWITCH_ROUND
+                        elif "SWITCH_ROUND" in json_data:
                             self.tabs.setCurrentIndex(0)
-                            self.update_jhg_state(json_data)
+                            self.enable_jhg_buttons_signal.emit()
 
-                        elif json_data["ROUND_TYPE"] == "sc_init":
-                            self.tabs.setCurrentIndex(1)
-                            self.round_state.options = json_data["OPTIONS"]
-                            self.round_state.nodes = json_data["NODES"]
-                            self.round_state.utilities = json_data["UTILITIES"]
-                            self.update_sc_round_signal.emit()
-                            self.enable_sc_buttons_signal.emit()
-                            self.disable_jhg_buttons_signal.emit()
+                    except json.JSONDecodeError:
+                        # Handle error in case of malformed JSON or invalid data
+                        print("Received invalid JSON data:", data)
+                        continue  # Skip this message and continue receiving more
 
-                        elif json_data["ROUND_TYPE"] == "sc_vote":
-                            self.main_window.update_potential_sc_votes(json_data["POTENTIAL_VOTES"])
+                    except Exception as e:
+                        # Handle any other unexpected errors
+                        print(f"Error processing message: {e}")
+                        continue  # Continue to the next loop iteration
 
-                        elif json_data["ROUND_TYPE"] == "sc_over": # cris-cross!
-                            self.disable_sc_buttons_signal.emit()
-                            self.main_window.update_nodes_graph(json_data["WINNING_VOTE"])
-                            self.main_window.update_win(json_data["WINNING_VOTE"])
-                            new_utilities = json.loads(json.dumps(json_data["NEW_UTILITIES"]))
-                            self.main_window.update_utilities_labels(new_utilities)
-                            self.main_window.update_tornado_graph(json_data["POSITIVE_VOTE_EFFECTS"], json_data["NEGATIVE_VOTE_EFFECTS"])
-                        elif json_data["ROUND_TYPE"] == "sc_in_progress":
-                            pass
-                    elif "SWITCH_ROUND" in json_data:
-                        self.tabs.setCurrentIndex(0)
-                        self.enable_jhg_buttons_signal.emit()
-                except:
-                    print("An error occurred in server listener")
-                    pass
+            except Exception as e:
+                # Catch general socket or connection errors
+                print(f"Error receiving data: {e}")
+                break  # Optionally break or continue listening based on your use case
 
 
 
@@ -73,7 +99,7 @@ class ServerListener(QObject):
         self.round_state.sent = json_data["SENT"]
         self.round_state.round_number = int(json_data["ROUND"])
         self.round_state.tokens = self.round_state.num_players * 2
-
+        self.round_state.current_popularities = json_data["POPULARITY"]
         self.jhg_plot.clear()
 
         self.update_jhg_round_signal.emit()
