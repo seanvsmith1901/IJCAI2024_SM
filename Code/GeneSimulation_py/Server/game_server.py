@@ -33,8 +33,8 @@ class GameServer:
         self.num_causes = num_causes
         self.save_dict = {}
         self.big_dict = {}
-        self.utilities = self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
-
+        self.utilities = None
+        self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
         self.sc_groups = generate_two_plus_one_groups(num_players, group_sizes_option)
 
         # Tracking the SC game over time
@@ -102,7 +102,6 @@ class GameServer:
             for client, received_json in data.items():
                 if "FINAL_VOTE" in received_json:
                     if received_json["FINAL_VOTE"] not in player_votes or player_votes[received_json["FINAL_VOTE"]] != received_json["FINAL_VOTE"]:
-                        print("NEW FINAL VOTE RECEIVED")
                         player_votes[received_json["CLIENT_ID"]] = received_json["FINAL_VOTE"]
                         self.append_stuff_big(player_fake_votes, "FINAL_VOTE")
                 if "POTENTIAL_VOTE" in received_json:
@@ -160,8 +159,6 @@ class GameServer:
         }
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
-        # That should be something like how we would like to see it.
-        # Will probably need some polish, but that's the "basic" framework that we can expand upon.
 
     def play_jhg_round(self, round):
         client_input = self.get_client_input()
@@ -294,7 +291,7 @@ class GameServer:
             selected_vote = all_votes[str(i)]  # Which option the ith player voted for
             for j in range(self.num_players):
                 vote_effect = current_options_matrix[j][selected_vote]
-                self.vote_effects[j][i] += vote_effect  # The effect of the ith players vote on the jth player
+                self.vote_effects[j][i] += vote_effect  # The effect of the ith player's vote on the jth player
                 round_vote_effects[i][j] = vote_effect
 
                 if vote_effect > 0:

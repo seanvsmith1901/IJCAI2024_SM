@@ -27,8 +27,9 @@ class Social_Choice_Sim:
         # creates a 0 dict for all the players at some list i. I could not do that, but this feels safer.
 
     def apply_vote(self, winning_vote):
-        for i in range(self.num_players):
-            self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
+        if winning_vote != -1:
+            for i in range(self.num_players):
+                self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
 
     def create_options_matrix(self, groups):
         self.options_matrix = generate_two_plus_one_groups_options_best_of_three(groups)

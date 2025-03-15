@@ -233,9 +233,10 @@ class MainWindow(QMainWindow):
                 self.utility_qlabels[i][j].setText(str(self.round_state.utilities[j][i]))
         self.update_nodes_graph()
 
-    def update_utilities_labels(self, new_utilities):
-        for i in range(self.round_state.num_players):
-            self.round_state.players[i].utility_label.setText(str(new_utilities[str(i)]))
+    def update_utilities_labels(self, new_utilities, winning_vote):
+        if winning_vote != -1:
+            for i in range(self.round_state.num_players):
+                self.round_state.players[i].utility_label.setText(str(new_utilities[str(i)]))
 
     def sc_vote(self, vote):
         message = {
