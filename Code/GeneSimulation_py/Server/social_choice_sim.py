@@ -8,6 +8,7 @@ import numpy as np
 from Bots import Pareto
 from Code.GeneSimulation_py.Server.Bots.Pareto import ParetoBot
 from Code.GeneSimulation_py.Server.Bots.Greedy import GreedyBot
+from Code.GeneSimulation_py.Server.Bots.gameTheory import gameTheoryBot
 from Node import Node
 
 class Social_Choice_Sim:
@@ -38,6 +39,8 @@ class Social_Choice_Sim:
                 bots_array.append(ParetoBot(i))
             if self.type_bot == 2:
                 bots_array.append(GreedyBot(i))
+            if self.type_bot == 3:
+                bots_array.append(gameTheoryBot(i))
             # TODO: Implement other types of bots. We also have a default greedy one that I could implement as well.
 
 
