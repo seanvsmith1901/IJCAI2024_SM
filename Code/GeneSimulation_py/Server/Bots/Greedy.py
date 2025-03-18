@@ -6,6 +6,7 @@ import math
 class GreedyBot():
     def __init__(self, self_id):
         self.self_id = self_id
+        self.type = "G"
 
     def get_vote(self, current_options_matrix):
         current_row = current_options_matrix[self.self_id]

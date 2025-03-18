@@ -218,7 +218,7 @@ class Social_Choice_Sim:
     def start_round(self):
         # options may change, but the causes themselves don't, so we can generate them in init functionality.
         self.current_options_matrix = self.create_options_matrix()
-        self.player_nodes = self.create_player_nodes()
+        #self.player_nodes = self.create_player_nodes() # TODO: UNCOMMENT THIS LINE
         # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
 
     # takes in the influence matrix, and then spits out the 3 strongest calculated relations for every player.
@@ -311,8 +311,20 @@ class Social_Choice_Sim:
 
     def get_votes(self):
         bot_votes = {}
+        all_possibilities = {}
+        # So I think at some point I am going to want to mix certain types of bots
+        # so what we should do is run the code to generate the giant fetcher once.
+        # then use it between bots.
+        # so for every bot, check the type, then check if we have a giant fetcher.
+
+
         for i, bot in enumerate(self.bots):
-            bot_votes[i] = bot.get_vote(self.current_options_matrix)
+            if bot.type == "GT":
+                if not all_possibilities:
+                    all_possibilities = bot.generate_all_possibilities(self.current_options_matrix)
+                bot.get_vote(all_possibilities)
+            else:
+                bot_votes[i] = bot.get_vote(self.current_options_matrix)
         # there is a lot goign on here but most of it relates to my idea of solving the nash equilibrium. Not sure
         # gonna implement the pareto bot firs.t
 

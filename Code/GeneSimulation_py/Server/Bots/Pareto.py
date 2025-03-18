@@ -4,6 +4,7 @@ import math
 class ParetoBot:
     def __init__(self, self_id):
         self.self_id = self_id
+        self.type = "P"
 
     def get_vote(self, current_options_matrix):
         options = {}
