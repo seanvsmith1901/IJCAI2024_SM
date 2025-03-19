@@ -3,14 +3,15 @@ import sys
 import socket
 
 from PyQt6.QtWidgets import QApplication
-from PyqtComponents.MainWindow import MainWindow
+# from PyqtComponents.MainWindow import MainWindow
+from combinedLayout.MainWindow import MainWindow
 
 if __name__ == "__main__":
     # Create a QApplication first
     app = QApplication(sys.argv)
 
     host = '127.0.0.1'  # your local host address
-    port = 12345  # The port number to connect to
+    port = 12347  # The port number to connect to
     # Create a TCP socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # Connect to the server

@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QLabel
 
-from PyqtComponents.allocation_buttons import MinusButton, PlusButton
+from combinedLayout.allocation_buttons import MinusButton, PlusButton
 
 class Player:
     received_from_player = 0

@@ -35,6 +35,7 @@ class GameServer:
         self.big_dict = {}
         self.utilities = None
         self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
+
         self.sc_groups = generate_two_plus_one_groups(num_players, group_sizes_option)
 
         # Tracking the SC game over time

@@ -3,6 +3,10 @@ import json
 import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal
 
+from combinedLayout.SC_functions import update_potential_sc_votes, update_sc_nodes_graph, update_win, \
+    update_sc_utilities_labels, update_sc_tornado_graph
+
+
 class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
     update_sc_round_signal = pyqtSignal()
@@ -55,15 +59,16 @@ class ServerListener(QObject):
                                 self.update_jhg_network_graph.emit()
 
                             elif json_data["ROUND_TYPE"] == "sc_vote":
-                                self.main_window.update_potential_sc_votes(json_data["POTENTIAL_VOTES"])
+                                # self.main_window.update_potential_sc_votes(json_data["POTENTIAL_VOTES"])
+                                update_potential_sc_votes(self.main_window, json_data["POTENTIAL_VOTES"])
 
                             elif json_data["ROUND_TYPE"] == "sc_over":  # cris-cross!
                                 self.disable_sc_buttons_signal.emit()
-                                self.main_window.update_nodes_graph(json_data["WINNING_VOTE"])
-                                self.main_window.update_win(json_data["WINNING_VOTE"])
+                                update_sc_nodes_graph(self.main_window, json_data["WINNING_VOTE"])
+                                update_win(self.main_window, json_data["WINNING_VOTE"])
                                 new_utilities = json.loads(json.dumps(json_data["NEW_UTILITIES"]))
-                                self.main_window.update_utilities_labels(new_utilities, json_data["WINNING_VOTE"])
-                                self.main_window.update_tornado_graph(json_data["POSITIVE_VOTE_EFFECTS"],
+                                update_sc_utilities_labels(self.main_window, new_utilities, json_data["WINNING_VOTE"])
+                                update_sc_tornado_graph(self.main_window, json_data["POSITIVE_VOTE_EFFECTS"],
                                                                       json_data["NEGATIVE_VOTE_EFFECTS"])
 
                             elif json_data["ROUND_TYPE"] == "sc_in_progress":
