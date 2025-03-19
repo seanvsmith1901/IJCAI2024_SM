@@ -13,13 +13,14 @@ class gameTheoryBot:
         # so we can calculate the probability of that cause winning.
         # so thats nuts.
         cause_probability = self.get_cause_probability(all_possibilities)
-
+        normalized_cause_probability = copy.copy(cause_probability)
+        normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability]
         max_value = max(cause_probability)
         max_index = cause_probability.index(max_value)
         # so this current model isn't greedy but is probabilistic.
         # there are a couple of improvements I can make to the model.
         # i can weight my own personal benefit vs the likely benefit and decide if the risk is worht it.
-        
+
         return (int(max_index) - 1) # thats it tahts the value
 
     def get_cause_probability(self, all_possibilities):
