@@ -1,5 +1,3 @@
-from functools import partial
-
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QWidget, QHBoxLayout
 from PyQt6.QtWidgets import QPushButton
