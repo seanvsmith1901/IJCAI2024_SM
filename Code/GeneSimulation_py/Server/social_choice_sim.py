@@ -322,9 +322,9 @@ class Social_Choice_Sim:
             if bot.type == "GT":
                 if not all_possibilities:
                     all_possibilities = bot.generate_all_possibilities(self.current_options_matrix)
-                bot.get_vote(all_possibilities)
+                bot_votes[i] = bot.get_vote(all_possibilities, self.current_options_matrix)
             else:
-                bot_votes[i] = bot.get_vote(self.current_options_matrix)
+                bot_votes[i] = bot.get_vote([], self.current_options_matrix)
         # there is a lot goign on here but most of it relates to my idea of solving the nash equilibrium. Not sure
         # gonna implement the pareto bot firs.t
 

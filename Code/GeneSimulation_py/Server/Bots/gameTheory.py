@@ -7,7 +7,10 @@ class gameTheoryBot:
         self.type = "GT"
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
-    def get_vote(self, all_possibilities):
+    def get_vote(self, all_possibilities, current_options_matrix):
+        self.current_options_matrix = current_options_matrix
+        self.num_players = len(current_options_matrix)
+        self.num_causes = len(current_options_matrix[0])
         # so what we currently have is a giant mcfetching list of all of the options and their associated probability.
         # so now we need to create a dict of causes, everytime a cause wins we add that probability to that cause
         # so we can calculate the probability of that cause winning.
@@ -15,13 +18,28 @@ class gameTheoryBot:
         cause_probability = self.get_cause_probability(all_possibilities)
         normalized_cause_probability = copy.copy(cause_probability)
         normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability]
-        max_value = max(cause_probability)
-        max_index = cause_probability.index(max_value)
-        # so this current model isn't greedy but is probabilistic.
-        # there are a couple of improvements I can make to the model.
-        # i can weight my own personal benefit vs the likely benefit and decide if the risk is worht it.
+        current_rewards = self.think_about_reward(normalized_cause_probability)
+        max_tuple = max(current_rewards, key=lambda x: x[1])
+        return current_rewards.index(max_tuple) - 1
+        # so now we have a couple of options. we can scale based on a few things, such as following current greedy probability
+        # or we can make it focused on pure reward. RN lets make it focused on pure reward and go from there.
 
-        return (int(max_index) - 1) # thats it tahts the value
+
+
+    def think_about_reward(self, normalized_cause_probability):
+        current_options = self.current_options_matrix
+        current_rewards = [] # stores a tuple that contains the index and the expected reward.
+        for i, value in enumerate(normalized_cause_probability):
+            if i == 0:
+                expected_reward = 0
+            else:
+                expected_reward = value * current_options[self.self_id][i-1]
+
+            current_rewards.append((value, expected_reward)) # want it as a tuple
+        return current_rewards
+
+
+
 
     def get_cause_probability(self, all_possibilities):
         cause_probability = [0 for _ in range(self.num_causes + 1)]
@@ -42,8 +60,7 @@ class gameTheoryBot:
         options = {}
         new_array = [1] * (len(current_options_matrix) + 1)  # n + 1 total values
         big_boy_list = []
-        self.add_more_stuff(0, options, new_array, big_boy_list)
-        print("this is the big boy list ", big_boy_list)
+        self.add_more_stuff(0, options, new_array, big_boy_list) # recursive function to generate all the fetchers.
         return big_boy_list
 
     def create_choices_matrix(self, current_options_matrix):

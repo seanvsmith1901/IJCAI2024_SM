@@ -6,8 +6,10 @@ class ParetoBot:
         self.self_id = self_id
         self.type = "P"
 
-    def get_vote(self, current_options_matrix):
+    def get_vote(self, empty_list, current_options_matrix):
         options = {}
+        self.num_players = len(current_options_matrix)
+        self.num_causes = len(current_options_matrix[0])
         for col in range(len(current_options_matrix[0])): # want the cols not num rows.
             options[col] = 0
 
