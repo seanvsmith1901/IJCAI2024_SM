@@ -311,7 +311,7 @@ class Social_Choice_Sim:
 
     def get_votes(self):
         bot_votes = {}
-        all_possibilities = {}
+        probabilities = []
         # So I think at some point I am going to want to mix certain types of bots
         # so what we should do is run the code to generate the giant fetcher once.
         # then use it between bots.
@@ -320,9 +320,9 @@ class Social_Choice_Sim:
 
         for i, bot in enumerate(self.bots):
             if bot.type == "GT":
-                if not all_possibilities:
-                    all_possibilities = bot.generate_all_possibilities(self.current_options_matrix)
-                bot_votes[i] = bot.get_vote(all_possibilities, self.current_options_matrix)
+                if not probabilities:
+                    probabilities = bot.generate_all_possibilities(self.current_options_matrix)
+                bot_votes[i] = bot.get_vote(probabilities, self.current_options_matrix)
             else:
                 bot_votes[i] = bot.get_vote([], self.current_options_matrix)
         # there is a lot goign on here but most of it relates to my idea of solving the nash equilibrium. Not sure

@@ -7,7 +7,7 @@ class gameTheoryBot:
         self.type = "GT"
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
-    def get_vote(self, all_possibilities, current_options_matrix):
+    def get_vote(self, normalized_cause_probability, current_options_matrix):
         self.current_options_matrix = current_options_matrix
         self.num_players = len(current_options_matrix)
         self.num_causes = len(current_options_matrix[0])
@@ -15,12 +15,10 @@ class gameTheoryBot:
         # so now we need to create a dict of causes, everytime a cause wins we add that probability to that cause
         # so we can calculate the probability of that cause winning.
         # so thats nuts.
-        cause_probability = self.get_cause_probability(all_possibilities)
-        normalized_cause_probability = copy.copy(cause_probability)
-        normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability]
+
         current_rewards = self.think_about_reward(normalized_cause_probability)
         max_tuple = max(current_rewards, key=lambda x: x[1])
-        return current_rewards.index(max_tuple) - 1
+        return current_rewards.index(max_tuple) - 1 # offset for -1 cause we normally start at 0.
         # so now we have a couple of options. we can scale based on a few things, such as following current greedy probability
         # or we can make it focused on pure reward. RN lets make it focused on pure reward and go from there.
 
@@ -46,14 +44,15 @@ class gameTheoryBot:
         for possibility in all_possibilities:
             counts = Counter(possibility)
             most_common = counts.most_common(1)[0][0]
-            cause_probability[int(most_common) + 1] += possibility[-1]
+            cause_probability[int(most_common)] += possibility[-1]
         return cause_probability
 
-
+    # start here. This is where all teh magic starts.
     def generate_all_possibilities(self, current_options_matrix):
         self.current_options_matrix = current_options_matrix
         choices_matrix = self.create_choices_matrix(current_options_matrix)
         probability_matrix = self.create_probability_matrix(choices_matrix)
+        # just ot make sure we have everythinbg we need.
         self.num_players = len(current_options_matrix)
         self.num_causes = len(current_options_matrix[0])
         self.probability_matrix = probability_matrix
@@ -61,8 +60,15 @@ class gameTheoryBot:
         new_array = [1] * (len(current_options_matrix) + 1)  # n + 1 total values
         big_boy_list = []
         self.add_more_stuff(0, options, new_array, big_boy_list) # recursive function to generate all the fetchers.
-        return big_boy_list
+        cause_probability = self.get_cause_probability(big_boy_list)
 
+
+        normalized_cause_probability = copy.copy(cause_probability)
+        normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability]
+
+        return normalized_cause_probability
+
+    ## creates the choice of each index, from 2 being the best to -1 being the worst. (2, 1, 0, -1)
     def create_choices_matrix(self, current_options_matrix):
         new_probabilities_matrix = copy.deepcopy(current_options_matrix)
         for i in range(len(current_options_matrix)):
@@ -73,6 +79,8 @@ class gameTheoryBot:
             new_probabilities_matrix[i] = [index_map[val] for val in new_list]  # Replace values with indexes
         return new_probabilities_matrix
 
+    # reorders the probabilibty matrix to contain probabilities -- 3 or 4th choice get zeroed out, 25% chance to pick second choice.
+    # this is where we could afford to do some refining.
     def create_probability_matrix(self, choices_matrix):
         probability_matrix = copy.deepcopy(choices_matrix)
         for i in range(len(choices_matrix)):
@@ -95,12 +103,12 @@ class gameTheoryBot:
             return
 
         for cause in range(-1, (self.num_causes)): # for each cause, crate a new array with that vote for that player filled in
-
-            prob = self.probability_matrix[current_id][cause]
+            new_cause = cause + 1 # I think this is needed as an adjustment?
+            prob = self.probability_matrix[current_id][new_cause]
             if prob > 0:
                 new_array = current_array.copy()
-                new_array[current_id] = cause
-                new_name = str(current_id) + '_' + str(cause)
+                new_array[current_id] = new_cause
+                new_name = str(current_id) + '_' + str(new_cause)
                 options[new_name] = {}
                 new_array[-1] *= prob
                 self.add_more_stuff(current_id + 1, options[new_name], new_array, big_boy_list)
