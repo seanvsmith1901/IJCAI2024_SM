@@ -1,5 +1,5 @@
 # just a small testbed to make sure that all the math was mathing. it is now all mathing the way that I want it to.
-
+import time
 
 from Code.GeneSimulation_py.Server.social_choice_sim import Social_Choice_Sim
 from Code.GeneSimulation_py.Server.sim_interface import JHG_simulator
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # we need the total number of players, the number of causes (should never be different than 3), the total numbe4r of players and the type of bot.
     # is the paretro optimal, I'll add more as we go. 0 will proabbly be greedy, etc.
 
-    sim = Social_Choice_Sim(3, 1, 0, 3) # starts the social choice sim, call it whatever you want
+    sim = Social_Choice_Sim(11, 3, 0, 3) # starts the social choice sim, call it whatever you want
     jhg_sim = JHG_simulator(0, 11) # already done in game_server, so you're chillin
     sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
     current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
@@ -37,12 +37,17 @@ if __name__ == "__main__":
 
     # plt.plot(x,y,'o')
     # plt.show()
-
+    time_start = time.time()
     bot_votes = sim.get_votes() # you will need to do this in gameserver.
+    time_end = time.time()
+    total_time = time_end - time_start
+    print("this was the total time, ", total_time)
     # IN GAMESERVER, YOU WILL NEED TO GRAB THE VOTES FROM THE BOTS FROM THE JHG SIM - THAT FUNCTIONALITY DOESN'T EXIST IN SC.
     #player_votes = {"9": 1, "10": 1} # made up votes --> get these from client input.
 
     # right now we are workign with puer bots
+
+
     total_votes = len(bot_votes)
     winning_vote_count = Counter(bot_votes.values()).most_common(1)[0][1]
     winning_vote = Counter(bot_votes.values()).most_common(1)[0][0]

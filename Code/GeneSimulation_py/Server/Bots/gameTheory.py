@@ -1,6 +1,5 @@
 import copy
-
-import numpy as np
+from collections import Counter
 
 class gameTheoryBot:
     def __init__(self, self_id):
@@ -9,55 +8,87 @@ class gameTheoryBot:
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
     def get_vote(self, all_possibilities):
-        # dummy code. fill this in better later.
-        print("This is what we currently receive under all_possibilities")
-        current_best = 0
+        # so what we currently have is a giant mcfetching list of all of the options and their associated probability.
+        # so now we need to create a dict of causes, everytime a cause wins we add that probability to that cause
+        # so we can calculate the probability of that cause winning.
+        # so thats nuts.
+        cause_probability = self.get_cause_probability(all_possibilities)
 
-        return current_best
+        max_value = max(cause_probability)
+        max_index = cause_probability.index(max_value)
+        # so this current model isn't greedy but is probabilistic.
+        # there are a couple of improvements I can make to the model.
+        # i can weight my own personal benefit vs the likely benefit and decide if the risk is worht it.
+        
+        return (int(max_index) - 1) # thats it tahts the value
 
+    def get_cause_probability(self, all_possibilities):
+        cause_probability = [0 for _ in range(self.num_causes + 1)]
+        for possibility in all_possibilities:
+            counts = Counter(possibility)
+            most_common = counts.most_common(1)[0][0]
+            cause_probability[int(most_common) + 1] += possibility[-1]
+        return cause_probability
 
 
     def generate_all_possibilities(self, current_options_matrix):
         self.current_options_matrix = current_options_matrix
+        choices_matrix = self.create_choices_matrix(current_options_matrix)
+        probability_matrix = self.create_probability_matrix(choices_matrix)
         self.num_players = len(current_options_matrix)
         self.num_causes = len(current_options_matrix[0])
+        self.probability_matrix = probability_matrix
         options = {}
+        new_array = [1] * (len(current_options_matrix) + 1)  # n + 1 total values
+        big_boy_list = []
+        self.add_more_stuff(0, options, new_array, big_boy_list)
+        print("this is the big boy list ", big_boy_list)
+        return big_boy_list
 
-        new_array = [None] * (len(current_options_matrix) + 1)  # n + 1 total values
+    def create_choices_matrix(self, current_options_matrix):
+        new_probabilities_matrix = copy.deepcopy(current_options_matrix)
+        for i in range(len(current_options_matrix)):
+            new_list = new_probabilities_matrix[i]
+            new_list.insert(0, 0)
+            sorted_list = sorted(new_list)
+            index_map = {val: idx - 1 for idx, val in enumerate(sorted_list)}  # Get new indexes
+            new_probabilities_matrix[i] = [index_map[val] for val in new_list]  # Replace values with indexes
+        return new_probabilities_matrix
 
-        options, new_name = self.add_more_stuff(0, options, new_array)
+    def create_probability_matrix(self, choices_matrix):
+        probability_matrix = copy.deepcopy(choices_matrix)
+        for i in range(len(choices_matrix)):
+            for j in range(len(choices_matrix[i])):
+                if choices_matrix[i][j] == -1:
+                    probability_matrix[i][j] = 0
+                if choices_matrix[i][j] == 0:
+                    probability_matrix[i][j] = 0
+                if choices_matrix[i][j] == 1:
+                    probability_matrix[i][j] = .25
+                if choices_matrix[i][j] == 2:
+                    probability_matrix[i][j] = .75
 
-        return options
+        return probability_matrix
 
-    def add_more_stuff(self, current_id, options, current_array, new_name=None):
-        print("here is the player id ", str(current_id), " and the state of the current_array ", str(current_array))
 
-        current_options = {}
+    def add_more_stuff(self, current_id, options, current_array, big_boy_list):
+
+        if current_id == self.num_players:
+            return
 
         for cause in range(-1, (self.num_causes)): # for each cause, crate a new array with that vote for that player filled in
-            new_array = current_array.copy()
-            new_array[current_id] = cause
-            new_name = str(current_id) + '_' + str(cause)
-            current_options[new_name] = new_array
 
-        if current_id == ((self.num_players)): # base case for jakes father in law. populate it first and go from there.
-            print("We have hit return with ", current_array, " and ", new_name)
-            return current_array, new_name
+            prob = self.probability_matrix[current_id][cause]
+            if prob > 0:
+                new_array = current_array.copy()
+                new_array[current_id] = cause
+                new_name = str(current_id) + '_' + str(cause)
+                options[new_name] = {}
+                new_array[-1] *= prob
+                self.add_more_stuff(current_id + 1, options[new_name], new_array, big_boy_list)
 
-        current_id += 1 # go to the next player
-        for player in range(current_id, self.num_players): # for every other player
-            new_names = []
-            new_options_list = []
-            for new_name in current_options: # this is where those names are suppsoed to get stored.
-                new_options = current_options[new_name]
-                new_options, _ = self.add_more_stuff(player, options, new_options, new_name) # and call the same function again on the smaller case.
-                new_names.append(new_name) # not sure if this will help.
-                new_options_list.append(new_options)
-
-            for i, name in enumerate(new_names):
-                current_options[name] = new_options_list[i]
-
-        return current_options, new_name
-
+                if current_id + 1 == self.num_players:
+                    big_boy_list.append(new_array)
+                    options[new_name] = new_array
 
 
