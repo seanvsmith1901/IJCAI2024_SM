@@ -16,7 +16,6 @@ if __name__ == "__main__":
     # is the paretro optimal, I'll add more as we go. 0 will proabbly be greedy, etc.
 
     sim = Social_Choice_Sim(11, 3, 0, 3) # starts the social choice sim, call it whatever you want
-    jhg_sim = JHG_simulator(0, 11) # already done in game_server, so you're chillin
     sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
     current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
 

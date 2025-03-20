@@ -5,6 +5,14 @@ class gameTheoryBot:
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "GT"
+        # my idea for risk adversity is as follows:
+        # MAX: Follows the most likely outcome
+        # HIGH: unless the reward is higher for the second most likely outcome and those are fairly close, vote likely
+        # MEDIUM-HIGH - looks at first and second, is more willing to go less likely.
+        # MEDIUM LOW - looks at first second and third, is willing much more willing to go less likely
+        # LOW - Purely expected value based.
+        # MIN - pure greedy basically.
+        self.risk_adversity = "MAX"
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
     def get_vote(self, normalized_cause_probability, current_options_matrix):
@@ -17,10 +25,32 @@ class gameTheoryBot:
         # so thats nuts.
 
         current_rewards = self.think_about_reward(normalized_cause_probability)
-        max_tuple = max(current_rewards, key=lambda x: x[1])
-        return current_rewards.index(max_tuple) - 1 # offset for -1 cause we normally start at 0.
+        current_vote = self.use_bot_type(current_rewards)
+
+        #max_tuple = max(current_rewards, key=lambda x: x[1]) # if we want a pure expected value vote.
+
+        return current_vote # offset for -1 cause we normally start at 0.
         # so now we have a couple of options. we can scale based on a few things, such as following current greedy probability
         # or we can make it focused on pure reward. RN lets make it focused on pure reward and go from there.
+
+
+    def use_bot_type(self, current_rewards): # lets start here for now.
+        ra = self.risk_adversity
+        max_tuple = max(current_rewards, key=lambda x: x[1]) # getting the max right off the bat could be helpful.
+        max_value, max_chance = max_tuple
+        max_index  = current_rewards.index(max_tuple)  # offset for -1 cause we normally start at 0.
+        if ra == "MAX":
+            return current_rewards.index(max_tuple) - 1 # to adjust for 0 and -1 error.
+        if ra == "HIGH": # if they are within 0.9 of eachother and the reward is significantly higher.
+            for index, reward in enumerate(current_rewards):
+                expected_value, chance = reward # double check this line.
+                # if there is a higher payoff to be found here
+                if self.current_options_matrix[self.self_id][index] > (self.current_options_matrix[self.self_id][max_index]) * 1.5:
+                    if (chance / max_chance) > 0.9: # margin of error
+                        return index
+            return max_index # if there is no better option, return the max
+
+
 
 
 
@@ -41,10 +71,15 @@ class gameTheoryBot:
 
     def get_cause_probability(self, all_possibilities):
         cause_probability = [0 for _ in range(self.num_causes + 1)]
+        total_votes = len(all_possibilities[0]) # just the first element. if its emty something is afoot.
         for possibility in all_possibilities:
             counts = Counter(possibility)
-            most_common = counts.most_common(1)[0][0]
-            cause_probability[int(most_common)] += possibility[-1]
+            winning_vote = counts.most_common(1)[0][0]
+            winning_vote_count = counts.most_common(1)[0][1]
+            if winning_vote_count > total_votes // 2: # check for majority
+                cause_probability[int(winning_vote)] += possibility[-1]
+            else:
+                cause_probability[0] += possibility[-1] # no majority, 0 is now the most likel yo pass
         return cause_probability
 
     # start here. This is where all teh magic starts.
@@ -83,16 +118,33 @@ class gameTheoryBot:
     # this is where we could afford to do some refining.
     def create_probability_matrix(self, choices_matrix):
         probability_matrix = copy.deepcopy(choices_matrix)
+
         for i in range(len(choices_matrix)):
             for j in range(len(choices_matrix[i])):
-                if choices_matrix[i][j] == -1:
-                    probability_matrix[i][j] = 0
-                if choices_matrix[i][j] == 0:
-                    probability_matrix[i][j] = 0
-                if choices_matrix[i][j] == 1:
-                    probability_matrix[i][j] = .25
-                if choices_matrix[i][j] == 2:
-                    probability_matrix[i][j] = .75
+                if j == 0: # considering no vote
+                    if choices_matrix[i][j] == 2: # no vote is their most likely option
+                        probability_matrix[i][j] = 1 # if their best option is no vote, they aren't going to vote for anything else.
+                        continue # keep moving on
+                    if choices_matrix[i][j] == 1: #
+                        probability_matrix[i][j] = 0.25
+                        continue # keep moving on
+
+                if self.current_options_matrix[i][j-1] > 0: # if there is a positive value
+                    if choices_matrix[i][j] == -1: # all positive options are now considered.
+                        probability_matrix[i][j] = .1
+                    if choices_matrix[i][j] == 0:
+                        probability_matrix[i][j] = .25
+                    if choices_matrix[i][j] == 1:
+                        probability_matrix[i][j] = .5
+                    if choices_matrix[i][j] == 2:
+                        probability_matrix[i][j] = .75
+                elif self.current_options_matrix[i][j-1] == 0:
+                    if choices_matrix[i][j] == 1 :
+                        probability_matrix[i][j] = 0.25
+                    if choices_matrix[i][j] == 2:
+                        probability_matrix[i][j] = 1 # its this or nothing. nothing else really makes sense.
+                else:
+                    probability_matrix[i][j] = 0 # if its negative, ain't no way they are voting for it.
 
         return probability_matrix
 
