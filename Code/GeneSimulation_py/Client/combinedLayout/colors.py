@@ -1,0 +1,1 @@
+COLORS = ["#FF9191", "#D15C5E", "#965875", "#FFF49F", "#B1907D", "#FFAFD8", "#C9ADE9", "#fdbf6f"]

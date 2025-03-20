@@ -3,8 +3,9 @@ import json
 import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal
 
-from combinedLayout.SC_functions import update_potential_sc_votes, update_sc_nodes_graph, update_win, \
-    update_sc_utilities_labels, update_sc_tornado_graph
+from combinedLayout.ui_functions.sc_tornado_graph import update_sc_tornado_graph
+from combinedLayout.ui_functions.SC_functions import update_potential_sc_votes, update_sc_nodes_graph, update_win, \
+    update_sc_utilities_labels
 
 
 class ServerListener(QObject):

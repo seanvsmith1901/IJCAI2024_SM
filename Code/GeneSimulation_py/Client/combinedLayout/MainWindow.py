@@ -1,14 +1,17 @@
-from combinedLayout.JhgPanel import JhgPanel
-from .SC_functions import *
-from .JHG_functions import *
-
 from PyQt6.QtCore import QThread
 from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QTabWidget, QGridLayout, QPushButton
+from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QTabWidget, QGridLayout
 from RoundState import RoundState
 from ServerListener import ServerListener
+from matplotlib.figure import Figure
 
-COLORS = ["#FF9191", "#D15C5E", "#965875", "#FFF49F", "#B1907D", "#FFAFD8", "#C9ADE9", "#fdbf6f"]
+from combinedLayout.JhgPanel import JhgPanel
+from .ui_functions.SC_functions import *
+from .ui_functions.JHG_functions import *
+
+from .ui_functions.jhg_network_graph import create_jhg_network_graph
+
+
 class MainWindow(QMainWindow):
     def __init__(self, client_socket, num_players, num_causes, id, max_rounds):
         super().__init__()

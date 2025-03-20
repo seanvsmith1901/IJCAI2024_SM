@@ -1,26 +1,8 @@
 import numpy as np
+from .StudyScripts.network import NodeNetwork
+from ..colors import COLORS
 import pyqtgraph as pg
 
-from StudyScripts.network import NodeNetwork
-
-COLORS = ["#FF9191", "#D15C5E", "#965875", "#FFF49F", "#B1907D", "#FFAFD8", "#C9ADE9", "#fdbf6f"]
-
-def update_jhg_ui_elements(main_window):
-    for i in range(main_window.round_state.num_players):
-        # If players[i] is the client, show tokens kept. Else, show the received and sent tokens for that player
-        if i == int(main_window.round_state.client_id):
-            main_window.round_state.players[i].kept_number_label.setText(str(int(main_window.round_state.received[i])))
-        else:
-            main_window.round_state.players[i].received_label.setText(str(int(main_window.round_state.received[i])))
-            main_window.round_state.players[i].sent_label.setText(str(int(main_window.round_state.sent[i])))
-
-        main_window.round_state.allocations[i] = 0
-        main_window.round_state.players[i].popularity_label.setText(str(round(main_window.round_state.message["POPULARITY"][i])))
-        main_window.round_state.players[i].popularity_over_time.append(main_window.round_state.message["POPULARITY"][i])
-        main_window.round_state.players[i].allocation_box.setText("0")
-        pen = pg.mkPen(COLORS[i])
-        main_window.jhg_plot.plot(main_window.round_state.players[i].popularity_over_time, pen=pen)
-        
 def create_jhg_network_graph(main_window):
     if main_window.round_state.round_number == 0:
         current_popularity = np.full((main_window.round_state.num_players, main_window.round_state.num_players), 100)
@@ -88,11 +70,3 @@ def create_jhg_network_graph(main_window):
                 main_window.jhg_network.addItem(line)
 
     main_window.jhg_network.scene().update()  # Force refresh
-
-def disable_jhg_buttons(main_window):
-    for button in main_window.jhg_buttons:
-        button.setEnabled(False)
-
-def enable_jhg_buttons(main_window):
-    for button in main_window.jhg_buttons:
-        button.setEnabled(True)
