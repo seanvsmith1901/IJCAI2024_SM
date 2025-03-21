@@ -3,7 +3,7 @@ import json
 import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal
 
-from combinedLayout.ui_functions.sc_tornado_graph import update_sc_tornado_graph
+from combinedLayout.ui_functions.tornado_graph import update_tornado_graph
 from combinedLayout.ui_functions.SC_functions import update_potential_sc_votes, update_sc_nodes_graph, update_win, \
     update_sc_utilities_labels
 
@@ -17,14 +17,14 @@ class ServerListener(QObject):
     disable_jhg_buttons_signal = pyqtSignal()
     update_jhg_network_graph = pyqtSignal()
 
-    def __init__(self, main_window, client_socket, round_state, round_counter, token_label, jhg_plot, tabs, utility_qlabels):
+    def __init__(self, main_window, client_socket, round_state, round_counter, token_label, jhg_popularity_graph, tabs, utility_qlabels):
         super().__init__()
         self.client_socket = client_socket
         self.round_state = round_state
         self.round_counter = round_counter
         self.main_window = main_window
         self.token_label = token_label
-        self.jhg_plot = jhg_plot
+        self.jhg_popularity_graph = jhg_popularity_graph
         self.tabs = tabs
         self.utility_qlabels = utility_qlabels
 
@@ -69,7 +69,7 @@ class ServerListener(QObject):
                                 update_win(self.main_window, json_data["WINNING_VOTE"])
                                 new_utilities = json.loads(json.dumps(json_data["NEW_UTILITIES"]))
                                 update_sc_utilities_labels(self.main_window, new_utilities, json_data["WINNING_VOTE"])
-                                update_sc_tornado_graph(self.main_window, json_data["POSITIVE_VOTE_EFFECTS"],
+                                update_tornado_graph(self.main_window, self.main_window.tornado_ax, json_data["POSITIVE_VOTE_EFFECTS"],
                                                                       json_data["NEGATIVE_VOTE_EFFECTS"])
 
                             elif json_data["ROUND_TYPE"] == "sc_in_progress":
@@ -106,7 +106,7 @@ class ServerListener(QObject):
         self.round_state.round_number = int(json_data["ROUND"])
         self.round_state.tokens = self.round_state.num_players * 2
         self.round_state.current_popularities = json_data["POPULARITY"]
-        self.jhg_plot.clear()
+        self.jhg_popularity_graph.clear()
 
         self.update_jhg_round_signal.emit()
 

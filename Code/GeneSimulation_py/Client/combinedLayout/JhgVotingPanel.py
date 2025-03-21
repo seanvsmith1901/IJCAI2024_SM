@@ -1,14 +1,8 @@
-import time
 from functools import partial
-
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QWidget, QGridLayout
-
 from .SubmitButton import SubmitButton
 
-#          l. blue,   red,       orange,    yellow,    pink,      purple,    black,     teal,      l. green,  d. green,   d. blue,  gray
-# COLORS = ["#1e88e4", "#e41e1e", "#f5a115", "#f3e708", "#e919d3", "#a00fb9", "#000000", "#1fedbd", "#82e31e", "#417a06", "#1e437e", "#9b9ea4"]
-COLORS = ["#FFFF9191", "#FFD15C5E", "#FF965875", "#FFFFF49F", "#FFB1907D", "#FFFFAFD8", "#FFC9ADE9", "#fffdbf6f"]
+from .colors import COLORS
 
 
 class JhgVotingPanel(QVBoxLayout):

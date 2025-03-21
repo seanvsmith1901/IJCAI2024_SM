@@ -1,15 +1,12 @@
 import json
-import time
 from functools import partial
 from collections import Counter
-import numpy as np
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QTabWidget, QGridLayout, QPushButton
 
+from .tornado_graph import create_tornado_graph
 from .sc_nodes_graph import update_sc_nodes_graph, create_sc_nodes_graph
 from ..Arrow import Arrow
 from ..colors import COLORS
-from .sc_tornado_graph import create_sc_tornado_graph
 
 
 def create_sc_ui_elements(main_window):
@@ -86,7 +83,7 @@ def create_sc_ui_elements(main_window):
 
     graphs_layout = QVBoxLayout()
     main_window.graph_canvas = create_sc_nodes_graph(main_window)
-    main_window.tornado_canvas = create_sc_tornado_graph(main_window)
+    main_window.tornado_canvas = create_tornado_graph(main_window, main_window.tornado_fig, main_window.tornado_ax, main_window.tornado_y)
 
     sc_graph_tabs = QTabWidget()
     sc_graph_tabs.addTab(main_window.graph_canvas, "Causes Graph")
@@ -99,6 +96,8 @@ def create_sc_ui_elements(main_window):
 
 
 def update_sc_ui_elements(main_window):
+    main_window.SC_panel.setStyleSheet("#SC_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
+    main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: none; }")
     for i in range(main_window.round_state.num_causes):
         for j in range(main_window.round_state.num_players):
             main_window.utility_qlabels[i][j].setText(str(main_window.round_state.utilities[j][i]))
@@ -215,7 +214,7 @@ def sc_display_winning_vote(main_window, winning_vote):
     )
 
     main_window.nodes_canvas.draw()
-    time.sleep(1)  # show it red for 3 seconds
+    # time.sleep(1)  # show it red for 3 seconds
 
 
 def disable_sc_buttons(main_window):

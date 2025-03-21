@@ -153,7 +153,8 @@ class GameServer:
         for i in range(len(self.connected_clients)):
             self.connected_clients[i].send(json.dumps(message).encode())
 
-        time.sleep(2) # Force the fetcher to sleep for a little bit so we know which vote has won. And congrats!
+        # Note: Removing this time.sleep will brick the program... So, unless you're ready to redo how the server connection works, it stays.
+        time.sleep(.5) # Force the fetcher to sleep for a little bit so we know which vote has won. And congrats!
 
         message = {
             "SWITCH_ROUND": "jhg",
