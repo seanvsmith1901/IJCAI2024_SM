@@ -55,7 +55,7 @@ class JHG_simulator():
         plyrs = []
         for i in range(0, len(player_idxs)):
             if player_idxs[i] >= popSize:
-                plyrs.append(configured_players[player_idxs[i] - popSize])
+                plyrs.append(configured_players[int(player_idxs[i] - popSize)])
             else:
                 plyrs.append(theGenePools[player_idxs[i]])
         players = np.array(plyrs)

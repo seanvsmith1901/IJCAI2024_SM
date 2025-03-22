@@ -8,6 +8,8 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from combinedLayout.JhgPanel import JhgPanel
+
+from .SCGrid import SCGrid
 from .ui_functions.SC_functions import *
 from .ui_functions.JHG_functions import *
 
@@ -51,13 +53,10 @@ class MainWindow(QMainWindow):
             [[(i, str(i)) for i in range(100)]])
         view_box = self.jhg_popularity_graph.getViewBox()
         view_box.setLimits(xMin=0, xMax=2, yMin=0, yMax=120)
-        # self.jhg_popularity_graph.plot_widget.setMouseEnabled(x=False, y=False)
         self.jhg_network = pg.PlotWidget()
         tabs = QTabWidget()
 
-        # Initialize the social choice tab. This includes defining several variables that will be initialized in SC_functions
-        self.social_choice_tab = QWidget()
-
+        # Initialize the social choice panel. This includes defining several variables that will be initialized in SC_functions
         self.nodes_fig = Figure(figsize=(5, 4), dpi=100)
         self.nodes_ax = self.nodes_fig.add_subplot(111)
         self.nodes_x = np.linspace(0, 10, 100)
@@ -71,7 +70,7 @@ class MainWindow(QMainWindow):
 
         # The QLabels used to display the utility values of each choice in the social choice game
         self.utility_qlabels = []
-        self.cause_table_layout = QGridLayout()
+        self.SC_voting_grid = QGridLayout()
         self.cause_table = QWidget()
 
         # Header for JHG tab
@@ -109,6 +108,8 @@ class MainWindow(QMainWindow):
 
         self.JHG_panel = QWidget()
         self.JHG_panel.setLayout(JhgPanel(self.round_state, client_socket, self.token_label, self.jhg_popularity_graph, self.jhg_network, self.jhg_buttons))
+        self.sc_history_grid = QWidget()
+        self.sc_history_grid.setLayout(SCGrid(self.round_state.num_players, self.round_state.num_causes, "Utility", [0 for _ in range(self.round_state.num_players)], [[0 for _ in range(self.round_state.num_causes)] for _ in range(self.round_state.num_players)]))
         self.JHG_panel.setObjectName("JHG_Panel")
         self.JHG_panel.setStyleSheet("#JHG_Panel {border: 2px solid #FFFDD0; border-radius: 5px; }")
         self.SC_panel = QWidget()
@@ -117,10 +118,14 @@ class MainWindow(QMainWindow):
 
         create_sc_ui_elements(self)
 
-        self.splitter = QSplitter(Qt.Orientation.Vertical)
-        self.splitter.addWidget(self.JHG_panel)
-        self.splitter.addWidget(self.SC_panel)
-        self.panel_grid.addWidget(self.splitter)
+        self.JHG_top_SC_bottom_splitter = QSplitter(Qt.Orientation.Vertical) # Top level splitter to divide the JHG and SCG
+        self.SC_splitter = QSplitter(Qt.Orientation.Horizontal) # Sub splitter to horizontally divide the SC pane
+        self.SC_splitter.addWidget(self.SC_panel)
+        self.SC_splitter.addWidget(self.sc_history_grid)
+        self.JHG_top_SC_bottom_splitter.addWidget(self.JHG_panel)
+        self.JHG_top_SC_bottom_splitter.addWidget(self.SC_splitter)
+
+        self.panel_grid.addWidget(self.JHG_top_SC_bottom_splitter)
 
         # self.panel_grid.addWidget(self.JHG_panel, 0, 0, 1, 1)
         # self.panel_grid.addWidget(self.SC_panel, 1, 0)

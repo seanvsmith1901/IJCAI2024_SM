@@ -1,4 +1,4 @@
-from ..colors import COLORS
+from combinedLayout.colors import COLORS
 
 def create_sc_nodes_graph(main_window):
     main_window.nodes_type = []
