@@ -29,6 +29,7 @@ class Social_Choice_Sim:
         self.default_greedy = [] # len = num players, contains the current cuase that they are voting for.
         self.bots = self.create_bots()
         self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
+        self.probabilities = []
         # but like when we add players I want the bots to be able to change thier strategy based on player input. maybe.
 
 
@@ -309,9 +310,12 @@ class Social_Choice_Sim:
         all_nodes = causes + player_nodes
         return all_nodes
 
+    def get_probabilities(self):
+        return self.probabilities
+
     def get_votes(self):
         bot_votes = {}
-        probabilities = []
+        self.probabilities = []
         # So I think at some point I am going to want to mix certain types of bots
         # so what we should do is run the code to generate the giant fetcher once.
         # then use it between bots.
@@ -320,9 +324,9 @@ class Social_Choice_Sim:
 
         for i, bot in enumerate(self.bots):
             if bot.type == "GT":
-                if not probabilities:
-                    probabilities = bot.generate_all_possibilities(self.current_options_matrix)
-                bot_votes[i] = bot.get_vote(probabilities, self.current_options_matrix)
+                if not self.probabilities:
+                    self.probabilities = bot.generate_all_possibilities(self.current_options_matrix)
+                bot_votes[i] = bot.get_vote(self.probabilities, self.current_options_matrix)
             else:
                 bot_votes[i] = bot.get_vote([], self.current_options_matrix)
         # there is a lot goign on here but most of it relates to my idea of solving the nash equilibrium. Not sure

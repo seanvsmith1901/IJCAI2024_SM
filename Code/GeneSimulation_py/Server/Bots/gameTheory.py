@@ -1,5 +1,6 @@
 import copy
 from collections import Counter
+import numpy as np
 
 class gameTheoryBot:
     def __init__(self, self_id):
@@ -16,6 +17,11 @@ class gameTheoryBot:
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
     def get_vote(self, normalized_cause_probability, current_options_matrix):
+        # self.current_options_matrix = [[4, 3, 8], [-6, 7, -2], [10, 10, -10], [0, -7, 1], [1, -1, 9], [8, 3, 3],
+        #                                [1, 8, 10], [10, -8, 7], [1, -4, 6], [6, -4, 8],
+        #                                [-10, -2, 9]]  # greedily vote for 3
+        # # self.current_options_matrix = [[4, 3, 8], [-6, -7, 7], [-10, -10, 10], [0, -7, 1], [1, -1, 9], [3, 3, 8], [1, 8, 10], [-10, -8, 7], [1, -4, 6], [6, -4, 8], [-10, -2, 9]] # greedily vote for 3
+
         self.current_options_matrix = current_options_matrix
         self.num_players = len(current_options_matrix)
         self.num_causes = len(current_options_matrix[0])
@@ -84,9 +90,12 @@ class gameTheoryBot:
 
     # start here. This is where all teh magic starts.
     def generate_all_possibilities(self, current_options_matrix):
+        # self.current_options_matrix = [[4, 3, 8], [-6, 7, -2], [10, 10, -10], [0, -7, 1], [1, -1, 9], [8, 3, 3], [1, 8, 10], [10, -8, 7], [1, -4, 6], [6, -4, 8], [-10, -2, 9]] # greedily vote for 3
+        # #self.current_options_matrix = [[4, 3, 8], [-6, -7, 7], [-10, -10, 10], [0, -7, 1], [1, -1, 9], [3, 3, 8], [1, 8, 10], [-10, -8, 7], [1, -4, 6], [6, -4, 8], [-10, -2, 9]] # greedily vote for 3
+
         self.current_options_matrix = current_options_matrix
-        choices_matrix = self.create_choices_matrix(current_options_matrix)
-        probability_matrix = self.create_probability_matrix(choices_matrix)
+        choices_matrix, choice_list = self.create_choices_matrix(current_options_matrix)
+        probability_matrix = self.create_probability_matrix(choices_matrix, choice_list)
         # just ot make sure we have everythinbg we need.
         self.num_players = len(current_options_matrix)
         self.num_causes = len(current_options_matrix[0])
@@ -112,48 +121,90 @@ class gameTheoryBot:
             sorted_list = sorted(new_list)
             index_map = {val: idx - 1 for idx, val in enumerate(sorted_list)}  # Get new indexes
             new_probabilities_matrix[i] = [index_map[val] for val in new_list]  # Replace values with indexes
-        return new_probabilities_matrix
+
+        choices_array = np.array(new_probabilities_matrix)
+        total_sums = choices_array.sum(axis=0)
+        new_column_preferences = copy.deepcopy(total_sums.tolist())
+        sorted_list = sorted(new_column_preferences)
+        index_map = {val: idx - 1 for idx, val in enumerate(sorted_list)}  # Get new indexes
+        column_preferences = [index_map[val] for val in new_column_preferences]  # Replace values with indexes
+
+
+        return new_probabilities_matrix, column_preferences
 
     # reorders the probabilibty matrix to contain probabilities -- 3 or 4th choice get zeroed out, 25% chance to pick second choice.
     # this is where we could afford to do some refining.
-    def create_probability_matrix(self, choices_matrix):
+    def create_probability_matrix(self, choices_matrix, choice_list):
+        # Total sum represents the amount of votes that particular option has
+        # choice_list represents its magnitude of winning
+        # so if total sum is [15, 2, 3, 4] then nothing happening has 15 votes, cause 1 has 2, etc
+        # and choice list would then be [2, -1, 0, 1], where cause 1 is the most likely to win
+        # I want to combine this idea of winning along with if that yeilds a positive utility to decide votes.
+        # should be silly.
+
+        choices_array = np.array(choices_matrix)
+        total_sums = choices_array.sum(axis=0)
+
         probability_matrix = copy.deepcopy(choices_matrix)
 
         for i in range(len(choices_matrix)):
-            for j in range(len(choices_matrix[i])):
-                if j == 0: # considering no vote
-                    if choices_matrix[i][j] == 2: # no vote is their most likely option
-                        probability_matrix[i][j] = 1 # if their best option is no vote, they aren't going to vote for anything else.
-                        continue # keep moving on
-                    if choices_matrix[i][j] == 1: #
-                        probability_matrix[i][j] = 0.25
-                        continue # keep moving on
+            for j in range(len(choices_matrix[i])): # iterating through every choice
+                if j == 0: # if we are considering the no vote option
+                    new_utility = 0 - max(self.current_options_matrix[i]) # consider utility to be what you are missing out on
+                    if new_utility > 0: # if the max is negative
+                        probability_matrix[i][j] = 1 # then we will only vote for nothing to happen
 
-                if self.current_options_matrix[i][j-1] > 0: # if there is a positive value
-                    if choices_matrix[i][j] == -1: # all positive options are now considered.
-                        probability_matrix[i][j] = .1
-                    if choices_matrix[i][j] == 0:
-                        probability_matrix[i][j] = .25
-                    if choices_matrix[i][j] == 1:
-                        probability_matrix[i][j] = .5
-                    if choices_matrix[i][j] == 2:
-                        probability_matrix[i][j] = .75
-                elif self.current_options_matrix[i][j-1] == 0:
-                    if choices_matrix[i][j] == 1 :
-                        probability_matrix[i][j] = 0.25
-                    if choices_matrix[i][j] == 2:
-                        probability_matrix[i][j] = 1 # its this or nothing. nothing else really makes sense.
-                else:
-                    probability_matrix[i][j] = 0 # if its negative, ain't no way they are voting for it.
+                    else:
+                        if choices_matrix[i][j] == 2: # should only occur if best option is 0
+                            probability_matrix[i][j] = 0.25
+                        elif choices_matrix[i][j] == 1:
+                            probability_matrix[i][j] = 0.10
+                        elif choices_matrix[i][j] == 0:
+                            probability_matrix[i][j] = 0.05
+                        elif choices_matrix[i][j] == -1:
+                            probability_matrix[i][j] = 0 # literally the worst option. never vote for this.
+
+                else: # note: j = j-1 bc current_options_matrix doesn't consider the 0th option to have a utility. might be worth fixing.
+                    if total_sums[j] > 0 and self.current_options_matrix[i][j-1] > 0: # if this is GOOD for them
+                        if choices_matrix[i][j] == 2: # most attractive option
+                            probability_matrix[i][j] = 1 # Def what they will vote for.
+                        elif choices_matrix[i][j] == 1:
+                            probability_matrix[i][j] = 0.25 # some prob
+                        elif choices_matrix[i][j] == 0:
+                            probability_matrix[i][j] = 0.125
+                        elif choices_matrix[i][j] == 0:
+                            probability_matrix[i][j] = 0.0 # no shot.
+
+                    elif total_sums[j] > 0 and self.current_options_matrix[i][j-1] <= 0: # likely but not good for us
+                        if choices_matrix[i][j] == 2: # change these numbers around later.
+                            probability_matrix[i][j] = 0.125
+                        elif choices_matrix[i][j] == 1:
+                            probability_matrix[i][j] = 0.0625
+                        elif choices_matrix[i][j] == 0:
+                            probability_matrix[i][j] = 0.003125
+                        elif choices_matrix[i][j] == -1:
+                            probability_matrix[i][j] = 0
+
+                    elif total_sums[j] <= 0 and self.current_options_matrix[i][j-1] > 0: # not very likely but good for us
+                        if choices_matrix[i][j] == 2:  # change these numbers around later.
+                            probability_matrix[i][j] = 0.50
+                        elif choices_matrix[i][j] == 1:
+                            probability_matrix[i][j] = 0.25
+                        elif choices_matrix[i][j] == 0:
+                            probability_matrix[i][j] = 0.125
+                        elif choices_matrix[i][j] == 0:
+                            probability_matrix[i][j] = 0.0625
+
+                    elif total_sums[j] <= 0 and self.current_options_matrix[i][j-1] <= 0: # not likely, not good for us.
+                        probability_matrix[i][j] = 0 # there is never a reason to vote for this. this is just straight bad.
+
 
         return probability_matrix
 
 
     def add_more_stuff(self, current_id, options, current_array, big_boy_list):
-
         if current_id == self.num_players:
             return
-
         for cause in range(-1, (self.num_causes)): # for each cause, crate a new array with that vote for that player filled in
             new_cause = cause + 1 # I think this is needed as an adjustment?
             prob = self.probability_matrix[current_id][new_cause]
