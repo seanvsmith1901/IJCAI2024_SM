@@ -9,79 +9,11 @@ from combinedLayout.Arrow import Arrow
 from combinedLayout.SCVotingGrid import SCVotingGrid
 from combinedLayout.colors import COLORS
 
+from combinedLayout.SCHistoryGrid import SCHistoryGrid
+
 
 def create_sc_ui_elements(main_window):
-    # main_window.utility_qlabels.clear()
-
-    # # Clear the previous table layout and set up a fresh one
-    # main_window.cause_table_layout = QGridLayout()
-    # main_window.utility_qlabels.clear()
-    #
-    # # Add the player id column
-    # main_window.cause_table_layout.addWidget(QLabel("Player"), 0, 0)
-    # main_window.cause_table_layout.addWidget(QLabel("Utility"), 0, 1)
-    # main_window.cause_table_layout.setColumnStretch(0, 1)
-    #
-    # main_window.player_labels = {}
-    # main_window.cause_labels = {}
-    #
-    # # Add a row for each player to display their name and accumulated utility
-    # for player in main_window.round_state.players:
-    #     player_id = str(player.id + 1)
-    #     player_label = QLabel(player_id)
-    #
-    #     if str(int(main_window.round_state.client_id) + 1) == str(player_id):
-    #         player_label.setText(f"{player_id} You :)")
-    #     else:
-    #         player_label.setText(f"{player_id}")
-    #
-    #     player_label.setStyleSheet("color: " + COLORS[player.id])
-    #
-    #     main_window.player_labels[player_id] = player_label
-    #     utilities_label = player.utility_label
-    #
-    #     main_window.cause_table_layout.addWidget(player_label, int(player_id), 0)
-    #     main_window.cause_table_layout.addWidget(utilities_label, int(player_id), 1)
-    #
-    # main_window.sc_buttons = []
-    # # For each cause, create a header in the table
-    # for i in range(main_window.round_state.num_causes):
-    #     cause_label = QLabel(f"Cause #{i + 1}")
-    #     main_window.cause_table_layout.addWidget(cause_label, 0, i + 2)
-    #     main_window.cause_table_layout.setColumnStretch(i + 1, 1)
-    #     main_window.cause_labels[i] = cause_label
-    #
-    #     # Add a label to display the utility of the cause for each player for each cause
-    #     row = []
-    #     for j in range(main_window.round_state.num_players):
-    #         row.append(QLabel("0"))
-    #         main_window.cause_table_layout.addWidget(row[j], j + 1, i + 2)
-    #     main_window.utility_qlabels.append(row)
-    #
-    #     vote_button = QPushButton("Vote")
-    #     vote_button.setEnabled(False)
-    #     main_window.sc_buttons.append(vote_button)
-    #     vote_button.clicked.connect(partial(sc_vote, main_window, i))
-    #     button_layout = QHBoxLayout()
-    #     button_layout.addWidget(vote_button)
-    #     button_layout.addStretch(1)
-    #     main_window.cause_table_layout.addLayout(button_layout, main_window.round_state.num_players + 2, i + 2)
-    #
-    # # Create a single "Submit" button below the causes and vote buttons
-    # submit_button = QPushButton("Submit")
-    # submit_button.setEnabled(False)
-    # submit_button.clicked.connect(partial(sc_submit, main_window))
-    # main_window.sc_buttons.append(submit_button)
-    # submit_layout = QHBoxLayout()
-    # submit_layout.addWidget(submit_button)
-    # submit_layout.addStretch(1)
-    #
-    # # Add submit button layout at the bottom left of the vote buttons
-    # main_window.cause_table_layout.addLayout(submit_layout, main_window.round_state.num_players + 2, 0, 1,
-    #                                          main_window.round_state.num_causes)
-
-
-
+    client_id = main_window.round_state.client_id
     graphs_layout = QVBoxLayout()
     main_window.graph_canvas = create_sc_nodes_graph(main_window)
     main_window.tornado_canvas = create_tornado_graph(main_window, main_window.tornado_fig, main_window.tornado_ax, main_window.tornado_y)
@@ -92,10 +24,10 @@ def create_sc_ui_elements(main_window):
 
     graphs_layout.addWidget(sc_graph_tabs)
 
-    main_window.SC_voting_grid = SCVotingGrid(main_window.round_state.num_players, main_window.round_state.num_causes, graphs_layout, main_window)
-    main_window.SC_voting_grid.update_grid([1 for _ in range(main_window.round_state.num_players)], [[1 for _ in range(3)] for _ in range(main_window.round_state.num_players)])
+    # Set up the SC history panel
+    main_window.SC_voting_grid = SCVotingGrid(main_window.round_state.num_players, main_window.round_state.num_causes, client_id, graphs_layout, main_window)
+    main_window.SC_voting_grid.update_grid([0 for _ in range(main_window.round_state.num_players)], [[0 for _ in range(3)] for _ in range(main_window.round_state.num_players)])
 
-    # main_window.SC_panel.layout().addLayout(graphs_layout)
     main_window.SC_panel.layout().addLayout(main_window.SC_voting_grid)
 
 
@@ -106,7 +38,11 @@ def update_sc_ui_elements(main_window):
     update_sc_nodes_graph(main_window)
 
 
-def update_sc_utilities_labels(main_window, new_utilities, winning_vote):
+def update_sc_utilities_labels(main_window, new_utilities, winning_vote, last_round_votes, last_round_utilities):
+    history_grid = main_window.sc_history_grid.findChild(SCHistoryGrid)
+    history_grid.update_sc_history(main_window.round_state.round_number, last_round_votes, last_round_utilities)
+    history_grid.change_round(main_window.round_state.round_number)
+
     if winning_vote != -1:
         main_window.SC_voting_grid.update_col_2(new_utilities)
 
@@ -225,9 +161,3 @@ def disable_sc_buttons(main_window):
 def enable_sc_buttons(main_window):
     for button in main_window.SC_voting_grid.buttons:
         button.setEnabled(True)
-
-    # for i in range(len(main_window.player_labels)):
-    #     if i == int(main_window.round_state.client_id):
-    #         main_window.player_labels[str(i + 1)].setText(f"{i + 1} You :)")
-    #     else:
-    #         main_window.player_labels[str(i + 1)].setText(f"{i + 1}")

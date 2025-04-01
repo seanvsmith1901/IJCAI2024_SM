@@ -9,7 +9,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from combinedLayout.JhgPanel import JhgPanel
 
-from .SCGrid import SCGrid
+from SCHistoryGrid import SCHistoryGrid
 from .ui_functions.SC_functions import *
 from .ui_functions.JHG_functions import *
 
@@ -109,7 +109,8 @@ class MainWindow(QMainWindow):
         self.JHG_panel = QWidget()
         self.JHG_panel.setLayout(JhgPanel(self.round_state, client_socket, self.token_label, self.jhg_popularity_graph, self.jhg_network, self.jhg_buttons))
         self.sc_history_grid = QWidget()
-        self.sc_history_grid.setLayout(SCGrid(self.round_state.num_players, self.round_state.num_causes, "Utility", [0 for _ in range(self.round_state.num_players)], [[0 for _ in range(self.round_state.num_causes)] for _ in range(self.round_state.num_players)]))
+        self.sc_history_grid.setLayout(SCHistoryGrid(self.round_state.num_players, self.round_state.num_causes,
+                                                     self.round_state.client_id, "Voted for"))
         self.JHG_panel.setObjectName("JHG_Panel")
         self.JHG_panel.setStyleSheet("#JHG_Panel {border: 2px solid #FFFDD0; border-radius: 5px; }")
         self.SC_panel = QWidget()
@@ -126,9 +127,6 @@ class MainWindow(QMainWindow):
         self.JHG_top_SC_bottom_splitter.addWidget(self.SC_splitter)
 
         self.panel_grid.addWidget(self.JHG_top_SC_bottom_splitter)
-
-        # self.panel_grid.addWidget(self.JHG_panel, 0, 0, 1, 1)
-        # self.panel_grid.addWidget(self.SC_panel, 1, 0)
 
         self.central_widget = QWidget()
         self.central_widget.setLayout(self.panel_grid)

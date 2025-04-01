@@ -4,10 +4,11 @@ from colors import COLORS
 
 
 class SCGrid(QVBoxLayout):
-    def __init__(self, num_players, num_causes, col_2_header_text, col_2_vals, utility_mat):
+    def __init__(self, num_players, num_causes, client_id, col_2_header_text, col_2_vals, utility_mat):
         super().__init__()
         header_text_list = ["Player", col_2_header_text] + [f"Cause #{i + 1}" for i in range(num_causes)]
 
+        self.id = int(client_id)
         self.header_labels = [QLabel(header_text) for header_text in header_text_list]
         self.player_labels = [QLabel(f"{i + 1}") for i in range(num_players)]
         self.col_2_labels = [QLabel(str(val)) for val in col_2_vals]
@@ -21,6 +22,8 @@ class SCGrid(QVBoxLayout):
 
         # Add the Player numbers to identify each row
         for row, label in enumerate(self.player_labels):
+            if row == self.id:
+                label.setText(f"{row + 1} (you)")
             label.setStyleSheet("color: " + COLORS[row])
             self.grid.addWidget(label, row + 1, 0)
 

@@ -6,10 +6,10 @@ from SCGrid import SCGrid
 
 
 class SCVotingGrid(SCGrid):
-    def __init__(self, num_players, num_causes, graphs_layout, main_window):
+    def __init__(self, num_players, num_causes, player_id, graphs_layout, main_window):
         col_2_vals = [0 for _ in range(num_players)]
         utility_mat = [[0 for _ in range(num_causes)] for _ in range(num_players)]
-        super().__init__(num_players, num_causes, "Utility", col_2_vals, utility_mat)
+        super().__init__(num_players, num_causes, player_id, "Utility", col_2_vals, utility_mat)
 
         self.insertLayout(0, graphs_layout)
         self.vote_buttons = [QPushButton("Vote") for _ in range(num_causes)]

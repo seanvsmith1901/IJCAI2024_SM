@@ -68,7 +68,7 @@ class ServerListener(QObject):
                                 update_sc_nodes_graph(self.main_window, json_data["WINNING_VOTE"])
                                 update_win(self.main_window, json_data["WINNING_VOTE"])
                                 new_utilities = json.loads(json.dumps(json_data["NEW_UTILITIES"]))
-                                update_sc_utilities_labels(self.main_window, new_utilities, json_data["WINNING_VOTE"])
+                                update_sc_utilities_labels(self.main_window, new_utilities, json_data["WINNING_VOTE"], json_data["VOTES"], json_data["UTILITIES"])
                                 update_tornado_graph(self.main_window, self.main_window.tornado_ax, json_data["POSITIVE_VOTE_EFFECTS"],
                                                                       json_data["NEGATIVE_VOTE_EFFECTS"])
 

@@ -97,7 +97,6 @@ class GameServer:
         player_votes = {}
         player_fake_votes = {}
         # Keeps listening for client votes until all players have voted
-        # TODO: send the displayed vote to the bots so they can interact with the system.
         while len(player_votes) < len(self.connected_clients):
             data = self.get_client_data()
             for client, received_json in data.items():
@@ -121,6 +120,7 @@ class GameServer:
         bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
 
         all_votes = {**bot_votes, **player_votes}
+        all_votes_list = [option_num + 1 for option_num in all_votes.values()] # Adds one for display purposes
         self.options_votes_history[round] = all_votes # Saves the history of votes
 
         # Tracks the effects of each player's vote on everyone else
@@ -146,6 +146,8 @@ class GameServer:
             "VOTE_EFFECTS": self.vote_effects,
             "POSITIVE_VOTE_EFFECTS": self.positive_vote_effects_history,
             "NEGATIVE_VOTE_EFFECTS": self.negative_vote_effects_history,
+            "VOTES": all_votes_list,
+            "UTILITIES": current_options_matrix,
         }
 
         self.append_save_dict(player_votes, winning_vote)
