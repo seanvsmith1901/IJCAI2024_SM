@@ -30,20 +30,17 @@ class Social_Choice_Sim:
         self.bots = self.create_bots()
         self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
         self.probabilities = []
-        # but like when we add players I want the bots to be able to change thier strategy based on player input. maybe.
 
 
     def create_bots(self):
         bots_array = []
-        for i in range(self.num_bots):
+        for i in range(self.num_bots): # this is where we can add more bots.
             if self.type_bot == 1:  # pareto optimal bots for now
                 bots_array.append(ParetoBot(i))
             if self.type_bot == 2:
                 bots_array.append(GreedyBot(i))
             if self.type_bot == 3:
                 bots_array.append(gameTheoryBot(i))
-            # TODO: Implement other types of bots. We also have a default greedy one that I could implement as well.
-
 
         return bots_array
 
@@ -53,21 +50,12 @@ class Social_Choice_Sim:
         for i in range(self.num_humans):
             players[str(i)] = 0
         return players
-        # creates a 0 dict for all the players at some list i. I could not do that, but this feels safer.
 
     def apply_vote(self, winning_vote):
         for i in range(self.total_players):
             self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
 
     def create_options_matrix(self):
-        # self.options_matrix = self.current_options_matrix = [
-        #     [-10, -10, -10],
-        #     [0, 0, 0],
-        #     [10, -10, -10],
-        #     [-10, 0, 0],
-        #     [-1, 5, -4],
-        #     [-2, 10, -8]
-        # ]
         self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.total_players)]
         return self.options_matrix # because why not
 
@@ -104,9 +92,7 @@ class Social_Choice_Sim:
                 # create the new positions (onyl use teh abs so the flips scale correctly.
                 position_x, position_y = (self.causes[cause_index].get_x()), self.causes[cause_index].get_y() # get the strength based on where they are
                 # take the absolute value of the strength, we will flip it later. maybe.
-                #position_x = (position_x * abs(normalized_current_options_matrix[i][cause_index])) # normalize it to the circle
                 position_x = ((position_x * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
-                #position_y = (position_y * abs(normalized_current_options_matrix[i][cause_index])) # normalize it to the circleposition_x = ((position_x * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
                 position_y = ((position_y * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
 
                 current_x += position_x
@@ -315,97 +301,14 @@ class Social_Choice_Sim:
 
     def get_votes(self):
         bot_votes = {}
-        self.probabilities = []
-        # So I think at some point I am going to want to mix certain types of bots
-        # so what we should do is run the code to generate the giant fetcher once.
-        # then use it between bots.
-        # so for every bot, check the type, then check if we have a giant fetcher.
-
+        self.probabilities = [] # used for the current implementation of the GT bot.
 
         for i, bot in enumerate(self.bots):
             if bot.type == "GT":
                 if not self.probabilities:
                     self.probabilities = bot.generate_all_possibilities(self.current_options_matrix)
                 bot_votes[i] = bot.get_vote(self.probabilities, self.current_options_matrix)
-            else:
+            else: # only generate the probability matrix if we need it, fetcher is expensive.
                 bot_votes[i] = bot.get_vote([], self.current_options_matrix)
-        # there is a lot goign on here but most of it relates to my idea of solving the nash equilibrium. Not sure
-        # gonna implement the pareto bot firs.t
-
-        # distance_array = []
-        # player_array = []
-        # cause_array = []
-        # organized_dict = {}
-        # for player in range(len(self.options_matrix)):
-        #     organized_dict[player] = {}
-        #     for cause in range(len(self.options_matrix[player])):
-        #         organized_dict[player][cause] = 0
-        #         # lets use x1 as player and x2 as cause.
-        #         current_distance = (math.sqrt(((self.causes[cause].get_x() + self.player_nodes[player].get_x()) ** 2) + (self.causes[cause].get_y() + self.player_nodes[player].get_y()) ** 2))
-        #         distance_array.append(current_distance)
-        #         player_array.append(player)
-        #         cause_array.append(cause)
-        #         organized_dict[player][cause] = current_distance
-        # big_boy_array = list(zip(distance_array, player_array, cause_array))
-        # sorted_list = sorted(big_boy_array, key=lambda x: x[0])
-        # self.organized_distance_dict = organized_dict
-        # self.create_default_greedy()
-        #
-        # self.evalute_majority(self.default_greedy)
-        #
-        # for bot_index in len(self.num_bots):
-        #     pass
-        # # so know that we have the most likely swaps
-        # # i need to build a system that can evalute for majorities super quick.
-        # # so lets get everyone's greedy vote and go from there.
-
-
-
-
-        # this is the portion I don't understand - not sure the best way to brute force it without just blowing up my computer haha.
-        # like I understand that some swaps are more likely than others but like
-        # I don't understand how I should force swaps to be considered
-        # we should do this even if there is a majority, just to check to see if there is a better nash equilibrium that is somewhat likely
-        # i am NOT sure how to evalute how likely a swap is, likely using a multiplicaiton of distance
-        # but given that, I am not sure how high that needs to be in order to conisder siwtching
-        # obviously if we are at a favorible nash equilibrium, is it even worth considering a swap?
-        # idk. THose are questions for future sean bc this project might get hairy.
-        # could be mad fun though, I am looking forward to it.
-        # for swap in swaps (ordered from most likely to least likely, likely with a max limiter)
-            # if w/ swap there is a majority
-                # save swap as a nash equilibria
 
         return bot_votes
-
-
-
-    def create_default_greedy(self):
-        default_greedy = []
-        for player in self.organized_distance_dict: # gets me the keys
-            player_dict = self.organized_distance_dict[player]
-            min_key = min(player_dict, key=player_dict.get)
-            default_greedy.append(min_key)
-        self.default_greedy = default_greedy
-
-
-    def evalute_majority(self, current_votes):
-        winning_vote = -1
-        winning_vote_count = Counter(current_votes.values()).most_common(1)[0][1]
-        winning_vote = Counter(current_votes.values()).most_common(1)[0][0]
-
-        if not (winning_vote_count > len(current_votes) // 2):
-            winning_vote = -1
-
-        return winning_vote # if its -1, no majority, else, that is the winning vote.
-
-
-    # current swap needs to be the index, the player and the cause in that order as a list of truples. use the dict to amke sure we hit every player.
-    def get_greedy_vote(self, current_swap): # current_swap is a list of possible swaps that we would like to exectute and then return the greedy vote array
-        greedy_votes = []
-        # get all of hte zero votes
-        #for player in self.organized_distance_dict:
-
-
-
-
-

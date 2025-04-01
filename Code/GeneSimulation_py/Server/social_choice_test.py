@@ -53,6 +53,7 @@ if __name__ == "__main__":
             sums_per_round[bot].append(current_sum)
     print("This is what sums per round looks like ", sums_per_round)
 
+
     # Prepare the x-axis (rounds)
     rounds = range(num_rounds) # 10 rounds, so x-values range from 0 to 9
     # Calculate the total score for each round
@@ -64,17 +65,20 @@ if __name__ == "__main__":
 
     # Calculate the cumulative average score
     cumulative_average_score = [sum(average_scores_per_round[:i + 1]) for i in range(len(average_scores_per_round))]
+    total_average_increase = cumulative_average_score[-1] / num_rounds
 
     # Set up the plot
     plt.figure(figsize=(10, 6))
-
-
 
     # Loop through each player's scores and plot them
     for player, scores_list in sums_per_round.items():
         plt.plot(rounds, scores_list, marker='o', label=f'Player {player}')
 
     plt.plot(rounds, cumulative_average_score, marker='x', label='Cumulative Total Score', linewidth=3, color='black')
+
+    plt.text(0.95, 0.95, f'Avg Increase: {total_average_increase:.2f}',
+             horizontalalignment='right', verticalalignment='top',
+             transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
 
     # Adding labels and title
     plt.xlabel('Round')
