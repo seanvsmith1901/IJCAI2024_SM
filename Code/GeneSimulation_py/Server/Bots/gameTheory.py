@@ -56,10 +56,6 @@ class gameTheoryBot:
                         return index
             return max_index # if there is no better option, return the max
 
-
-
-
-
     def think_about_reward(self, normalized_cause_probability):
         current_options = self.current_options_matrix
         current_rewards = [] # stores a tuple that contains the index and the expected reward.
@@ -71,9 +67,6 @@ class gameTheoryBot:
 
             current_rewards.append((value, expected_reward)) # want it as a tuple
         return current_rewards
-
-
-
 
     def get_cause_probability(self, all_possibilities):
         cause_probability = [0 for _ in range(self.num_causes + 1)]
