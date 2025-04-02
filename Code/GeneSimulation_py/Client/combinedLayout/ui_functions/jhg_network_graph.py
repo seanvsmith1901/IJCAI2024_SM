@@ -21,7 +21,7 @@ def create_jhg_network_graph(main_window):
     main_window.jhg_network.clear()  # Clear any existing items
 
     # Create a scatter plot for the nodes
-    node_positions = np.array([node.position[0] for node in net.nodes])  # Assuming node.position is a (x, y) tuple
+    node_positions = np.array([node.position[-1] for node in net.nodes])  # Assuming node.position is a (x, y) tuple
 
     spots = []
     for i, (x, y) in enumerate(node_positions):
@@ -33,8 +33,8 @@ def create_jhg_network_graph(main_window):
     main_window.jhg_network.addItem(scatter)
 
     # Normalize the influence weights for color mapping and opacity
-    min_weight = np.min(main_window.round_state.influence_mat)
-    max_weight = np.max(main_window.round_state.influence_mat)
+    min_weight = np.min(np.abs(main_window.round_state.influence_mat))
+    max_weight = np.max(np.abs(main_window.round_state.influence_mat))
 
     def get_edge_color_and_opacity(weight):
         """Map influence weight to color and opacity."""
@@ -48,7 +48,7 @@ def create_jhg_network_graph(main_window):
             color = (255, 0, 0)  # Red for negative
 
         # Opacity scales with connection strength (stronger = more opaque)
-        opacity = int(255 * normalized)  # Full opacity (255) for strong connections, 0 for weak/no connection
+        opacity = int(abs(255 * normalized))  # Full opacity (255) for strong connections, 0 for weak/no connection
 
         return color, opacity
 
@@ -59,7 +59,7 @@ def create_jhg_network_graph(main_window):
                 edge_color, opacity = get_edge_color_and_opacity(weight)
 
                 # Explicitly create the pen with the color and alpha
-                pen = pg.mkPen(color=edge_color + (opacity,), width=2)  # Use a 4-tuple for (r, g, b, alpha)
+                pen = pg.mkPen(color=edge_color + (opacity,), width=2)
 
                 # Create edge (PlotDataItem)
                 line = pg.PlotDataItem([node_positions[i, 0], node_positions[j, 0]],
