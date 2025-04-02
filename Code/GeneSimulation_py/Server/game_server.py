@@ -17,12 +17,13 @@ class ReceivedData:
 
 
 class GameServer:
-    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players, group_sizes_option):
+    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players, group_sizes_option, jhg_rounds_per_sc_round):
         #General
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.num_players = num_players
         self.client_usernames = client_usernames
+        self.jhg_rounds_per_sc_round = jhg_rounds_per_sc_round
 
         # JHG
         self.current_round = 0
@@ -59,7 +60,7 @@ class GameServer:
 
         while self.current_round <= max_rounds:
             # This range says how many jhg rounds to play between sc rounds
-            for i in range(1):
+            for i in range(self.jhg_rounds_per_sc_round):
                 self.play_jhg_round(round)
                 print(f"Played round {round}")
                 round += 1
@@ -71,6 +72,7 @@ class GameServer:
         self.save_stuff_small()
         self.save_stuff_big()
         print("game over")
+
 
     def play_social_choice_round(self, round):
         self.sc_sim.start_round(self.sc_groups)

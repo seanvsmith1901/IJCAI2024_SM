@@ -13,6 +13,7 @@ HUMAN_PLAYERS = 1 # how many players need to join before things start to blow up
 TOTAL_PLAYERS = 5
 BOT_PLAYERS = TOTAL_PLAYERS - HUMAN_PLAYERS
 NUM_CAUSES = 3
+JHG_ROUNDS_PER_SC_ROUND = 1
 
 connected_clients = {}
 client_input = {}
@@ -62,7 +63,7 @@ def start_server(host='127.0.0.1', port=12346):
 
 
         if len(connected_clients) == HUMAN_PLAYERS: # when we have all the players that we are expecting
-            GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS, BOT_PLAYERS, NUM_CAUSES, TOTAL_PLAYERS, SC_GROUP_SIZE) # might need to make a copy and overwrite connected clients
+            GameServer(connected_clients, client_id_dict, client_usernames, MAX_ROUNDS, BOT_PLAYERS, NUM_CAUSES, TOTAL_PLAYERS, SC_GROUP_SIZE, JHG_ROUNDS_PER_SC_ROUND) # might need to make a copy and overwrite connected clients
             # Readies for another game maybe possibly. Who knows. Will probably never test.
             connected_clients.clear()
             client_id_dict.clear()
