@@ -1,9 +1,6 @@
-# this fetcher just holds connections and instantiates game servers when we have enough people, think 12. do NOT hold all connections, delete them after passing them down to gameServer
-
 import json
 import socket
 from time import sleep
-
 from game_server import GameServer
 
 
@@ -29,12 +26,9 @@ round = 1
 # See options_creation.py -> group_size_options to understand what this means
 SC_GROUP_SIZE = 2
 
-#          l. blue,  red,      orange,   yellow,   pink,     purple,   black,    white,   l. green,  d. green, d. blue,    gray
-COLORS = ["1e88e4", "#e41e1e", "f5a115", "f3e708", "e919d3", "a00fb9", "000000", "ffffff", "82e31e", "417a06", "1e437e", "9b9ea4"]
 
 def start_server(host='127.0.0.1', port=12346):
     # Create a TCP socket
-    #     server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(12)  # Allow only one connection

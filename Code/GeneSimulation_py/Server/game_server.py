@@ -242,6 +242,19 @@ class GameServer:
                 pass
         return data
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     def append_save_dict(self, all_votes, winning_vote): # just adds the new vote dict to the fetcher.
         all_votes["winning_cause"] = winning_vote
         if self.current_round not in self.save_dict:
