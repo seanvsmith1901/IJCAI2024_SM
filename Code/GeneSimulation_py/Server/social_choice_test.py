@@ -13,10 +13,10 @@ if __name__ == "__main__":
     # pure bot sim
     sim = Social_Choice_Sim(11, 3, 0, 3)  # starts the social choice sim, call it whatever you want
     results = {}
-    num_rounds = 10
+    num_rounds = 40000
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
-
+    start_time = time.time()
     for i in range(num_rounds): # just a ridicuously large number
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
@@ -38,7 +38,8 @@ if __name__ == "__main__":
 
         for i in range(total_votes):
             results[i].append(current_options_matrix[i][winning_vote])
-
+    end_time = time.time()
+    print("This was the total time ", end_time - start_time)
     print("here were the resuts ", results)
         #print("This was the current options matrix \n", current_options_matrix, "\n this were the probabilities \n", probs, " \n these were the actual votes \n", bot_votes, " and here was the winning vote ", winning_vote)
     # Number of rounds (assuming all bots have the same number of rounds)

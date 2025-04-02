@@ -82,9 +82,9 @@ class gameTheoryBot:
         return cause_probability
 
     # start here. This is where all teh magic starts.
-    def generate_all_possibilities(self, current_options_matrix, weights_array):
-        #weights_array = [1, 0.25, 0.10, 0.05, 0, 1, 0.25, 0.125, 0.0, 0.125, 0.0625, 0.003125, 0, 0.50, 0.25, 0.125, 0.0625, 0]
-        weights_array = weights_array
+    def generate_all_possibilities(self, current_options_matrix):#, weights_array):
+        weights_array = [1, 0.25, 0.10, 0.05, 0, 1, 0.25, 0.125, 0.0, 0.125, 0.0625, 0.003125, 0, 0.50, 0.25, 0.125, 0.0625, 0]
+       # weights_array = weights_array
         self.current_options_matrix = current_options_matrix
         choices_matrix, choice_list = self.create_choices_matrix(current_options_matrix)
         probability_matrix = self.create_probability_matrix(choices_matrix, weights_array)
@@ -92,10 +92,11 @@ class gameTheoryBot:
         self.num_players = len(current_options_matrix)
         self.num_causes = len(current_options_matrix[0])
         self.probability_matrix = probability_matrix
-        options = {}
-        new_array = [1] * (len(current_options_matrix) + 1)  # n + 1 total values
-        big_boy_list = []
-        self.add_more_stuff(0, options, new_array, big_boy_list) # recursive function to generate all the fetchers.
+
+
+        big_boy_list = list(self.generate_combinations(0, [1] * (self.num_players + 1)))
+
+
         cause_probability = self.get_cause_probability(big_boy_list)
 
 
@@ -199,23 +200,16 @@ class gameTheoryBot:
 
         return probability_matrix
 
-
-    def add_more_stuff(self, current_id, options, current_array, big_boy_list):
+    def generate_combinations(self, current_id, current_array):
         if current_id == self.num_players:
+            yield tuple(current_array)  # Using tuple instead of copy to save memory
             return
-        for cause in range(-1, (self.num_causes)): # for each cause, crate a new array with that vote for that player filled in
-            new_cause = cause + 1 # I think this is needed as an adjustment?
-            prob = self.probability_matrix[current_id][new_cause]
+
+        for cause in range(self.num_causes):
+            prob = self.probability_matrix[current_id][cause]
             if prob > 0:
-                new_array = current_array.copy()
-                new_array[current_id] = new_cause
-                new_name = str(current_id) + '_' + str(new_cause)
-                options[new_name] = {}
-                new_array[-1] *= prob
-                self.add_more_stuff(current_id + 1, options[new_name], new_array, big_boy_list)
-
-                if current_id + 1 == self.num_players:
-                    big_boy_list.append(new_array)
-                    options[new_name] = new_array
-
+                current_array[current_id] = cause
+                current_array[-1] *= prob
+                yield from self.generate_combinations(current_id + 1, current_array)
+                current_array[-1] /= prob  # Restore probability for next iteration
 

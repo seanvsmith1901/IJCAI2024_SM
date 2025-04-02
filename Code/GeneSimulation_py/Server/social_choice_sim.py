@@ -307,7 +307,7 @@ class Social_Choice_Sim:
         for i, bot in enumerate(self.bots):
             if bot.type == "GT":
                 if not self.probabilities:
-                    self.probabilities = bot.generate_all_possibilities(self.current_options_matrix, self.weights_matrix)
+                    self.probabilities = bot.generate_all_possibilities(self.current_options_matrix)#, self.weights_matrix)
                 bot_votes[i] = bot.get_vote(self.probabilities, self.current_options_matrix)
             else: # only generate the probability matrix if we need it, fetcher is expensive.
                 bot_votes[i] = bot.get_vote([], self.current_options_matrix)
