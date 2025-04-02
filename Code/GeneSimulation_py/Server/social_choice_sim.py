@@ -5,11 +5,10 @@ from collections import Counter
 
 import numpy as np
 
-from Bots import Pareto
 from Code.GeneSimulation_py.Server.Bots.Pareto import ParetoBot
 from Code.GeneSimulation_py.Server.Bots.Greedy import GreedyBot
 from Code.GeneSimulation_py.Server.Bots.gameTheory import gameTheoryBot
-from Node import Node
+from Code.GeneSimulation_py.Server.Node import Node
 
 class Social_Choice_Sim:
     def __init__(self, total_players, num_causes, num_humans, type_bot):
@@ -31,6 +30,8 @@ class Social_Choice_Sim:
         self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
         self.probabilities = []
 
+    def set_chromosome(self, chromosome):
+        self.weights_matrix = chromosome
 
     def create_bots(self):
         bots_array = []
@@ -306,7 +307,7 @@ class Social_Choice_Sim:
         for i, bot in enumerate(self.bots):
             if bot.type == "GT":
                 if not self.probabilities:
-                    self.probabilities = bot.generate_all_possibilities(self.current_options_matrix)
+                    self.probabilities = bot.generate_all_possibilities(self.current_options_matrix, self.weights_matrix)
                 bot_votes[i] = bot.get_vote(self.probabilities, self.current_options_matrix)
             else: # only generate the probability matrix if we need it, fetcher is expensive.
                 bot_votes[i] = bot.get_vote([], self.current_options_matrix)

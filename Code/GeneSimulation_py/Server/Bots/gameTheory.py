@@ -89,13 +89,12 @@ class gameTheoryBot:
         return cause_probability
 
     # start here. This is where all teh magic starts.
-    def generate_all_possibilities(self, current_options_matrix):
-        # self.current_options_matrix = [[4, 3, 8], [-6, 7, -2], [10, 10, -10], [0, -7, 1], [1, -1, 9], [8, 3, 3], [1, 8, 10], [10, -8, 7], [1, -4, 6], [6, -4, 8], [-10, -2, 9]] # greedily vote for 3
-        # #self.current_options_matrix = [[4, 3, 8], [-6, -7, 7], [-10, -10, 10], [0, -7, 1], [1, -1, 9], [3, 3, 8], [1, 8, 10], [-10, -8, 7], [1, -4, 6], [6, -4, 8], [-10, -2, 9]] # greedily vote for 3
-
+    def generate_all_possibilities(self, current_options_matrix, weights_array):
+        #weights_array = [1, 0.25, 0.10, 0.05, 0, 1, 0.25, 0.125, 0.0, 0.125, 0.0625, 0.003125, 0, 0.50, 0.25, 0.125, 0.0625, 0]
+        weights_array = weights_array
         self.current_options_matrix = current_options_matrix
         choices_matrix, choice_list = self.create_choices_matrix(current_options_matrix)
-        probability_matrix = self.create_probability_matrix(choices_matrix, choice_list)
+        probability_matrix = self.create_probability_matrix(choices_matrix, weights_array)
         # just ot make sure we have everythinbg we need.
         self.num_players = len(current_options_matrix)
         self.num_causes = len(current_options_matrix[0])
@@ -134,7 +133,13 @@ class gameTheoryBot:
 
     # reorders the probabilibty matrix to contain probabilities -- 3 or 4th choice get zeroed out, 25% chance to pick second choice.
     # this is where we could afford to do some refining.
-    def create_probability_matrix(self, choices_matrix, choice_list):
+    def create_probability_matrix(self, choices_matrix, weights_array):
+        # weights are an array that holds the 5 possible edge cases
+        # first is the null case and the other 4 are for varying cases
+        # with the last case being almost worthless to explore so there's no reason
+        # i think there are definitely better ways to map this out; having another weight being attributed to the difference in weights, for example
+        # but lets start here and get something workign and go from there.
+
         # Total sum represents the amount of votes that particular option has
         # choice_list represents its magnitude of winning
         # so if total sum is [15, 2, 3, 4] then nothing happening has 15 votes, cause 1 has 2, etc
@@ -152,51 +157,51 @@ class gameTheoryBot:
                 if j == 0: # if we are considering the no vote option
                     new_utility = 0 - max(self.current_options_matrix[i]) # consider utility to be what you are missing out on
                     if new_utility > 0: # if the max is negative
-                        probability_matrix[i][j] = 1 # then we will only vote for nothing to happen
+                        probability_matrix[i][j] = weights_array[0] # then we will only vote for nothing to happen
 
                     else:
                         if choices_matrix[i][j] == 2: # should only occur if best option is 0
-                            probability_matrix[i][j] = 0.25
+                            probability_matrix[i][j] = weights_array[1]
                         elif choices_matrix[i][j] == 1:
-                            probability_matrix[i][j] = 0.10
+                            probability_matrix[i][j] = weights_array[2]
                         elif choices_matrix[i][j] == 0:
-                            probability_matrix[i][j] = 0.05
+                            probability_matrix[i][j] = weights_array[3]
                         elif choices_matrix[i][j] == -1:
-                            probability_matrix[i][j] = 0 # literally the worst option. never vote for this.
+                            probability_matrix[i][j] = weights_array[4] # literally the worst option. never vote for this.
 
                 else: # note: j = j-1 bc current_options_matrix doesn't consider the 0th option to have a utility. might be worth fixing.
                     if total_sums[j] > 0 and self.current_options_matrix[i][j-1] > 0: # if this is GOOD for them
                         if choices_matrix[i][j] == 2: # most attractive option
-                            probability_matrix[i][j] = 1 # Def what they will vote for.
+                            probability_matrix[i][j] = weights_array[5] # Def what they will vote for.
                         elif choices_matrix[i][j] == 1:
-                            probability_matrix[i][j] = 0.25 # some prob
+                            probability_matrix[i][j] = weights_array[6] # some prob
                         elif choices_matrix[i][j] == 0:
-                            probability_matrix[i][j] = 0.125
+                            probability_matrix[i][j] = weights_array[7]
                         elif choices_matrix[i][j] == 0:
-                            probability_matrix[i][j] = 0.0 # no shot.
+                            probability_matrix[i][j] = weights_array[8] # no shot.
 
                     elif total_sums[j] > 0 and self.current_options_matrix[i][j-1] <= 0: # likely but not good for us
                         if choices_matrix[i][j] == 2: # change these numbers around later.
-                            probability_matrix[i][j] = 0.125
+                            probability_matrix[i][j] = weights_array[9]
                         elif choices_matrix[i][j] == 1:
-                            probability_matrix[i][j] = 0.0625
+                            probability_matrix[i][j] = weights_array[10]
                         elif choices_matrix[i][j] == 0:
-                            probability_matrix[i][j] = 0.003125
+                            probability_matrix[i][j] = weights_array[11]
                         elif choices_matrix[i][j] == -1:
-                            probability_matrix[i][j] = 0
+                            probability_matrix[i][j] = weights_array[12]
 
                     elif total_sums[j] <= 0 and self.current_options_matrix[i][j-1] > 0: # not very likely but good for us
                         if choices_matrix[i][j] == 2:  # change these numbers around later.
-                            probability_matrix[i][j] = 0.50
+                            probability_matrix[i][j] = weights_array[13]
                         elif choices_matrix[i][j] == 1:
-                            probability_matrix[i][j] = 0.25
+                            probability_matrix[i][j] = weights_array[14]
                         elif choices_matrix[i][j] == 0:
-                            probability_matrix[i][j] = 0.125
+                            probability_matrix[i][j] = weights_array[15]
                         elif choices_matrix[i][j] == 0:
-                            probability_matrix[i][j] = 0.0625
+                            probability_matrix[i][j] = weights_array[16]
 
                     elif total_sums[j] <= 0 and self.current_options_matrix[i][j-1] <= 0: # not likely, not good for us.
-                        probability_matrix[i][j] = 0 # there is never a reason to vote for this. this is just straight bad.
+                        probability_matrix[i][j] = weights_array[17] # there is never a reason to vote for this. this is just straight bad.
 
 
         return probability_matrix

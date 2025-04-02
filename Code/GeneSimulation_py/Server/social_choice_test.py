@@ -2,10 +2,9 @@
 import time
 
 from Code.GeneSimulation_py.Server.social_choice_sim import Social_Choice_Sim
-from Code.GeneSimulation_py.Server.sim_interface import JHG_simulator
 import matplotlib.pyplot as plt
 from collections import Counter
-from Code.GeneSimulation_py.Client.PyqtComponents.MainWindow import MainWindow
+
 
 # ok now I need to make it play an actual round of JHG here in the sim so I can test the influence matrix. This is annoying.
 
@@ -14,7 +13,7 @@ if __name__ == "__main__":
     # pure bot sim
     sim = Social_Choice_Sim(11, 3, 0, 3)  # starts the social choice sim, call it whatever you want
     results = {}
-    num_rounds = 1000
+    num_rounds = 10
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
 
