@@ -30,9 +30,6 @@ class Social_Choice_Sim:
         self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
         self.probabilities = []
 
-    def set_chromosome(self, chromosome):
-        self.weights_matrix = chromosome
-
     def create_bots(self):
         bots_array = []
         for i in range(self.num_bots): # this is where we can add more bots.
@@ -51,6 +48,13 @@ class Social_Choice_Sim:
         for i in range(self.num_humans):
             players[str(i)] = 0
         return players
+
+    def set_chromosome(self, chromosomes):
+        if len(chromosomes) != len(self.bots):
+            print("WRONG WRONG WRONG")
+        else:
+            for i in range(len(self.bots)):
+                self.bots[i].set_chromosome(chromosomes[i])
 
     def apply_vote(self, winning_vote):
         for i in range(self.total_players):
@@ -313,3 +317,21 @@ class Social_Choice_Sim:
                 bot_votes[i] = bot.get_vote([], self.current_options_matrix)
 
         return bot_votes
+
+    def return_win(self, all_votes):
+        results = []
+        total_votes = all_votes
+        winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
+        winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
+        if not (winning_vote_count > len(total_votes) // 2):
+            winning_vote = -1
+
+        if winning_vote != -1:
+
+            for i in range(len(total_votes)):
+                results.append(self.current_options_matrix[i][winning_vote])
+        else:
+            for i in range(len(total_votes)):
+                results.append(0)
+
+        return winning_vote, results

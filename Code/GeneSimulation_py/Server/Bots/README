@@ -1,0 +1,8 @@
+just some explanation as for the genetic algorithm that I have in one place
+
+Weights array 0-17 is all weights for hte probability matirxx (0-1)
+Weights array 18 (0-1)
+Weights arary 19 is the risk adversity level (0 or 1?)
+
+I have the option to add more weights to the arryay, and the risk adversity level can be amped up as well. not working on it yet bc it woudl be a lot more weights
+and I want to focus on getting this working first. \

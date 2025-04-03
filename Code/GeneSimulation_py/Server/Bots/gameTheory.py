@@ -6,6 +6,7 @@ class gameTheoryBot:
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "GT"
+        self.chromosome = None
         # my idea for risk adversity is as follows:
         # MAX: Follows the most likely outcome
         # HIGH: unless the reward is higher for the second most likely outcome and those are fairly close, vote likely
@@ -14,6 +15,11 @@ class gameTheoryBot:
         # LOW - Purely expected value based.
         # MIN - pure greedy basically.
         self.risk_adversity = "MAX"
+        # so RISK adversity is MAX (1) and High (0). thats why somethign wasn't working earlier.
+
+
+    def set_chromosome(self, chromosome):
+        self.chromosome = chromosome
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
     def get_vote(self, normalized_cause_probability, current_options_matrix):
@@ -41,20 +47,20 @@ class gameTheoryBot:
 
 
     def use_bot_type(self, current_rewards): # lets start here for now.
-        ra = self.risk_adversity
+        ra = self.chromosome[19] # last element in the chromosome represents the risk adversity.
         max_tuple = max(current_rewards, key=lambda x: x[1]) # getting the max right off the bat could be helpful.
         max_value, max_chance = max_tuple
         max_index  = current_rewards.index(max_tuple)  # offset for -1 cause we normally start at 0.
-        if ra == "MAX":
+        if ra == 1 or ra == 0:
             return current_rewards.index(max_tuple) - 1 # to adjust for 0 and -1 error.
-        if ra == "HIGH": # if they are within 0.9 of eachother and the reward is significantly higher.
-            for index, reward in enumerate(current_rewards):
-                expected_value, chance = reward # double check this line.
-                # if there is a higher payoff to be found here
-                if self.current_options_matrix[self.self_id][index] > (self.current_options_matrix[self.self_id][max_index]) * 1.5:
-                    if (chance / max_chance) > 0.9: # margin of error
-                        return index
-            return max_index # if there is no better option, return the max
+        # if ra == 0: # if they are within 0.9 of eachother and the reward is significantly higher. This hasn't been tested, remove for now.
+        #     for index, reward in enumerate(current_rewards):
+        #         expected_value, chance = reward # double check this line.
+        #         # if there is a higher payoff to be found here
+        #         if self.current_options_matrix[self.self_id][index] > (self.current_options_matrix[self.self_id][max_index]) * 1.5:
+        #             if (chance / max_chance) > self.chromosome[18]: # margin of error
+        #                 return index
+        #     return max_index # if there is no better option, return the max
 
     def think_about_reward(self, normalized_cause_probability):
         current_options = self.current_options_matrix
@@ -82,9 +88,9 @@ class gameTheoryBot:
         return cause_probability
 
     # start here. This is where all teh magic starts.
-    def generate_all_possibilities(self, current_options_matrix):#, weights_array):
-        weights_array = [1, 0.25, 0.10, 0.05, 0, 1, 0.25, 0.125, 0.0, 0.125, 0.0625, 0.003125, 0, 0.50, 0.25, 0.125, 0.0625, 0]
-       # weights_array = weights_array
+    def generate_all_possibilities(self, current_options_matrix):
+        #weights_array = [1, 0.25, 0.10, 0.05, 0, 1, 0.25, 0.125, 0.0, 0.125, 0.0625, 0.003125, 0, 0.50, 0.25, 0.125, 0.0625, 0]
+        weights_array = self.chromosome
         self.current_options_matrix = current_options_matrix
         choices_matrix, choice_list = self.create_choices_matrix(current_options_matrix)
         probability_matrix = self.create_probability_matrix(choices_matrix, weights_array)
