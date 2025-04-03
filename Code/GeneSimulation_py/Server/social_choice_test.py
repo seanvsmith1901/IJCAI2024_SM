@@ -13,12 +13,13 @@ if __name__ == "__main__":
     # pure bot sim
     sim = Social_Choice_Sim(11, 3, 0, 3)  # starts the social choice sim, call it whatever you want
     results = {}
-    num_rounds = 40000
+    num_rounds = 10
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
+    chromosomes = [[0.6210486585952955, 0.7547986715457604, 0.2525279612328297, 0.46196784934711166, 0.819004579415406, 0.7181349915985507, 0.9232352336229714, 0.3293687231403176, 0.9259238686577719, 0.6925405567790517, 0.7562068076997185, 0.5238774792306058, 0.03214344296676497, 0.888789491379897, 0.1665885339565425, 0.8179923951585332, 0.6603572661126325, 0.8130412443711176, 0.1687030055257267, 0]] * 11
     for i in range(num_rounds): # just a ridicuously large number
-
+        sim.set_chromosome(chromosomes)
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
         bot_votes = sim.get_votes() # where da magic happens

@@ -7,6 +7,7 @@ class ParetoBot:
         self.type = "P"
 
     def get_vote(self, empty_list, current_options_matrix):
+
         options = {}
 
 

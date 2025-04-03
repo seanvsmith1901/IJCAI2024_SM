@@ -22,11 +22,16 @@ class gameTheoryBot:
         self.chromosome = chromosome
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
-    def get_vote(self, normalized_cause_probability, current_options_matrix):
+    def get_vote(self, big_boy_list, current_options_matrix):
         # self.current_options_matrix = [[4, 3, 8], [-6, 7, -2], [10, 10, -10], [0, -7, 1], [1, -1, 9], [8, 3, 3],
         #                                [1, 8, 10], [10, -8, 7], [1, -4, 6], [6, -4, 8],
         #                                [-10, -2, 9]]  # greedily vote for 3
         # # self.current_options_matrix = [[4, 3, 8], [-6, -7, 7], [-10, -10, 10], [0, -7, 1], [1, -1, 9], [3, 3, 8], [1, 8, 10], [-10, -8, 7], [1, -4, 6], [6, -4, 8], [-10, -2, 9]] # greedily vote for 3
+
+
+        cause_probability = self.get_cause_probability(big_boy_list)
+        normalized_cause_probability = copy.copy(cause_probability)
+        normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability]
 
         self.current_options_matrix = current_options_matrix
         self.num_players = len(current_options_matrix)
@@ -75,20 +80,30 @@ class gameTheoryBot:
         return current_rewards
 
     def get_cause_probability(self, all_possibilities):
-        cause_probability = [0 for _ in range(self.num_causes + 1)]
+        num_causes = 3
+        cause_probability = [0 for _ in range(num_causes + 1)]
         total_votes = len(all_possibilities[0]) # just the first element. if its emty something is afoot.
         for possibility in all_possibilities:
-            counts = Counter(possibility)
-            winning_vote = counts.most_common(1)[0][0]
-            winning_vote_count = counts.most_common(1)[0][1]
-            if winning_vote_count > total_votes // 2: # check for majority
-                cause_probability[int(winning_vote)] += possibility[-1]
+            freqs = {}
+            max_item = None
+            max_count = 0
+
+            # doing this by hand my speed it up
+            for item in possibility:
+                freqs[item] = freqs.get(item, 0) + 1
+                if freqs[item] > max_count:
+                    max_count = freqs[item]
+                    max_item = item
+
+            if max_count > total_votes // 2:
+                cause_probability[int(max_item)] += possibility[-1]
             else:
-                cause_probability[0] += possibility[-1] # no majority, 0 is now the most likel yo pass
+                cause_probability[0] += possibility[-1] # no majority, 0 is now the most likely yo pass
         return cause_probability
 
     # start here. This is where all teh magic starts.
     def generate_all_possibilities(self, current_options_matrix):
+        # this is the OG one.
         #weights_array = [1, 0.25, 0.10, 0.05, 0, 1, 0.25, 0.125, 0.0, 0.125, 0.0625, 0.003125, 0, 0.50, 0.25, 0.125, 0.0625, 0]
         weights_array = self.chromosome
         self.current_options_matrix = current_options_matrix
@@ -101,15 +116,7 @@ class gameTheoryBot:
 
 
         big_boy_list = list(self.generate_combinations(0, [1] * (self.num_players + 1)))
-
-
-        cause_probability = self.get_cause_probability(big_boy_list)
-
-
-        normalized_cause_probability = copy.copy(cause_probability)
-        normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability]
-
-        return normalized_cause_probability
+        return big_boy_list
 
     ## creates the choice of each index, from 2 being the best to -1 being the worst. (2, 1, 0, -1)
     def create_choices_matrix(self, current_options_matrix):

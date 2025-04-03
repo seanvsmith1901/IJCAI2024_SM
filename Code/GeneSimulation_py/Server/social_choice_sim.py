@@ -76,8 +76,6 @@ class Social_Choice_Sim:
     def create_player_nodes(self):
         #normalized_current_options_matrix = self.normalize_current_options_matrix()
         normalized_current_options_matrix = self.current_options_matrix
-
-
         player_nodes = []
         for i in range(self.total_players): # i is the player index
             if i == 1:
@@ -129,9 +127,6 @@ class Social_Choice_Sim:
                 current_x, current_y = self.flip_point(current_x, current_y, 0, 0) # we just flip over teh origin.
 
             player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(player_index+1)))
-
-
-
         return player_nodes
 
 
@@ -306,13 +301,13 @@ class Social_Choice_Sim:
 
     def get_votes(self):
         bot_votes = {}
-        self.probabilities = [] # used for the current implementation of the GT bot.
+        self.all_combinations = [] # used for the current implementation of the GT bot.
 
         for i, bot in enumerate(self.bots):
             if bot.type == "GT":
-                if not self.probabilities:
-                    self.probabilities = bot.generate_all_possibilities(self.current_options_matrix)#, self.weights_matrix)
-                bot_votes[i] = bot.get_vote(self.probabilities, self.current_options_matrix)
+                if not self.all_combinations:
+                    self.all_combinations = bot.generate_all_possibilities(self.current_options_matrix)#, self.weights_matrix)
+                bot_votes[i] = bot.get_vote(self.all_combinations, self.current_options_matrix)
             else: # only generate the probability matrix if we need it, fetcher is expensive.
                 bot_votes[i] = bot.get_vote([], self.current_options_matrix)
 
