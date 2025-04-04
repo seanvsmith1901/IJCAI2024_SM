@@ -1,4 +1,3 @@
-import os.path
 import time
 from collections import Counter
 
@@ -10,114 +9,89 @@ from sim_interface import JHG_simulator
 from social_choice_sim import Social_Choice_Sim
 
 
-class ReceivedData:
-    def __init__(self, client_id, allocations):
-        self.client_id = client_id
-        self.allocations = allocations
-
-
 class GameServer:
-    def __init__(self, new_clients, client_id_dict, client_usernames, max_rounds, num_bots, num_causes, num_players, group_sizes_option, jhg_rounds_per_sc_round):
+    def __init__(self, connection_manager, options):
         #General
-        self.connected_clients = new_clients
-        self.client_id_dict = client_id_dict
-        self.num_players = num_players
-        self.client_usernames = client_usernames
-        self.jhg_rounds_per_sc_round = jhg_rounds_per_sc_round
+        self.connection_manager = connection_manager
+        self.num_players = options["TOTAL_PLAYERS"]
+        self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
 
         # JHG
         self.current_round = 0
-        self.jhg_sim = JHG_simulator(len(new_clients), num_players) # creates a new JHG simulator object
-        self.num_bots = num_bots
+        self.jhg_sim = JHG_simulator(self.connection_manager.num_clients, options["TOTAL_PLAYERS"]) # creates a new JHG simulator object
+        self.num_bots = options["NUM_BOTS"]
 
         # SC
-        self.num_causes = num_causes
+        self.sc_round = 0
         self.save_dict = {}
         self.big_dict = {}
-        self.utilities = None
-        self.sc_sim = Social_Choice_Sim(num_players, self.num_causes)
-
-        self.sc_groups = generate_two_plus_one_groups(num_players, group_sizes_option)
+        self.utilities = {i: 0 for i in range(options["NUM_HUMANS"])}
+        self.sc_sim = Social_Choice_Sim(options["TOTAL_PLAYERS"])
+        self.sc_groups = generate_two_plus_one_groups(options["TOTAL_PLAYERS"], options["SC_GROUP_SIZE"])
 
         # Tracking the SC game over time
         self.options_history = {}
         self.options_votes_history = {}
-        self.vote_effects = []  # Tracks how the vote of every player would have affected each player had that cause passed
+        # Tracks how the vote of every player would have affected each player had that cause passed
+        self.vote_effects = [[0 for _ in range(options["TOTAL_PLAYERS"])] for _ in range(options["TOTAL_PLAYERS"])]
         self.vote_effects_history = {}
-        self.positive_vote_effects_history = []  # Tracks every positive vote effect by the ith player on the jth player
-        self.negative_vote_effects_history = []  # Tracks every negative vote effect by the ith player on the jth player
+        self.positive_vote_effects_history = [[0 for _ in range(options["TOTAL_PLAYERS"])] for _ in range(options["TOTAL_PLAYERS"])]
+        self.negative_vote_effects_history = [[0 for _ in range(options["TOTAL_PLAYERS"])] for _ in range(options["TOTAL_PLAYERS"])]
 
-        self.start_game(max_rounds)
+    def play_jhg_round(self, round):
+        client_input = self.connection_manager.get_responses()
 
 
-    def start_game(self, max_rounds):
-        round = 1
-        sc_round = 0
-        self.utilities = {i: 0 for i in range(self.num_players)}
-        self.vote_effects = [[0 for _ in range(self.num_players)] for _ in range(self.num_players)]
-        self.positive_vote_effects_history = [[0 for _ in range(self.num_players)] for _ in range(self.num_players)]
-        self.negative_vote_effects_history = [[0 for _ in range(self.num_players)] for _ in range(self.num_players)]
+        print(f"Results {client_input}")
+        current_popularity = self.jhg_sim.execute_round(client_input, round-1)
 
-        while self.current_round <= max_rounds:
-            # This range says how many jhg rounds to play between sc rounds
-            for i in range(self.jhg_rounds_per_sc_round):
-                self.play_jhg_round(round)
-                print(f"Played round {round}")
-                round += 1
-                print("New round")
-            self.play_social_choice_round(sc_round)
-            sc_round += 1
-            print("New round")
+        # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
+        allocations_matrix = self.jhg_sim.get_T()
 
-        self.save_stuff_small()
-        self.save_stuff_big()
-        print("game over")
+        # Send a message to each client so they can update
+        for i in range(self.num_players):
+            received = self.get_received(i, allocations_matrix)
+            sent = self.get_sent(i, allocations_matrix)
+
+            # Only attempts to send the message to humans
+            if i >= self.num_bots:
+                self.connection_manager.send_individual_message(i, "JHG_OVER", round, received, sent, list(current_popularity))
+
+        return client_input
 
 
     def play_social_choice_round(self, round):
+        # Initialize the round
         self.sc_sim.start_round(self.sc_groups)
         new_influence = self.jhg_sim.get_influence().tolist()
-        # new_relations = self.sc_sim.calculate_relation_strength(new_influence)
         current_options_matrix = self.sc_sim.get_current_options_matrix()
         self.options_history[round] = current_options_matrix
         player_nodes = self.sc_sim.get_player_nodes()
         causes = self.sc_sim.get_causes()
         all_nodes = causes + player_nodes
 
-        message = {
-            "ROUND_TYPE" : "sc_init",
-            "OPTIONS" : current_options_matrix,
-            "NODES" : [node.to_json() for node in all_nodes],
-            "UTILITIES" : current_options_matrix,
-            "INFLUENCE_MAT": new_influence,
-            # "RELATION_STRENGTH": new_relations,
-        }
-
-        for i in range(len(self.connected_clients)):
-            self.connected_clients[i].send(json.dumps(message).encode())
+        self.connection_manager.distribute_message("SC_INIT", current_options_matrix, [node.to_json() for node in all_nodes], current_options_matrix, new_influence)
 
         player_votes = {}
         player_fake_votes = {}
         # Keeps listening for client votes until all players have voted
-        while len(player_votes) < len(self.connected_clients):
+        while len(player_votes) < self.connection_manager.num_clients:
             data = self.get_client_data()
             for client, received_json in data.items():
-                if "FINAL_VOTE" in received_json:
+                if "SUBMIT_SC" == received_json["TYPE"]:
                     if received_json["FINAL_VOTE"] not in player_votes or player_votes[received_json["FINAL_VOTE"]] != received_json["FINAL_VOTE"]:
-                        player_votes[received_json["CLIENT_ID"]] = received_json["FINAL_VOTE"]
-                        self.append_stuff_big(player_fake_votes, "FINAL_VOTE")
-                if "POTENTIAL_VOTE" in received_json:
+                        player_votes[str(received_json["CLIENT_ID"])] = received_json["FINAL_VOTE"]
+                        # ### Sean's saving stuff ###
+                        # self.append_stuff_big(player_fake_votes, "FINAL_VOTE")
+                if "POTENTIAL_SC_VOTE" == received_json["TYPE"]:
                     # if there are no votes or if the vote is different, update and pass it down.
-                    if received_json["CLIENT_ID"] not in player_fake_votes or player_fake_votes[received_json["CLIENT_ID"]] != received_json["POTENTIAL_VOTE"]:
-                        player_fake_votes[received_json["CLIENT_ID"]] = received_json["POTENTIAL_VOTE"]
-                        self.append_stuff_big(player_fake_votes, "POTENTIAL_VOTE")
+                    if received_json["CLIENT_ID"] not in player_fake_votes or player_fake_votes[received_json["CLIENT_ID"]] != received_json["POTENTIAL_SC_VOTE"]:
+                        player_fake_votes[received_json["CLIENT_ID"]] = received_json["POTENTIAL_SC_VOTE"]
+                        # ### Sean's saving stuff ###
+                        # self.append_stuff_big(player_fake_votes, "POTENTIAL_VOTE")
+
             # sends out all the potential votes that we have made and redistributes them so that everyone can see them.
-            message = {
-                "ROUND_TYPE" : "sc_vote",
-                "POTENTIAL_VOTES" : player_fake_votes,
-            }
-            for i in range(len(self.connected_clients)):
-                self.connected_clients[i].send(json.dumps(message).encode())
+            self.connection_manager.distribute_message("SC_VOTES", player_fake_votes)
 
         bot_votes = self.jhg_sim.get_bot_votes(current_options_matrix)
 
@@ -141,52 +115,16 @@ class GameServer:
 
         new_utilities = self.sc_sim.get_player_utility()
 
-        message = {
-            "ROUND_TYPE": "sc_over",
-            "WINNING_VOTE": winning_vote,
-            "NEW_UTILITIES": new_utilities,
-            "VOTE_EFFECTS": self.vote_effects,
-            "POSITIVE_VOTE_EFFECTS": self.positive_vote_effects_history,
-            "NEGATIVE_VOTE_EFFECTS": self.negative_vote_effects_history,
-            "VOTES": all_votes_list,
-            "UTILITIES": current_options_matrix,
-        }
-
-        self.append_save_dict(player_votes, winning_vote)
-
-        for i in range(len(self.connected_clients)):
-            self.connected_clients[i].send(json.dumps(message).encode())
+        self.connection_manager.distribute_message("SC_OVER", winning_vote, new_utilities,
+                                                   self.positive_vote_effects_history, self.negative_vote_effects_history,
+                                                   all_votes_list, current_options_matrix)
+        # ### Sean's saving stuff ###
+        # self.append_save_dict(player_votes, winning_vote)
 
         # Note: Removing this time.sleep will brick the program... So, unless you're ready to redo how the server connection works, it stays.
         time.sleep(.5) # Force the fetcher to sleep for a little bit so we know which vote has won. And congrats!
 
-        message = {
-            "SWITCH_ROUND": "jhg",
-        }
-        for i in range(len(self.connected_clients)):
-            self.connected_clients[i].send(json.dumps(message).encode())
-
-    def play_jhg_round(self, round):
-        client_input = self.get_client_input()
-        current_popularity = self.jhg_sim.execute_round(client_input, round-1)
-
-        # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
-        allocations_matrix = self.jhg_sim.get_T()
-
-        # Sends a list containing
-        for i in range(self.num_players):
-            message = {
-                "ROUND_TYPE": "jhg",
-                "ROUND": round,
-                "RECEIVED": self.get_received(i, allocations_matrix),
-                "SENT": self.get_sent(i, allocations_matrix),
-                "POPULARITY": list(current_popularity),
-            }
-            # Only sends the message to connected clients.
-            if i >= self.num_bots:
-                self.connected_clients[i - self.num_bots].send(json.dumps(message).encode())
-
-        return client_input
+        self.connection_manager.distribute_message("SWITCH_ROUND", "jhg")
 
 
     def get_client_input(self):
@@ -194,20 +132,16 @@ class GameServer:
         while True:
             data = self.get_client_data()
             for client, received_json in data.items():
+                print(received_json)
                 if "CLIENT_ID" in received_json:
-                    client_input[json.loads(received_json)["CLIENT_ID"]] = json.loads(received_json)["ALLOCATIONS"]
+                    client_input[received_json["CLIENT_ID"]] = received_json["ALLOCATIONS"]
 
             # Check if all clients have provided input
-            if len(client_input) == len(self.connected_clients):
+            if len(client_input) == self.connection_manager.num_clients:
                 break
             # this isn't the most elegant solution, but it means that we can see all submitted votes. I want us to also be able to see unsubmitted votes.
             else: # we are still playing -- display who is voting for whom.
-                message = {
-                    "CURRENT_VOTES" : client_input,
-                }
-                for i in range(len(self.connected_clients)):
-                    self.connected_clients[i].send(json.dumps(message).encode())
-
+                self.connection_manager.distribute_message("JHG", client_input)
         return client_input
 
     def get_received(self, id, allocations_matrix):
@@ -226,7 +160,7 @@ class GameServer:
 
 
     def get_client_data(self):
-        ready_to_read, _, _ = select.select(list(self.connected_clients.values()), [], [], 0.1)
+        ready_to_read, _, _ = select.select(list(self.connection_manager.clients.values()), [], [], 0.1)
         data = {}
         for client in ready_to_read:
             try:
@@ -239,69 +173,58 @@ class GameServer:
                 if msg:
                     data[client] = json.loads(msg)
             except Exception as e:
+                print(f"Error getting data from client: {e}")
                 pass
         return data
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    def append_save_dict(self, all_votes, winning_vote): # just adds the new vote dict to the fetcher.
-        all_votes["winning_cause"] = winning_vote
-        if self.current_round not in self.save_dict:
-            self.save_dict[self.current_round] = all_votes
-
-    def append_stuff_big(self, new_potential_votes, potential_or_final):
-        if self.current_round not in self.big_dict:
-            self.big_dict[self.current_round] = {} # initialize an empty round
-        index = len(self.big_dict[self.current_round])+1
-        self.big_dict[self.current_round][index] = {} # new index, slap the potential or final in there.
-        self.big_dict[self.current_round][index][potential_or_final] = new_potential_votes.copy() # it is imperative that this be a copy. IDK why.
-
-    def save_stuff_big(self):
-        desktop_path = os.path.expanduser("~/Desktop")
-        folder_path = os.path.join(desktop_path, "sc_sim_jsons", "low_level_jsons")
-        low_level_path = "sc_sim_low_level.json"
-        # if not os.path.exists(folder_path): # folder should already be guaranteed to exist. don't worry about it.
-        #     os.makedirs(folder_path)
-
-        file_path_2 = os.path.join(folder_path, low_level_path)
-        unique_file_path_2 = self.get_unique_filename(file_path_2)
-
-        with open(unique_file_path_2, "w") as f:
-            json.dump(self.big_dict, f, indent=4)
-
-
-    def save_stuff_small(self):
-        desktop_path = os.path.expanduser("~/Desktop")
-        folder_path = os.path.join(desktop_path, "sc_sim_jsons")
-        top_level_path = "sc_top_level_json"
-
-        file_path_1 = os.path.join(folder_path, top_level_path)
-        unique_file_path_1 = self.get_unique_filename(file_path_1)
-
-        with open(unique_file_path_1, "w") as f:
-            json.dump(self.save_dict, f, indent=4)
-
-
-    def get_unique_filename(self, file_path):
-        if not os.path.exists(file_path):
-            return file_path
-        else:
-            base, extension = os.path.splitext(file_path)
-            counter = 1
-            while os.path.exists(f"{base}_{counter}{extension}"):
-                counter += 1
-            return f"{base}_{counter}{extension}"
+    ### Sean's saving stuff ###
+    # def append_save_dict(self, all_votes, winning_vote): # just adds the new vote dict to the fetcher.
+    #     all_votes["winning_cause"] = winning_vote
+    #     if self.current_round not in self.save_dict:
+    #         self.save_dict[self.current_round] = all_votes
+    #
+    # def append_stuff_big(self, new_potential_votes, potential_or_final):
+    #     if self.current_round not in self.big_dict:
+    #         self.big_dict[self.current_round] = {} # initialize an empty round
+    #     index = len(self.big_dict[self.current_round])+1
+    #     self.big_dict[self.current_round][index] = {} # new index, slap the potential or final in there.
+    #     self.big_dict[self.current_round][index][potential_or_final] = new_potential_votes.copy() # it is imperative that this be a copy. IDK why.
+    #
+    # def save_stuff_big(self):
+    #     desktop_path = os.path.expanduser("~/Desktop")
+    #     folder_path = os.path.join(desktop_path, "sc_sim_jsons", "low_level_jsons")
+    #     low_level_path = "sc_sim_low_level.json"
+    #     # if not os.path.exists(folder_path): # folder should already be guaranteed to exist. don't worry about it.
+    #     #     os.makedirs(folder_path)
+    #
+    #     file_path_2 = os.path.join(folder_path, low_level_path)
+    #     unique_file_path_2 = self.get_unique_filename(file_path_2)
+    #
+    #     with open(unique_file_path_2, "w") as f:
+    #         json.dump(self.big_dict, f, indent=4)
+    #
+    #
+    # def save_stuff_small(self):
+    #     desktop_path = os.path.expanduser("~/Desktop")
+    #     folder_path = os.path.join(desktop_path, "sc_sim_jsons")
+    #     top_level_path = "sc_top_level_json"
+    #
+    #     file_path_1 = os.path.join(folder_path, top_level_path)
+    #     unique_file_path_1 = self.get_unique_filename(file_path_1)
+    #
+    #     with open(unique_file_path_1, "w") as f:
+    #         json.dump(self.save_dict, f, indent=4)
+    #
+    #
+    # def get_unique_filename(self, file_path):
+    #     if not os.path.exists(file_path):
+    #         return file_path
+    #     else:
+    #         base, extension = os.path.splitext(file_path)
+    #         counter = 1
+    #         while os.path.exists(f"{base}_{counter}{extension}"):
+    #             counter += 1
+    #         return f"{base}_{counter}{extension}"
 
     def update_vote_effects(self, all_votes, current_options_matrix, round):
         round_vote_effects = [[0 for _ in range(self.num_players)] for _ in

@@ -64,7 +64,3 @@ def generate_two_plus_one_groups_options_best_of_three(groups):
             options[player - 1] = generated_options
 
     return options
-
-if __name__ == "__main__":
-    groups = generate_two_plus_one_groups(16, even_two_plus_one)
-    generate_two_plus_one_groups_options_best_of_three(groups)

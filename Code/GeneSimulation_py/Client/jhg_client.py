@@ -3,7 +3,8 @@ import sys
 import socket
 
 from PyQt6.QtWidgets import QApplication
-# from PyqtComponents.MainWindow import MainWindow
+
+from ClientConnectionManager import ClientConnectionManager
 from combinedLayout.MainWindow import MainWindow
 
 if __name__ == "__main__":
@@ -11,32 +12,23 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     host = '127.0.0.1'  # your local host address
-    port = 12346  # The port number to connect to
-    # Create a TCP socket
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Connect to the server
-    client_socket.connect((host, port))
+    port = 12345  # The port number to connect to
+
+    connection_manager = ClientConnectionManager(host, port)
 
     # Send data to the server to initialize the connection
     message = {"NEW_INPUT": "new_input"}
-    client_socket.send(json.dumps(message).encode())
+    connection_manager.send_message(message)
+    connection_manager.initialize_connection()
 
-    while True:
-        data = client_socket.recv(4096)
-        if data:
-            json_data = json.loads(data.decode())
-            if "ID" in json_data:
-                num_players = json_data["NUM_PLAYERS"]
-                num_causes = json_data["NUM_CAUSES"]
-                max_rounds = json_data["MAX_ROUNDS"]
-                id = json_data["ID"]
-                break
+    # Get the values from the server needed to initialize the client
+    init_vals = connection_manager.get_message()[0]
+    client_id = init_vals["CLIENT_ID"]
+    num_players = init_vals["NUM_PLAYERS"]
 
-    message = {"INIT": "init"}
-    client_socket.send(json.dumps(message).encode())
 
     # Now, create and show the main window
-    window = MainWindow(client_socket, num_players, num_causes, id, max_rounds)
+    window = MainWindow(connection_manager, num_players, client_id)
     window.show()
 
     # Start the event loop

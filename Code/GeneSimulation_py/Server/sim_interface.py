@@ -102,7 +102,7 @@ class JHG_simulator():
             game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
 
 
-    def execute_round(self, allocations, round):  # all of the player allocations will get passed in here
+    def execute_round(self, client_input, round):  # all of the player allocations will get passed in here
         # print("\nRound: " + str(r))
         # build allocations here.
 
@@ -111,9 +111,9 @@ class JHG_simulator():
         T_prev = self.sim.get_transaction()
         # print("these are the allocations ", allocations)
         # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
-        for i, plyr in enumerate(self.players):  # DON"T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
+        for i, plyr in enumerate(self.players):  # DON'T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
             if plyr.getType() == "Human":
-                T[i] = allocations[str(i)] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
+                T[i] = client_input[i]["ALLOCATIONS"] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
             else:
                 T[i] = plyr.play_round(
                     i,  # player index
@@ -121,7 +121,7 @@ class JHG_simulator():
                     T_prev[:, i],  # received
                     self.sim.get_popularity(),  # popularity
                     self.sim.get_influence(),  # influence
-                    self.sim.get_extra_data(i)  # could NOT tell you waht this is.
+                    self.sim.get_extra_data(i)  # could NOT tell you what this is.
                 )
                 #print(T[i])
 

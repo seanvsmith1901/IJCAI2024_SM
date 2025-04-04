@@ -25,7 +25,7 @@ def create_sc_ui_elements(main_window):
     graphs_layout.addWidget(sc_graph_tabs)
 
     # Set up the SC history panel
-    main_window.SC_voting_grid = SCVotingGrid(main_window.round_state.num_players, main_window.round_state.num_causes, client_id, graphs_layout, main_window)
+    main_window.SC_voting_grid = SCVotingGrid(main_window.round_state.num_players, client_id, graphs_layout, main_window)
     main_window.SC_voting_grid.update_grid([0 for _ in range(main_window.round_state.num_players)], [[0 for _ in range(3)] for _ in range(main_window.round_state.num_players)])
 
     main_window.SC_panel.layout().addLayout(main_window.SC_voting_grid)
@@ -112,20 +112,23 @@ def update_arrows(main_window, potential_votes):
 
 
 def sc_vote(main_window, vote):
-    message = {
-        "CLIENT_ID": main_window.round_state.client_id,
-        "POTENTIAL_VOTE": vote,
-    }
+    # message = {
+    #     "CLIENT_ID": main_window.round_state.client_id,
+    #     "POTENTIAL_VOTE": vote,
+    # }
+    # main_window.current_vote = vote
+    # main_window.client_socket.send(json.dumps(message).encode())
     main_window.current_vote = vote
-    main_window.client_socket.send(json.dumps(message).encode())
+    main_window.connection_manager.send_message("POTENTIAL_SC_VOTE", main_window.round_state.client_id, vote)
 
 
 def sc_submit(main_window):
-    message = {
-        "CLIENT_ID": main_window.round_state.client_id,
-        "FINAL_VOTE": main_window.current_vote,
-    }
-    main_window.client_socket.send(json.dumps(message).encode())
+    # message = {
+    #     "CLIENT_ID": main_window.round_state.client_id,
+    #     "FINAL_VOTE": main_window.current_vote,
+    # }
+    # main_window.client_socket.send(json.dumps(message).encode())
+    main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, main_window.current_vote)
 
 
 def sc_display_winning_vote(main_window, winning_vote):

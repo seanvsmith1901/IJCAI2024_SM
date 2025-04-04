@@ -4,9 +4,9 @@ from colors import COLORS
 
 
 class SCGrid(QVBoxLayout):
-    def __init__(self, num_players, num_causes, client_id, col_2_header_text, col_2_vals, utility_mat):
+    def __init__(self, num_players, client_id, col_2_header_text, col_2_vals, utility_mat):
         super().__init__()
-        header_text_list = ["Player", col_2_header_text] + [f"Cause #{i + 1}" for i in range(num_causes)]
+        header_text_list = ["Player", col_2_header_text] + [f"Cause #{i + 1}" for i in range(3)] # 3 is the number of causes
 
         self.id = int(client_id)
         self.header_labels = [QLabel(header_text) for header_text in header_text_list]
