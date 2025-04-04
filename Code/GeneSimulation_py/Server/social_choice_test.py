@@ -4,7 +4,7 @@ import time
 from Code.GeneSimulation_py.Server.social_choice_sim import Social_Choice_Sim
 import matplotlib.pyplot as plt
 from collections import Counter
-
+import statistics
 
 # ok now I need to make it play an actual round of JHG here in the sim so I can test the influence matrix. This is annoying.
 
@@ -13,11 +13,11 @@ if __name__ == "__main__":
     # pure bot sim
     sim = Social_Choice_Sim(11, 3, 0, 3)  # starts the social choice sim, call it whatever you want
     results = {}
-    num_rounds = 10
+    num_rounds = 2
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
-    chromosomes = [[0.6210486585952955, 0.7547986715457604, 0.2525279612328297, 0.46196784934711166, 0.819004579415406, 0.7181349915985507, 0.9232352336229714, 0.3293687231403176, 0.9259238686577719, 0.6925405567790517, 0.7562068076997185, 0.5238774792306058, 0.03214344296676497, 0.888789491379897, 0.1665885339565425, 0.8179923951585332, 0.6603572661126325, 0.8130412443711176, 0.1687030055257267, 0]] * 11
+    chromosomes = [[0.8504851734897924,0.18299297583397545,0.5058940101317753,0.4963137606192388,0.9494019500402363,0.8623133159934088,0.6096573860067854,0.5223926434074203,0.6248284939200799,0.06012518023666191,0.7817807344496781,0.05418476010992701,0.5539546298958223,0.36877177641247616,0.9887150534783434,0.48060516988112634,0.7341236019876349,0.45999049649402646,0.7113228601888715,0]] * 11
     for i in range(num_rounds): # just a ridicuously large number
         sim.set_chromosome(chromosomes)
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     print("here were the resuts ", results)
         #print("This was the current options matrix \n", current_options_matrix, "\n this were the probabilities \n", probs, " \n these were the actual votes \n", bot_votes, " and here was the winning vote ", winning_vote)
     # Number of rounds (assuming all bots have the same number of rounds)
-    num_rounds = len(next(iter(results.values())))  # length of the list of scores for a single bot
+    # num_rounds = len(next(iter(results.values())))  # length of the list of scores for a single bot
     sums_per_round = {}
     for bot in results:
         sums_per_round[bot] = []
@@ -52,6 +52,19 @@ if __name__ == "__main__":
         for i, new_sum in enumerate(results[bot]):
             current_sum += new_sum
             sums_per_round[bot].append(current_sum)
+    statistical_decviation = []
+    total_sum_deviation = {}
+    deviation_per_round = []
+
+    new_list = []
+    for bot in sums_per_round:
+        new_list.append(sums_per_round[bot][num_rounds-1])
+    deviation_per_round.append(statistics.stdev(new_list))
+
+    average_standard_deviation = statistics.mean(deviation_per_round)
+
+
+
     print("This is what sums per round looks like ", sums_per_round)
 
 
@@ -76,6 +89,10 @@ if __name__ == "__main__":
         plt.plot(rounds, scores_list, marker='o', label=f'Player {player}')
 
     plt.plot(rounds, cumulative_average_score, marker='x', label='Cumulative Total Score', linewidth=3, color='black')
+
+    plt.text(0.95, 0.90, f'Avg Std Dev: {average_standard_deviation:.2f}', # should display the average standard deviation as well.
+             horizontalalignment='right', verticalalignment='top',
+             transform=plt.gca().transAxes, fontsize=12, color='red', weight='bold')
 
     plt.text(0.95, 0.95, f'Avg Increase: {total_average_increase:.2f}',
              horizontalalignment='right', verticalalignment='top',

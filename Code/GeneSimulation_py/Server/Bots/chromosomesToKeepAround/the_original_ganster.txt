@@ -1,0 +1,3 @@
+1, 0.25, 0.10, 0.05, 0, 1, 0.25, 0.125, 0.0, 0.125, 0.0625, 0.003125, 0, 0.50, 0.25, 0.125, 0.0625, 0
+
+# the chromosome to end all chromosomes. it was just the best one I found by hand haha.

@@ -33,11 +33,25 @@ def reproduce(sorted_population, elite_size, population_size):
     new_population = apply_eliteness(sorted_population, elite_size)
 
     while len(new_population) < population_size:
-        parent = random.choice(sorted_population[:elite_size])
-        offspring = mutate(parent)
-        new_population.append(Chromosome(offspring))
+        parent1 = random.choice(sorted_population[:elite_size]).chromosome
+        parent2 = random.choice(sorted_population[:elite_size]).chromosome
+
+        offspring1, offspring2 = one_point_crossover(parent1, parent2)
+
+        offspring1 = mutate(offspring1)
+        offspring2 = mutate(offspring2)
+
+        new_population.append(Chromosome(offspring1))
+        new_population.append(Chromosome(offspring2))
 
     return new_population
+
+def one_point_crossover(parent1, parent2):
+    crossover_point = random.randint(0, len(parent1) - 1)
+    offspring1 = parent1[:crossover_point] + parent2[crossover_point:]
+    offspring2 = parent2[:crossover_point] + parent1[crossover_point:]
+
+    return offspring1, offspring2
 
 
 
@@ -56,7 +70,8 @@ if __name__ == '__main__':
 
     ## POPULATION INITIALIZING / START ##
     for generation in range(100): # run 200 generations
-        for i in range(100): # plays 100 games per generation (can prolly make this less)
+        # chromosomes_used = {} # where the key is the chromosome, and the attribute is all of the fintesses.
+        for i in range(10): # plays 100 games per generation (can prolly make this less)
             selected_population = [random.randint(0, 99) for _ in range(11)]  # 11 random numbers from 1-100
             current_chromosomes = [population[i] for i in selected_population] # sets up the population
             sim.set_chromosome(current_chromosomes) # should set all the chromosomes
@@ -88,7 +103,7 @@ if __name__ == '__main__':
                 for i, gene in enumerate(top_11):
                     writer.writerow([i + 1] + gene.chromosome)  # Keeps proper CSV formatting
 
-           # print(f"Successfully saved {file_path}")
+            print(f"Successfully saved {file_path}")
 
         except Exception as e:
             print(f"Error writing file {file_path}: {e}")
