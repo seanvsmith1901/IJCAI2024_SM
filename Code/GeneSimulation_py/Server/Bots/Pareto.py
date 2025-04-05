@@ -17,7 +17,7 @@ class ParetoBot:
             options[col] = 0
 
         for col in range(len(current_options_matrix[0])): # make the assumption that he is square.
-            for row in range(len(current_options_matrix[col])):
+            for row in range(len(current_options_matrix)):
                 options[col] += current_options_matrix[row][col]
 
 
@@ -28,5 +28,5 @@ class ParetoBot:
                 cur_max = options[col]
                 curr_best = col
 
-        print('this is what we are voting for ', curr_best)
+        #print('this is what we are voting for ', curr_best) # no reason to keep this around
         return curr_best

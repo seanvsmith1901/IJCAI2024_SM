@@ -7,16 +7,29 @@ from collections import Counter
 from Code.GeneSimulation_py.Server.Bots.chromosome import Chromosome
 import os
 import csv
+import statistics
+import numpy as np # in order to keep track of variance
+from Code.GeneSimulation_py.Server.Bots.genetic_logger import Logger
+
+
+
+
 
 def initalize_population(pop_size, num_genes, lower_bound, upper_bound):
     population = []
-
     for _ in range(pop_size): # how many we want to create
         chromosome = [random.uniform(lower_bound, upper_bound) for _ in range(num_genes-1)]
         chromosome.append(random.randint(0, 1))
         population.append(Chromosome(chromosome))
-
     return population
+
+def tournament_selection(population, k=5, num_parents=11):
+    selected = []
+    for _ in range(num_parents):
+        tournament = random.sample(population, k)
+        winner = max(tournament, key=lambda c: c.fitness)
+        selected.append(winner)
+    return selected
 
 def sort_by_fitness(population):
     return sorted(population, key=lambda chromosome: chromosome.fitness, reverse=True) # highest fitness first
@@ -24,14 +37,25 @@ def sort_by_fitness(population):
 def apply_eliteness(sorted_chromosomes, num_to_keep):
     return sorted_chromosomes[:num_to_keep]
 
-def mutate(chromosome, mutation_rate = 0.01):
-    return [
-        gene if random.random() > mutation_rate else random.choice([0,1]) for gene in chromosome
-    ]
+
+def mutate(chromosome, mutation_rate=0.05):
+    new_chrom = []
+    for gene in chromosome[:-1]:  # float genes
+        if random.random() < mutation_rate:
+            new_chrom.append(random.uniform(0, 1))  # resample in same range
+        else:
+            new_chrom.append(gene)
+
+    # Last gene is binary (0 or 1), flip it with mutation_rate
+    if random.random() < mutation_rate:
+        new_chrom.append(1 - chromosome[-1])
+    else:
+        new_chrom.append(chromosome[-1])
+
+    return new_chrom
 
 def reproduce(sorted_population, elite_size, population_size):
     new_population = apply_eliteness(sorted_population, elite_size)
-
     while len(new_population) < population_size:
         parent1 = random.choice(sorted_population[:elite_size]).chromosome
         parent2 = random.choice(sorted_population[:elite_size]).chromosome
@@ -43,7 +67,6 @@ def reproduce(sorted_population, elite_size, population_size):
 
         new_population.append(Chromosome(offspring1))
         new_population.append(Chromosome(offspring2))
-
     return new_population
 
 def one_point_crossover(parent1, parent2):
@@ -53,6 +76,25 @@ def one_point_crossover(parent1, parent2):
 
     return offspring1, offspring2
 
+def save_to_file(genes_to_save, gen_number):
+    directory = r"C:\Users\Sean\Documents\GitHub\IJCAI2024_SM\Code\GeneSimulation_py\Server\Bots\chromosomeRepo"
+    if not os.path.exists(directory):
+        # print(f"Directory {directory} does not exist. Creating it now...")
+        os.makedirs(directory)
+    file_path = os.path.join(directory, f"generation_{gen_number}.csv")
+    try:
+        with open(file_path, mode="w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerow(["Gene Index", "Chromosome"])  # Header row
+            for i, gene in enumerate(genes_to_save):
+                writer.writerow([i + 1] + gene.chromosome)  # Keeps proper CSV formatting
+        print(f"Successfully saved {file_path}")
+    except Exception as e:
+        print(f"Error writing file {file_path}: {e}")
+
+def reset_fitness(population):
+    for chromosome in population:
+        chromosome.reset_fitness()
 
 
 if __name__ == '__main__':
@@ -62,58 +104,51 @@ if __name__ == '__main__':
     upper_bound = 1
     num_to_keep = 11 # just becuase, why not.
 
+    logger = Logger()
+
     start_time = time.time()
     # initalize the sim, and sets up a defualt population
     sim = Social_Choice_Sim(11, 3, 0, 3)  # starts the social choice sim (always use these parameters for now)
     population = initalize_population(pop_size, num_genes, lower_bound, upper_bound)
-
+    fitness_history = []
+    diversity_history = []
 
     ## POPULATION INITIALIZING / START ##
-    for generation in range(100): # run 200 generations
-        # chromosomes_used = {} # where the key is the chromosome, and the attribute is all of the fintesses.
-        for i in range(10): # plays 100 games per generation (can prolly make this less)
+    for generation in range(5): # run 200 generations
+        chromosomes_used = {} # where the key is the chromosome, and the attribute is all of the fintesses.
+        for i in range(10): # tries 10 trials for chromosome fitness
             selected_population = [random.randint(0, 99) for _ in range(11)]  # 11 random numbers from 1-100
             current_chromosomes = [population[i] for i in selected_population] # sets up the population
             sim.set_chromosome(current_chromosomes) # should set all the chromosomes
-            for i in range(10): # play 10 rounds
+            for i in range(10): # play 10 rounds per set of chromosomes.
                 sim.start_round()
                 bot_votes = sim.get_votes()
                 winning_vote, results = sim.return_win(bot_votes) # is all votes, works here
                 for i, chromosome in enumerate(current_chromosomes):
-                    chromosome.add_fitness(results[i]) # PLEASE be in the right order. if not thats going to be a problem.
+                    if chromosome not in chromosomes_used:
+                        chromosomes_used[chromosome] = []
+                    chromosomes_used[chromosome].append(results[i])
             print("games done. training chromosomes again...")
 
+        for chromosome in chromosomes_used: # gets the average utility increase for each chromosome.
+            chromosome.add_fitness(statistics.mean(chromosomes_used[chromosome]))
+
         print("chromosomes trained. Selecting the most fit...")
-        population = sort_by_fitness(population)
-        top_11 = population[:11] # grabs the 11 top ones
+        population = sort_by_fitness(population) # now it shoudl work as anticipated.
+        logger.log_generation(population)
 
-        directory = r"C:\Users\Sean\Documents\GitHub\IJCAI2024_SM\Code\GeneSimulation_py\Server\Bots\chromosomeRepo"
-
-        if not os.path.exists(directory):
-            #print(f"Directory {directory} does not exist. Creating it now...")
-            os.makedirs(directory)
-
-        file_path = os.path.join(directory, f"generation_{generation}.csv")
-
-        try:
-            with open(file_path, mode="w", newline="") as file:
-                writer = csv.writer(file)
-                writer.writerow(["Gene Index", "Chromosome"])  # Header row
-
-                for i, gene in enumerate(top_11):
-                    writer.writerow([i + 1] + gene.chromosome)  # Keeps proper CSV formatting
-
-            print(f"Successfully saved {file_path}")
-
-        except Exception as e:
-            print(f"Error writing file {file_path}: {e}")
-
-
-        population = reproduce(population, num_to_keep, pop_size)
+        top_11 = tournament_selection(population, k=5, num_parents=num_to_keep)
+        #top_11 = population[:11] # grabs the 11 top ones
+        save_to_file(population, generation) # save the actual chromosomes around so I can look for them later. s
+        population = reproduce(top_11, num_to_keep, pop_size) # only keep the top 11. no wonder we were struggling.
+        for chromosome in population: # reset the fitness so it doesn't accumulate.
+            chromosome.reset_fitness()
+    logger.save_logs()
+    logger.plot_pca_snapshots()
     end_time = time.time()
     print("this was the total training time ", end_time - start_time)
 
-    # need to decide which chomosomes to keep
+
 
 
 

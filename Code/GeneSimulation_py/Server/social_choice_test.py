@@ -5,21 +5,25 @@ from Code.GeneSimulation_py.Server.social_choice_sim import Social_Choice_Sim
 import matplotlib.pyplot as plt
 from collections import Counter
 import statistics
-
+import random
 # ok now I need to make it play an actual round of JHG here in the sim so I can test the influence matrix. This is annoying.
 
 
 if __name__ == "__main__":
     # pure bot sim
-    sim = Social_Choice_Sim(11, 3, 0, 3)  # starts the social choice sim, call it whatever you want
+    # wanna get some results for pareto optimal
+    sim = Social_Choice_Sim(11, 3, 0, 2)  # starts the social choice sim, call it whatever you want
+    #chromosomes = [[0.14596498326505314,0.9771860239933535,0.30421736004971067,0.9013883929685444,0.2935735969819985,0.26895617061622723,0.8015444130652044,0.38763987943959655,0.840265769054056,0.9280936968864469,0.32887573919216284,0.4606764827331278,0.8238271261242128,0.11467963071713083,0.5862458509657092,0.3603218802399152,0.512299688934243,0.6368346776639202,0.3636616659220744,0]] * 11
     results = {}
-    num_rounds = 2
+    num_rounds = 100
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
-    chromosomes = [[0.8504851734897924,0.18299297583397545,0.5058940101317753,0.4963137606192388,0.9494019500402363,0.8623133159934088,0.6096573860067854,0.5223926434074203,0.6248284939200799,0.06012518023666191,0.7817807344496781,0.05418476010992701,0.5539546298958223,0.36877177641247616,0.9887150534783434,0.48060516988112634,0.7341236019876349,0.45999049649402646,0.7113228601888715,0]] * 11
+    num_genes = 20
+
+    # chromosomes = [random.uniform(0, 1) for _ in range(num_genes)] * 11
     for i in range(num_rounds): # just a ridicuously large number
-        sim.set_chromosome(chromosomes)
+        #sim.set_chromosome(chromosomes)
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
         bot_votes = sim.get_votes() # where da magic happens
@@ -90,7 +94,7 @@ if __name__ == "__main__":
 
     plt.plot(rounds, cumulative_average_score, marker='x', label='Cumulative Total Score', linewidth=3, color='black')
 
-    plt.text(0.95, 0.90, f'Avg Std Dev: {average_standard_deviation:.2f}', # should display the average standard deviation as well.
+    plt.text(0.95, 0.90, f'Final Std Dev: {average_standard_deviation:.2f}', # should display the average standard deviation as well.
              horizontalalignment='right', verticalalignment='top',
              transform=plt.gca().transAxes, fontsize=12, color='red', weight='bold')
 
