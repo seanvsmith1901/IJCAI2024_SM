@@ -84,6 +84,7 @@ class ServerListener(QObject):
 
 
     def SWITCH_ROUND(self, message):
+        print("Here")
         self.tabs.setCurrentIndex(0)
         self.enable_jhg_buttons_signal.emit()
 

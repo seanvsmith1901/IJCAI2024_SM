@@ -22,7 +22,7 @@ WIDTH = 3
 hunters = []
 
 
-def start_server(host='127.0.0.1', port=12345):
+def start_server(host='127.0.0.1', port=12346):
     connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
     print("Server started")
 
@@ -34,7 +34,6 @@ def start_server(host='127.0.0.1', port=12345):
 def start_game(game):
     # Main game loop -- Play as many rounds as specified in OPTIONS
     while game.current_round <= OPTIONS["MAX_ROUNDS"]:
-        game.current_round += 1
         # This range says how many jhg rounds to play between sc rounds
         for i in range(OPTIONS["JHG_ROUNDS_PER_SC_ROUND"]):
             game.play_jhg_round(game.current_round)
@@ -44,8 +43,8 @@ def start_game(game):
         print("New round")
 
     ### Sean's saving stuff ###
-    game.save_stuff_small()
-    game.save_stuff_big()
+    # game.save_stuff_small()
+    # game.save_stuff_big()
     print("game over")
 
 

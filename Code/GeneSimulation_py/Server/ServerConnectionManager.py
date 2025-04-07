@@ -27,7 +27,7 @@ class ServerConnectionManager(ConnectionManager):
             "SC_VOTES": ["POTENTIAL_VOTES"],
             "SC_OVER": ["WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
                         "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES"],
-            "SWITCH_ROUND": [],
+            "SWITCH_ROUND": ["ROUND_TYPE"],
         }
 
         # NOTE: All messages also receive the CLIENT_ID, but it is not included in the message_type specification

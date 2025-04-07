@@ -112,22 +112,11 @@ def update_arrows(main_window, potential_votes):
 
 
 def sc_vote(main_window, vote):
-    # message = {
-    #     "CLIENT_ID": main_window.round_state.client_id,
-    #     "POTENTIAL_VOTE": vote,
-    # }
-    # main_window.current_vote = vote
-    # main_window.client_socket.send(json.dumps(message).encode())
     main_window.current_vote = vote
     main_window.connection_manager.send_message("POTENTIAL_SC_VOTE", main_window.round_state.client_id, vote)
 
 
 def sc_submit(main_window):
-    # message = {
-    #     "CLIENT_ID": main_window.round_state.client_id,
-    #     "FINAL_VOTE": main_window.current_vote,
-    # }
-    # main_window.client_socket.send(json.dumps(message).encode())
     main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, main_window.current_vote)
 
 

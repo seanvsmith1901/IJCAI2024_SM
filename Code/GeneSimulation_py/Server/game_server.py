@@ -17,7 +17,7 @@ class GameServer:
         self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
 
         # JHG
-        self.current_round = 0
+        self.current_round = 1
         self.jhg_sim = JHG_simulator(self.connection_manager.num_clients, options["TOTAL_PLAYERS"]) # creates a new JHG simulator object
         self.num_bots = options["NUM_BOTS"]
 

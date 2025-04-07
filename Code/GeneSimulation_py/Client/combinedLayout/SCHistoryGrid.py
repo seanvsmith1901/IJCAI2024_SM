@@ -61,10 +61,10 @@ class SCHistoryGrid(SCGrid):
                 else:
                     label.setStyleSheet("color: white;")
 
-            for i, label in enumerate(self.header_labels):
-                if winning_vote != -1:
-                    if i - 2 == winning_vote: # There are two columns before the utility labels start, so you need to subtract 2
-                        label.setStyleSheet("color: green;")
+        for i, label in enumerate(self.header_labels):
+            if winning_vote != -1:
+                if i - 2 == winning_vote: # There are two columns before the utility labels start, so you need to subtract 2
+                    label.setStyleSheet("color: green;")
                 else:
                     label.setStyleSheet("color: white;")
 
