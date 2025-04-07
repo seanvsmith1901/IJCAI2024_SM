@@ -11,14 +11,15 @@ class Logger:
         self.fitness_history = []
         self.diversity_history = []
         self.pca_snapshots = []
+        self.cooperation_scores = []
 
-    def log_generation(self, population):
+    def log_generation(self, population, cooperation_score):
         fitnesses = [c.fitness for c in population]
         avg_fitness = statistics.mean(fitnesses)
         max_fitness = max(fitnesses)
         diversity = compute_diversity(population)
 
-        self.fitness_history.append((avg_fitness, max_fitness))
+        self.fitness_history.append((avg_fitness, max_fitness, cooperation_score))
         self.diversity_history.append(diversity)
 
         gene_matrix = np.array([chrom.chromosome for chrom in population])
@@ -32,7 +33,7 @@ class Logger:
         os.makedirs(folder, exist_ok=True)
         with open(os.path.join(folder, "fitness.csv"), "w") as f:
             writer = csv.writer(f)
-            writer.writerow(["Generation", "Average", "Max"])
+            writer.writerow(["Generation", "Average", "Max", "Coop"])
             for i, (avg, max_) in enumerate(self.fitness_history):
                 writer.writerow([i, avg, max_])
         with open(os.path.join(folder, "diversity.csv"), "w") as f:

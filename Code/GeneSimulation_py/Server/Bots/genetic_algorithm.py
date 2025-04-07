@@ -114,7 +114,8 @@ if __name__ == '__main__':
     diversity_history = []
 
     ## POPULATION INITIALIZING / START ##
-    for generation in range(5): # run 200 generations
+    for generation in range(200): # run 200 generations
+        cooperation_score = 0 # starts at 0 for every generation
         chromosomes_used = {} # where the key is the chromosome, and the attribute is all of the fintesses.
         for i in range(10): # tries 10 trials for chromosome fitness
             selected_population = [random.randint(0, 99) for _ in range(11)]  # 11 random numbers from 1-100
@@ -124,6 +125,8 @@ if __name__ == '__main__':
                 sim.start_round()
                 bot_votes = sim.get_votes()
                 winning_vote, results = sim.return_win(bot_votes) # is all votes, works here
+                if winning_vote != -1: # keep track of how often they cooperate.
+                    cooperation_score += 1
                 for i, chromosome in enumerate(current_chromosomes):
                     if chromosome not in chromosomes_used:
                         chromosomes_used[chromosome] = []
@@ -135,7 +138,7 @@ if __name__ == '__main__':
 
         print("chromosomes trained. Selecting the most fit...")
         population = sort_by_fitness(population) # now it shoudl work as anticipated.
-        logger.log_generation(population)
+        logger.log_generation(population, cooperation_score)
 
         top_11 = tournament_selection(population, k=5, num_parents=num_to_keep)
         #top_11 = population[:11] # grabs the 11 top ones

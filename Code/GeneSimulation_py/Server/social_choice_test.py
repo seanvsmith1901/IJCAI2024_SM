@@ -14,13 +14,14 @@ if __name__ == "__main__":
     # wanna get some results for pareto optimal
     sim = Social_Choice_Sim(11, 3, 0, 2)  # starts the social choice sim, call it whatever you want
     #chromosomes = [[0.14596498326505314,0.9771860239933535,0.30421736004971067,0.9013883929685444,0.2935735969819985,0.26895617061622723,0.8015444130652044,0.38763987943959655,0.840265769054056,0.9280936968864469,0.32887573919216284,0.4606764827331278,0.8238271261242128,0.11467963071713083,0.5862458509657092,0.3603218802399152,0.512299688934243,0.6368346776639202,0.3636616659220744,0]] * 11
+    #chromosomes = [[0.07608630291702134, 0.6384130720727683, 0.19168194910868275, 0.4621622949954527, 0.8947894398834366, 0.6144458421842767, 0.13055966348312054, 0.7007393159760924, 0.12892661702624952, 0.7011314424376426, 0.276691960478721, 0.15631126834587383, 0.3895274814737226, 0.8127386708328449, 0.18970050900353053, 0.7007645540311098, 0.7671485548172058, 0.49097298823917235, 0.2032415957611493, 1]] * 11
     results = {}
-    num_rounds = 100
+    num_rounds = 10000
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
     num_genes = 20
-
+    cooperation_score = 0
     # chromosomes = [random.uniform(0, 1) for _ in range(num_genes)] * 11
     for i in range(num_rounds): # just a ridicuously large number
         #sim.set_chromosome(chromosomes)
@@ -32,13 +33,9 @@ if __name__ == "__main__":
         winning_vote_count = Counter(bot_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(bot_votes.values()).most_common(1)[0][0]
         probs = sim.get_probabilities()
-        ## Put this back in when you are ready to deal with humans again.
-        # all_votes = {**bot_votes, **player_votes}
-        # total_votes = len(all_votes)
-        # winning_vote_count = Counter(all_votes.values()).most_common(1)[0][1]
-        # winning_vote = Counter(all_votes.values()).most_common(1)[0][0]
-
+        cooperation_score += 1
         if not (winning_vote_count > total_votes // 2):
+            cooperation_score -= 1
             winning_vote = -1
 
         for i in range(total_votes):
@@ -46,9 +43,8 @@ if __name__ == "__main__":
     end_time = time.time()
     print("This was the total time ", end_time - start_time)
     print("here were the resuts ", results)
-        #print("This was the current options matrix \n", current_options_matrix, "\n this were the probabilities \n", probs, " \n these were the actual votes \n", bot_votes, " and here was the winning vote ", winning_vote)
-    # Number of rounds (assuming all bots have the same number of rounds)
-    # num_rounds = len(next(iter(results.values())))  # length of the list of scores for a single bot
+
+
     sums_per_round = {}
     for bot in results:
         sums_per_round[bot] = []
@@ -65,12 +61,12 @@ if __name__ == "__main__":
         new_list.append(sums_per_round[bot][num_rounds-1])
     deviation_per_round.append(statistics.stdev(new_list))
 
-    average_standard_deviation = statistics.mean(deviation_per_round)
-
+    average_standard_deviation = deviation_per_round[-1]
+    cooperation_score = cooperation_score / num_rounds # as a percent, how often we cooperated.
 
 
     print("This is what sums per round looks like ", sums_per_round)
-
+    print("this was the cooperation score ", cooperation_score)
 
     # Prepare the x-axis (rounds)
     rounds = range(num_rounds) # 10 rounds, so x-values range from 0 to 9
@@ -96,9 +92,14 @@ if __name__ == "__main__":
 
     plt.text(0.95, 0.90, f'Final Std Dev: {average_standard_deviation:.2f}', # should display the average standard deviation as well.
              horizontalalignment='right', verticalalignment='top',
-             transform=plt.gca().transAxes, fontsize=12, color='red', weight='bold')
+             transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
 
     plt.text(0.95, 0.95, f'Avg Increase: {total_average_increase:.2f}',
+             horizontalalignment='right', verticalalignment='top',
+             transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
+
+    plt.text(0.95, 0.85, f'Cooperation Score: {cooperation_score:.2f}',
+             # should display the average standard deviation as well.
              horizontalalignment='right', verticalalignment='top',
              transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
 
