@@ -6,6 +6,9 @@ class ParetoBot:
         self.self_id = self_id
         self.type = "P"
 
+    def set_chromosome(self, chromosome):
+        self.chromosome = chromosome
+
     def get_vote(self, empty_list, current_options_matrix):
 
         options = {}

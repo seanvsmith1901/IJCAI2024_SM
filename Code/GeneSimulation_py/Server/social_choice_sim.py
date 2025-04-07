@@ -8,6 +8,7 @@ import numpy as np
 from Code.GeneSimulation_py.Server.Bots.Pareto import ParetoBot
 from Code.GeneSimulation_py.Server.Bots.Greedy import GreedyBot
 from Code.GeneSimulation_py.Server.Bots.gameTheory import gameTheoryBot
+from Code.GeneSimulation_py.Server.Bots.Random import RandomBot
 from Code.GeneSimulation_py.Server.Node import Node
 
 class Social_Choice_Sim:
@@ -39,6 +40,8 @@ class Social_Choice_Sim:
                 bots_array.append(GreedyBot(i))
             if self.type_bot == 3:
                 bots_array.append(gameTheoryBot(i))
+            if self.type_bot == 4:
+                bots_array.append(RandomBot(i))
 
         return bots_array
 
@@ -321,8 +324,7 @@ class Social_Choice_Sim:
         if not (winning_vote_count > len(total_votes) // 2):
             winning_vote = -1
 
-        if winning_vote != -1:
-
+        if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
                 results.append(self.current_options_matrix[i][winning_vote])
         else:

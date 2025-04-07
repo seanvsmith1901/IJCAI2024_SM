@@ -85,7 +85,8 @@ def save_to_file(genes_to_save, gen_number):
     try:
         with open(file_path, mode="w", newline="") as file:
             writer = csv.writer(file)
-            writer.writerow(["Gene Index", "Chromosome"])  # Header row
+            #header = ["Gene Index"] + [f"C[{i}]" for i in range(num_genes)] possible espansion?
+            writer.writerow(["Gene Index", "C[0]", "C[1]" ,"C[2]","C[3]","C[4]","C[5]","C[6]","C[7]","C[8]","C[9]","C[10]","C[11]","C[12]","C[13]","C[14]","C[15]","C[16]","C[17]","C[18]","C[19]","C[20]"])  # Header row
             for i, gene in enumerate(genes_to_save):
                 writer.writerow([i + 1] + gene.chromosome)  # Keeps proper CSV formatting
         print(f"Successfully saved {file_path}")

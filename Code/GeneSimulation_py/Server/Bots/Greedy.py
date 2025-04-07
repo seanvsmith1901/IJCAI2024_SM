@@ -8,6 +8,9 @@ class GreedyBot():
         self.self_id = self_id
         self.type = "G"
 
+    def set_chromosome(self, chromosome):
+        self.chromosome = chromosome
+
     def get_vote(self, empty_list, current_options_matrix):
         current_row = current_options_matrix[self.self_id]
         current_vote = current_row.index(max(current_row))
