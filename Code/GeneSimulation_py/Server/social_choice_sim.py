@@ -7,17 +7,16 @@ from networkx import normalized_cut_size
 from options_creation import generate_two_plus_one_groups_options_best_of_three
 from Node import Node
 
+NUM_CAUSES = 3
+
 class Social_Choice_Sim:
-    def __init__(self, num_players, num_causes):
+    def __init__(self, num_players):
         self.num_players = num_players
-        # self.num_humans = num_humans
-        # self.num_bots = num_players - num_humans
-        # self.type_bot = type_bot
+
         self.players = self.create_players()
         self.cpp = 3
         self.rad = 5  # hardcoded just work with me here
-        self.num_causes = num_causes
-        self.causes = self.create_cause_nodes(num_causes)
+        self.causes = self.create_cause_nodes()
         self.current_options_matrix = {}
         self.player_nodes = []
         self.all_votes = {}
@@ -44,10 +43,10 @@ class Social_Choice_Sim:
         return self.options_matrix # because why not
         # self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.num_players)]
 
-    def create_cause_nodes(self, num_causes):
-        displacement = (2 * math.pi) / num_causes # need an additional "0" cause.
+    def create_cause_nodes(self):
+        displacement = (2 * math.pi) / NUM_CAUSES # need an additional "0" cause.
         causes = []
-        for i in range(num_causes):
+        for i in range(NUM_CAUSES): #3 is the number of causes
             new_x = math.cos(displacement * i) * self.rad
             new_y = math.sin(displacement * i) * self.rad
             causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1)))
@@ -65,14 +64,14 @@ class Social_Choice_Sim:
             current_x = 0  # https://www.youtube.com/watch?v=r7l0Rq9E8MY
             current_y = 0
             curr_negatives = []
-            for cause_index in range(self.num_causes):  # completely populate this fetcher first.
+            for cause_index in range(NUM_CAUSES):  # completely populate this fetcher first.
                 # keep track of negatives
                 if (self.options_matrix[i][cause_index]) < 0:
                     curr_negatives.append(1)
                 else:
                     curr_negatives.append(0)
 
-            for cause_index in range(self.num_causes):
+            for cause_index in range(NUM_CAUSES):
                 # create the new positions (onyl use teh abs so the flips scale correctly.
                 position_x, position_y = (self.causes[cause_index].get_x()), self.causes[
                     cause_index].get_y()  # get the strength based on where they are
@@ -288,3 +287,9 @@ class Social_Choice_Sim:
         # We have to put them all somewhere and here works as good as anywhere else. Not sure if we will need it.
         self.all_votes[round] = votes
 
+    def get_bot_votes(self, current_options_matrix):
+        votes = {}
+        for i, player in enumerate(self.players):
+            if player.getType() != "Human":
+                votes[str(i)] = player.getVote(current_options_matrix, i)
+        return votes

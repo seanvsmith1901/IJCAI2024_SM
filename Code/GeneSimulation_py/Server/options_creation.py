@@ -22,8 +22,8 @@ group_size_options = {
 }
 
 
-def generate_two_plus_one_groups(num_players, group_sizes):
-    group_sizes = group_size_options[group_sizes]
+def generate_two_plus_one_groups(num_players, group_option):
+    group_sizes = group_size_options[group_option]
     players = [i + 1 for i in range(num_players)]
     if num_players < 5:
         raise ValueError("Must have at least 5 players to generate a two plus one group")
@@ -64,7 +64,3 @@ def generate_two_plus_one_groups_options_best_of_three(groups):
             options[player - 1] = generated_options
 
     return options
-
-if __name__ == "__main__":
-    groups = generate_two_plus_one_groups(16, even_two_plus_one)
-    generate_two_plus_one_groups_options_best_of_three(groups)

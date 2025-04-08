@@ -4,11 +4,11 @@ from SCGrid import SCGrid
 
 
 class SCHistoryGrid(SCGrid):
-    def __init__(self, num_players, num_causes, player_id, col_2_header_text):
+    def __init__(self, num_players, player_id, col_2_header_text):
         self.sc_history = {}
         col_2_vals = [0 for _ in range(num_players)]
-        utility_mat = [[0 for _ in range(num_causes)] for _ in range(num_players)]
-        super().__init__(num_players, num_causes, player_id, col_2_header_text, col_2_vals, utility_mat)
+        utility_mat = [[0 for _ in range(3)] for _ in range(num_players)]
+        super().__init__(num_players, player_id, col_2_header_text, col_2_vals, utility_mat)
 
         self.round_drop_down = QComboBox()
         self.round_drop_down.currentIndexChanged.connect(self.change_round)
@@ -61,11 +61,11 @@ class SCHistoryGrid(SCGrid):
                 else:
                     label.setStyleSheet("color: white;")
 
-            for i, label in enumerate(self.header_labels):
-                if winning_vote != -1:
-                    if i - 2 == winning_vote: # There are two columns before the utility labels start, so you need to subtract 2
-                        label.setStyleSheet("color: green;")
-                else:
-                    label.setStyleSheet("color: white;")
+        for i, label in enumerate(self.header_labels):
+            label.setStyleSheet("color: white;")
+            if winning_vote != -1:
+                if i - 2 == winning_vote: # There are two columns before the utility labels start, so you need to subtract 2
+                    label.setStyleSheet("color: green;")
+
 
 

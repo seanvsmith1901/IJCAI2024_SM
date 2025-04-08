@@ -6,7 +6,7 @@ from .colors import COLORS
 
 
 class JhgVotingPanel(QVBoxLayout):
-    def __init__(self, round_state, client_socket, token_counter, jhg_buttons):
+    def __init__(self, round_state, connection_manager, token_counter, jhg_buttons):
         super().__init__()
         while round_state.client_id == -1: # tripping over its own shoelaces.
             pass
@@ -15,7 +15,7 @@ class JhgVotingPanel(QVBoxLayout):
         # Needs to go through the SubmitButton class so that the signal and socket works correctly
         submitButton = SubmitButton()
         jhg_buttons.append(submitButton)
-        submitButton.clicked.connect(lambda: submitButton.submit(round_state, client_socket))
+        submitButton.clicked.connect(lambda: submitButton.submit(round_state, connection_manager))
         footer.addWidget(submitButton)
         token_counter.setText(f"Tokens: {round_state.tokens}")
         footer.addWidget(token_counter)

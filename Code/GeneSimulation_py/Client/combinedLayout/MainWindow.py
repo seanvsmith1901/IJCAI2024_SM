@@ -17,7 +17,7 @@ from .ui_functions.jhg_network_graph import create_jhg_network_graph
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, client_socket, num_players, num_causes, id, max_rounds):
+    def __init__(self, connection_manager, num_players, client_id):
         super().__init__()
         # self.setStyleSheet("background-color: #FF171717;")
         self.setStyleSheet("color: #FFEBEBEB; background-color: #FF171717;")
@@ -33,12 +33,11 @@ class MainWindow(QMainWindow):
         self.player_labels = {}
         self.cause_labels = {}
         self.jhg_buttons = []
-        self.round_state = RoundState(id, num_players, num_causes, self.jhg_buttons, max_rounds)
+        self.round_state = RoundState(client_id, num_players, self.jhg_buttons)
+        self.connection_manager = connection_manager
     #/1#
 
     #2# Block two: Creates the elements that will be passed to the server listener for dynamic updating. Must happen before the server listener is created
-        self.client_socket = client_socket
-
         self.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
 
         # keep track of the current vote
@@ -84,7 +83,7 @@ class MainWindow(QMainWindow):
 
     #3# Block three: Sets up the server listener, which depends on blocks 1&2.
         # Server Listener setup
-        self.ServerListener = ServerListener(self, client_socket, self.round_state, self.round_counter, self.token_label,
+        self.ServerListener = ServerListener(self, connection_manager, self.round_state, self.round_counter, self.token_label,
                                              self.jhg_popularity_graph, tabs, self.utility_qlabels)
         self.ServerListener_thread = QThread()
         self.ServerListener.moveToThread(self.ServerListener_thread)
@@ -107,9 +106,9 @@ class MainWindow(QMainWindow):
         # self.side_by_side_layout = QHBoxLayout()
 
         self.JHG_panel = QWidget()
-        self.JHG_panel.setLayout(JhgPanel(self.round_state, client_socket, self.token_label, self.jhg_popularity_graph, self.jhg_network, self.jhg_buttons))
+        self.JHG_panel.setLayout(JhgPanel(self.round_state, connection_manager, self.token_label, self.jhg_popularity_graph, self.jhg_network, self.jhg_buttons))
         self.sc_history_grid = QWidget()
-        self.sc_history_grid.setLayout(SCHistoryGrid(self.round_state.num_players, self.round_state.num_causes,
+        self.sc_history_grid.setLayout(SCHistoryGrid(self.round_state.num_players,
                                                      self.round_state.client_id, "Voted for"))
         self.JHG_panel.setObjectName("JHG_Panel")
         self.JHG_panel.setStyleSheet("#JHG_Panel {border: 2px solid #FFFDD0; border-radius: 5px; }")
