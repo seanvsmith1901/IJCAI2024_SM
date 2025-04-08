@@ -1,4 +1,5 @@
 import json
+from collections import deque
 
 try:
     from GeneSimulation_py.ConnectionManager import ConnectionManager
@@ -27,7 +28,7 @@ class ClientConnectionManager(ConnectionManager):
         def extract_json_objects(response_string):
             decoder = json.JSONDecoder()
             idx = 0
-            objects = [] # TODO: Convert this to a queue
+            objects = deque()
 
             # Loop through the
             while idx < len(response_string):
