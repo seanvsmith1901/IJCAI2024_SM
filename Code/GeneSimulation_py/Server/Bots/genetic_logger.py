@@ -54,11 +54,6 @@ class Logger:
             plt.savefig(os.path.join(folder, f"pca_gen_{i}.png"))
             plt.close()
 
-
-
-
-
-
 def compute_diversity(population):
     gene_matrix = np.array([chrom.chromosome for chrom in population])
     diversity = np.std(gene_matrix, axis=0).mean()

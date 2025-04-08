@@ -14,9 +14,7 @@ from pathlib import Path
 if __name__ == "__main__":
     bot_type = 3 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random
     sim = Social_Choice_Sim(11, 3, 0, bot_type)  # starts the social choice sim, call it whatever you want
-    #chromosomes = [[0.14596498326505314,0.9771860239933535,0.30421736004971067,0.9013883929685444,0.2935735969819985,0.26895617061622723,0.8015444130652044,0.38763987943959655,0.840265769054056,0.9280936968864469,0.32887573919216284,0.4606764827331278,0.8238271261242128,0.11467963071713083,0.5862458509657092,0.3603218802399152,0.512299688934243,0.6368346776639202,0.3636616659220744,0]] * 11
     current_file = "Bots/chromosomesToKeepAround/generation_7.csv"
-    # reads it in from the file.
     df = pd.read_csv(current_file, comment="#")
     chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
 
@@ -33,7 +31,7 @@ if __name__ == "__main__":
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
-        bot_votes = sim.get_votes() # where da magic happens
+        bot_votes = sim.get_votes_single_chromosome() # this one is optimized for testing the results of a single chromosome.
 
         total_votes = len(bot_votes)
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here

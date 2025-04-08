@@ -3,4 +3,8 @@ project(cppSocialChoiceGenes)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(cppSocialChoiceGenes main.cpp)
+add_executable(cppSocialChoiceGenes main.cpp
+        socialChoiceSim.cpp
+        socialChoiceSim.h
+        gameTheoryBot.cpp
+        gameTheoryBot.h)

@@ -45,7 +45,6 @@ class Social_Choice_Sim:
 
         return bots_array
 
-
     def create_players(self):
         players = {}
         for i in range(self.num_humans):
@@ -66,6 +65,91 @@ class Social_Choice_Sim:
     def create_options_matrix(self):
         self.options_matrix = [[random.randint(-10, 10) for _ in range(self.num_causes)] for _ in range(self.total_players)]
         return self.options_matrix # because why not
+
+    def get_causes(self):
+        return self.causes
+
+    def get_current_options_matrix(self):
+        return self.current_options_matrix
+
+    def get_player_nodes(self):
+        return self.player_nodes
+
+    def get_nodes(self):
+        return self.player_nodes + self.causes
+
+    def get_player_utility(self):
+        return self.players
+
+    def start_round(self):
+        # options may change, but the causes themselves don't, so we can generate them in init functionality.
+        self.current_options_matrix = self.create_options_matrix()
+        # self.player_nodes = self.create_player_nodes() # TODO: UNCOMMENT THIS LINE
+        # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
+
+    def get_probabilities(self):
+        return self.probabilities
+
+    def get_votes(self): # generic get votes for all bot types. Not optimized for a single chromosome
+        bot_votes = {}
+        self.all_combinations = [] # used for the current implementation of the GT bot.
+
+        for i, bot in enumerate(self.bots):
+            if bot.type == "GT":
+                if not self.all_combinations:
+                    self.all_combinations = bot.generate_all_possibilities(self.current_options_matrix)
+                bot_votes[i] = bot.get_vote(self.all_combinations, self.current_options_matrix)
+            else: # only generate the probability matrix if we need it, fetcher is expensive.
+                bot_votes[i] = bot.get_vote([], self.current_options_matrix)
+
+        return bot_votes
+
+    def get_votes_single_chromosome(self): # if we want to visualize/test a single chromosome, use this one.
+        if self.bots[0].type != "GT":
+            print("Hey thats wrong, try again ")
+            return
+        bot_votes = {}
+        self.all_combinations = [] # used for the current implementation of the GT bot.
+
+        for i, bot in enumerate(self.bots):
+            if bot.type == "GT":
+                if not self.all_combinations:
+                    self.probabilities = bot.generate_probabilities(self.current_options_matrix)
+                bot_votes[i] = bot.get_vote_optimized_single(self.probabilities, self.current_options_matrix)
+
+        return bot_votes
+
+
+    def return_win(self, all_votes):
+        results = []
+        total_votes = all_votes
+        winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
+        winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
+        if not (winning_vote_count > len(total_votes) // 2):
+            winning_vote = -1
+
+        if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
+            for i in range(len(total_votes)):
+                results.append(self.current_options_matrix[i][winning_vote])
+        else:
+            for i in range(len(total_votes)):
+                results.append(0)
+
+        return winning_vote, results
+
+
+
+
+
+
+    ## NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ##
+
+
+
+
+
+
+
 
     def create_cause_nodes(self, num_causes):
         displacement = (2 * math.pi) / num_causes # need an additional "0" cause.
@@ -190,26 +274,6 @@ class Social_Choice_Sim:
         print("these are the new options \n", new_options)
         return new_options
 
-    def get_causes(self):
-        return self.causes
-
-    def get_current_options_matrix(self):
-        return self.current_options_matrix
-
-    def get_player_nodes(self):
-        return self.player_nodes
-
-    def get_nodes(self):
-        return self.player_nodes + self.causes
-
-    def get_player_utility(self):
-        return self.players
-
-    def start_round(self):
-        # options may change, but the causes themselves don't, so we can generate them in init functionality.
-        self.current_options_matrix = self.create_options_matrix()
-        #self.player_nodes = self.create_player_nodes() # TODO: UNCOMMENT THIS LINE
-        # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
 
     # takes in the influence matrix, and then spits out the 3 strongest calculated relations for every player.
     def calculate_relation_strength(self, new_relations):
@@ -299,36 +363,3 @@ class Social_Choice_Sim:
         all_nodes = causes + player_nodes
         return all_nodes
 
-    def get_probabilities(self):
-        return self.probabilities
-
-    def get_votes(self):
-        bot_votes = {}
-        self.all_combinations = [] # used for the current implementation of the GT bot.
-
-        for i, bot in enumerate(self.bots):
-            if bot.type == "GT":
-                if not self.all_combinations:
-                    self.all_combinations = bot.generate_all_possibilities(self.current_options_matrix)#, self.weights_matrix)
-                bot_votes[i] = bot.get_vote(self.all_combinations, self.current_options_matrix)
-            else: # only generate the probability matrix if we need it, fetcher is expensive.
-                bot_votes[i] = bot.get_vote([], self.current_options_matrix)
-
-        return bot_votes
-
-    def return_win(self, all_votes):
-        results = []
-        total_votes = all_votes
-        winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
-        winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
-        if not (winning_vote_count > len(total_votes) // 2):
-            winning_vote = -1
-
-        if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
-            for i in range(len(total_votes)):
-                results.append(self.current_options_matrix[i][winning_vote])
-        else:
-            for i in range(len(total_votes)):
-                results.append(0)
-
-        return winning_vote, results

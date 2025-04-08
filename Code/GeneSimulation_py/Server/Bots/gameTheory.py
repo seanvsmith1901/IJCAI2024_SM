@@ -7,28 +7,14 @@ class gameTheoryBot:
         self.self_id = self_id
         self.type = "GT"
         self.chromosome = None
-        # my idea for risk adversity is as follows:
-        # MAX: Follows the most likely outcome
-        # HIGH: unless the reward is higher for the second most likely outcome and those are fairly close, vote likely
-        # MEDIUM-HIGH - looks at first and second, is more willing to go less likely.
-        # MEDIUM LOW - looks at first second and third, is willing much more willing to go less likely
-        # LOW - Purely expected value based.
-        # MIN - pure greedy basically.
         self.risk_adversity = "MAX"
-        # so RISK adversity is MAX (1) and High (0). thats why somethign wasn't working earlier.
-
+        # so RISK adversity is MAX (1) and High (0). It's not implemented yet.
 
     def set_chromosome(self, chromosome):
         self.chromosome = chromosome
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
     def get_vote(self, big_boy_list, current_options_matrix):
-        # self.current_options_matrix = [[4, 3, 8], [-6, 7, -2], [10, 10, -10], [0, -7, 1], [1, -1, 9], [8, 3, 3],
-        #                                [1, 8, 10], [10, -8, 7], [1, -4, 6], [6, -4, 8],
-        #                                [-10, -2, 9]]  # greedily vote for 3
-        # # self.current_options_matrix = [[4, 3, 8], [-6, -7, 7], [-10, -10, 10], [0, -7, 1], [1, -1, 9], [3, 3, 8], [1, 8, 10], [-10, -8, 7], [1, -4, 6], [6, -4, 8], [-10, -2, 9]] # greedily vote for 3
-
-
         cause_probability = self.get_cause_probability(big_boy_list)
         normalized_cause_probability = copy.copy(cause_probability)
         normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability]
@@ -36,22 +22,39 @@ class gameTheoryBot:
         self.current_options_matrix = current_options_matrix
         self.num_players = len(current_options_matrix)
         self.num_causes = len(current_options_matrix[0])
-        # so what we currently have is a giant mcfetching list of all of the options and their associated probability.
-        # so now we need to create a dict of causes, everytime a cause wins we add that probability to that cause
-        # so we can calculate the probability of that cause winning.
-        # so thats nuts.
 
         current_rewards = self.think_about_reward(normalized_cause_probability)
+        current_vote = self.use_bot_type(current_rewards) # accounts for off by one error.
+
+        return current_vote
+
+
+    # takes in the current options matrix, returns the probability of each cause passing.
+    def generate_probabilities(self, current_options_matrix):
+        weights_array = self.chromosome # just name passing
+        self.current_options_matrix = current_options_matrix # and setting
+        choices_matrix, choice_list = self.create_choices_matrix(current_options_matrix) # figures out which choice each cause is for each player
+        probability_matrix = self.create_probability_matrix(choices_matrix, weights_array) # generates the probaility matirx
+        # just ot make sure we have everythinbg we need.
+        self.num_players = len(current_options_matrix) # sets some stats
+        self.num_causes = len(current_options_matrix[0]) # sets other stats
+        self.probability_matrix = probability_matrix # ikd if this helps or not but its there
+
+        big_boy_list = list(self.generate_combinations(0, [1] * (self.num_players + 1))) # this is a FERTCHER. generates every possible vote and its probability
+        cause_probability = self.get_cause_probability(big_boy_list) # this is also a fetcher. Adds all them up and multiplies them to find the final probabiliyt
+        normalized_cause_probability = copy.copy(cause_probability) # we just want to normalize the probabilities so they add to 1
+        normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability] # normalize them
+        return normalized_cause_probability # returns that probability
+
+    def get_vote_optimized_single(self, normalized_cause_probability, current_options_matrix):
+        self.current_options_matrix = current_options_matrix
+        self.num_players = len(current_options_matrix)
+        self.num_causes = len(current_options_matrix[0])
+        current_rewards = self.think_about_reward(normalized_cause_probability)
         current_vote = self.use_bot_type(current_rewards)
+        return current_vote  # offset for -1 cause we normally start at 0.
 
-        #max_tuple = max(current_rewards, key=lambda x: x[1]) # if we want a pure expected value vote.
-
-        return current_vote # offset for -1 cause we normally start at 0.
-        # so now we have a couple of options. we can scale based on a few things, such as following current greedy probability
-        # or we can make it focused on pure reward. RN lets make it focused on pure reward and go from there.
-
-
-    def use_bot_type(self, current_rewards): # lets start here for now.
+    def use_bot_type(self, current_rewards): # cut some stuff out for now, we can add this in later to fine tune risk adversity.
         ra = self.chromosome[19] # last element in the chromosome represents the risk adversity.
         max_tuple = max(current_rewards, key=lambda x: x[1]) # getting the max right off the bat could be helpful.
         max_value, max_chance = max_tuple
@@ -134,12 +137,8 @@ class gameTheoryBot:
         sorted_list = sorted(new_column_preferences)
         index_map = {val: idx - 1 for idx, val in enumerate(sorted_list)}  # Get new indexes
         column_preferences = [index_map[val] for val in new_column_preferences]  # Replace values with indexes
-
-
         return new_probabilities_matrix, column_preferences
 
-    # reorders the probabilibty matrix to contain probabilities -- 3 or 4th choice get zeroed out, 25% chance to pick second choice.
-    # this is where we could afford to do some refining.
     def create_probability_matrix(self, choices_matrix, weights_array):
         # weights are an array that holds the 5 possible edge cases
         # first is the null case and the other 4 are for varying cases
@@ -209,7 +208,6 @@ class gameTheoryBot:
 
                     elif total_sums[j] <= 0 and self.current_options_matrix[i][j-1] <= 0: # not likely, not good for us.
                         probability_matrix[i][j] = weights_array[17] # there is never a reason to vote for this. this is just straight bad.
-
 
         return probability_matrix
 

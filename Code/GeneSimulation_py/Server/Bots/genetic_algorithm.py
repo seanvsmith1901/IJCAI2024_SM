@@ -2,17 +2,11 @@ import random
 import time
 
 from Code.GeneSimulation_py.Server.social_choice_sim import Social_Choice_Sim
-import matplotlib.pyplot as plt
-from collections import Counter
 from Code.GeneSimulation_py.Server.Bots.chromosome import Chromosome
 import os
 import csv
 import statistics
-import numpy as np # in order to keep track of variance
 from Code.GeneSimulation_py.Server.Bots.genetic_logger import Logger
-
-
-
 
 
 def initalize_population(pop_size, num_genes, lower_bound, upper_bound):
