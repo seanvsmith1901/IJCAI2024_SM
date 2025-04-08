@@ -27,7 +27,7 @@ class ClientConnectionManager(ConnectionManager):
         def extract_json_objects(response_string):
             decoder = json.JSONDecoder()
             idx = 0
-            objects = []
+            objects = [] # TODO: Convert this to a queue
 
             # Loop through the
             while idx < len(response_string):

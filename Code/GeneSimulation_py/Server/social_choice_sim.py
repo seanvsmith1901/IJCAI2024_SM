@@ -12,9 +12,7 @@ NUM_CAUSES = 3
 class Social_Choice_Sim:
     def __init__(self, num_players):
         self.num_players = num_players
-        # self.num_humans = num_humans
-        # self.num_bots = num_players - num_humans
-        # self.type_bot = type_bot
+
         self.players = self.create_players()
         self.cpp = 3
         self.rad = 5  # hardcoded just work with me here
@@ -289,3 +287,9 @@ class Social_Choice_Sim:
         # We have to put them all somewhere and here works as good as anywhere else. Not sure if we will need it.
         self.all_votes[round] = votes
 
+    def get_bot_votes(self, current_options_matrix):
+        votes = {}
+        for i, player in enumerate(self.players):
+            if player.getType() != "Human":
+                votes[str(i)] = player.getVote(current_options_matrix, i)
+        return votes
