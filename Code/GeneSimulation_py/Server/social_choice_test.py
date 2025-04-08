@@ -8,7 +8,7 @@ import statistics
 import random
 import numpy as np
 import os
-
+from pathlib import Path
 
 
 if __name__ == "__main__":
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
 
     results = {}
-    num_rounds = 1
+    num_rounds = 1000
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
@@ -113,11 +113,25 @@ if __name__ == "__main__":
     plt.grid(True)
     plt.tight_layout()
     if bot_type == 3: # game theory bot special case
-        file_name = chromosomes[0][0]
+        file_name = "Game Theory " + Path(current_file).stem
+    else:
+        bot_name = ""
+        if bot_type == 1:
+            bot_name = "Pareto"
+        if bot_type == 2:
+            bot_name = "Greedy"
+        if bot_type == 4:
+            bot_name = "Random"
+        file_name = str(bot_name)
 
-    filename = "scores for " + str(bot_type)
+    directory = r"C:\Users\Sean\Documents\GitHub\IJCAI2024_SM\Code\GeneSimulation_py\Server\Graphs"
 
-    plt.savefig('scores_plot.png', dpi=300, bbox_inches='tight') # save the fetcher
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    file_path = os.path.join(directory, f"{file_name}.png")
+
+
+    plt.savefig(file_path, dpi=300, bbox_inches='tight') # save the fetcher
     plt.show()
 
 
