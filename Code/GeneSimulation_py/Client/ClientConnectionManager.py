@@ -1,5 +1,4 @@
 import json
-from socket import socket
 
 try:
     from GeneSimulation_py.ConnectionManager import ConnectionManager
@@ -41,6 +40,7 @@ class ClientConnectionManager(ConnectionManager):
                     idx += 1
 
             return objects
+
 
         while True:
             try:

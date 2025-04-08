@@ -25,7 +25,6 @@ class ServerListener(QObject):
             "SC_INIT": self.SC_INIT,
             "SC_VOTES": self.SC_VOTES,
             "SC_OVER": self.SC_OVER,
-            "SWITCH_ROUND": self.SWITCH_ROUND,
         })
 
         self.connection_manager = connection_manager
@@ -82,8 +81,7 @@ class ServerListener(QObject):
         update_tornado_graph(self.main_window, self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"],
                                               message["NEGATIVE_VOTE_EFFECTS"])
 
-
-    def SWITCH_ROUND(self, message):
+        # Switch to JHG
         self.tabs.setCurrentIndex(0)
         self.enable_jhg_buttons_signal.emit()
 
