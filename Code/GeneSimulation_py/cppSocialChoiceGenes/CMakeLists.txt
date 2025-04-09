@@ -7,4 +7,10 @@ add_executable(cppSocialChoiceGenes main.cpp
         socialChoiceSim.cpp
         socialChoiceSim.h
         gameTheoryBot.cpp
-        gameTheoryBot.h)
+        gameTheoryBot.h
+        Chromosome.cpp
+        Chromosome.h
+        GeneticAlgorithm.cpp
+        GeneticAlgorithm.h
+        Logger.cpp
+        Logger.h)

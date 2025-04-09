@@ -7,7 +7,6 @@
 
 #include <vector>
 #include <string>
-#include <tuple>
 
 
 class GameTheoryBot {
@@ -45,10 +44,7 @@ private:
                                                             const std::vector<int>& choiceList);
 
     std::vector<std::vector<float>> generateAllPossibilities(const std::vector<std::vector<int>>& currentOptionsMatrix);
-    void generateCombinations(int currentId,
-                              std::vector<int>& currentArray,
-                              float currentProbability,
-                              std::vector<std::vector<float>>& allCombinations);
+    void generateCombinations(int currentId, std::vector<float>& currentArray, std::vector<std::vector<float>>& results);
 
 };
 
