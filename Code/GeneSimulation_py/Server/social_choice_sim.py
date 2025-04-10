@@ -11,13 +11,13 @@ from Node import Node
 from Bots.Pareto import ParetoBot
 from Bots.Greedy import GreedyBot
 from Bots.gameTheory import gameTheoryBot
-from Code.GeneSimulation_py.Server.Bots.Random import RandomBot
-from Code.GeneSimulation_py.Server.Node import Node
+from Bots.Random import RandomBot
+from Node import Node
 
 NUM_CAUSES = 3
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, type_bot):
+    def __init__(self, total_players, num_humans, type_bot):
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
@@ -34,6 +34,7 @@ class Social_Choice_Sim:
         self.bots = self.create_bots()
         self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
         self.probabilities = []
+        self.options_matrix = None
 
     def create_bots(self):
         bots_array = []
@@ -51,7 +52,7 @@ class Social_Choice_Sim:
 
     def create_players(self):
         players = {}
-        for i in range(self.num_humans):
+        for i in range(self.total_players):
             players[str(i)] = 0
         return players
 
@@ -155,8 +156,8 @@ class Social_Choice_Sim:
 
 
 
-    def create_cause_nodes(self, num_causes):
-        displacement = (2 * math.pi) / num_causes # need an additional "0" cause.
+    def create_cause_nodes(self):
+        displacement = (2 * math.pi) / NUM_CAUSES # need an additional "0" cause.
         causes = []
         for i in range(NUM_CAUSES): #3 is the number of causes
             new_x = math.cos(displacement * i) * self.rad
