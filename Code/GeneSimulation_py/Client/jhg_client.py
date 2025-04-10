@@ -1,6 +1,4 @@
-import json
 import sys
-import socket
 
 from PyQt6.QtWidgets import QApplication
 
