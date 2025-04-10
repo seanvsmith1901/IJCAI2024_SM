@@ -24,6 +24,7 @@ public:
     // Population manipulation methods
     void initializePopulation();
     std::vector<Chromosome> tournamentSelection(int k = 5, int num_parents = 11);
+    std::vector<Chromosome> getPopulation();
     void sortByFitness();
     std::vector<Chromosome> applyEliteness(int num_to_keep);
     void mutate(Chromosome& chromosome, float mutation_rate = 0.05f);

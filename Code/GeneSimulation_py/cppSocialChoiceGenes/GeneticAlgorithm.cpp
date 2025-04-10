@@ -27,6 +27,10 @@ void GeneticAlgorithm::initializePopulation() {
     }
 }
 
+std::vector<Chromosome> GeneticAlgorithm::getPopulation() {
+    return population;
+}
+
 std::vector<Chromosome> GeneticAlgorithm::tournamentSelection(int k, int num_parents) {
     std::vector<Chromosome> selected;
     for (int i = 0; i < num_parents; ++i) {

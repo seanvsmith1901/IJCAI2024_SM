@@ -7,6 +7,8 @@
 #include <map>        // for frequency counting
 #include <iostream>   // optional, for debugging
 
+#include "Chromosome.h"
+
 // Constructor
 GameTheoryBot::GameTheoryBot(int selfID, std::string type, std::vector<std::vector<float>>& chromosomes)
     : selfId(selfID), type("GT"), numPlayers(11), numCauses(3) {
@@ -14,8 +16,8 @@ GameTheoryBot::GameTheoryBot(int selfID, std::string type, std::vector<std::vect
 }
 
 // Set the chromosome
-void GameTheoryBot::setChromosome(const std::vector<float>& chromosomeVec) {
-    chromosome = chromosomeVec;
+void GameTheoryBot::setChromosome(Chromosome currChromosome) {
+    chromosome = currChromosome.getChromosome(); //
 }
 
 // Get vote based on current options and internal logic

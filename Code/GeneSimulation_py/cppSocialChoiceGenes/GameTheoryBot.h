@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <string>
-
+#include "Chromosome.h"
 
 class GameTheoryBot {
 public:
@@ -15,7 +15,7 @@ public:
 
     GameTheoryBot(int selfID, std::string type, std::vector<std::vector<float>>& chromosomes); // constructor
 
-    void setChromosome(const std::vector<float>& chromosome);
+    void setChromosome(Chromosome chromosome);
     int getVote(const std::vector<std::vector<int>>& currentOptionsMatrix,
                 const std::vector<std::vector<int>>& bigBoyList);
 

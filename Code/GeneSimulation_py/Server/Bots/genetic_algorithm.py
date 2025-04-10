@@ -126,7 +126,7 @@ if __name__ == '__main__':
                     if chromosome not in chromosomes_used:
                         chromosomes_used[chromosome] = []
                     chromosomes_used[chromosome].append(results[i])
-            print("games done. training chromosomes again...")
+
 
         for chromosome in chromosomes_used: # gets the average utility increase for each chromosome.
             chromosome.add_fitness(statistics.mean(chromosomes_used[chromosome]))
