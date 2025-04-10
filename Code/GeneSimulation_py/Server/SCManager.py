@@ -91,8 +91,7 @@ class SCManager:
         bot_votes = self.get_bot_votes(current_options_matrix)
 
         all_votes = {**bot_votes, **player_votes}
-        all_votes_list = [option_num + 1 for option_num in
-                          all_votes.values()]  # Convert 0-based votes to 1-based for display
+        all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in all_votes.values()] # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes
 
         return all_votes, all_votes_list
@@ -102,15 +101,16 @@ class SCManager:
         round_vote_effects = create_empty_vote_matrix(self.num_players)
         for i in range(self.num_players):
             selected_vote = all_votes[i]  # Which option the ith player voted for
-            for j in range(self.num_players):
-                vote_effect = current_options_matrix[j][selected_vote]
-                self.vote_effects[j][i] += vote_effect  # The effect of the ith player's vote on the jth player
-                round_vote_effects[i][j] = vote_effect
+            if selected_vote != -1:
+                for j in range(self.num_players):
+                    vote_effect = current_options_matrix[j][selected_vote]
+                    self.vote_effects[j][i] += vote_effect  # The effect of the ith player's vote on the jth player
+                    round_vote_effects[i][j] = vote_effect
 
-                if vote_effect > 0:
-                    self.positive_vote_effects_history[i][j] += vote_effect
-                elif vote_effect < 0:
-                    self.negative_vote_effects_history[i][j] += vote_effect
+                    if vote_effect > 0:
+                        self.positive_vote_effects_history[i][j] += vote_effect
+                    elif vote_effect < 0:
+                        self.negative_vote_effects_history[i][j] += vote_effect
         self.vote_effects_history[str(round_num)] = round_vote_effects
 
 

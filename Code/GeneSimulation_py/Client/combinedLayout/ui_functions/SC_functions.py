@@ -146,6 +146,7 @@ def sc_display_winning_vote(main_window, winning_vote):
 def disable_sc_buttons(main_window):
     for button in main_window.SC_voting_grid.buttons:
         button.setEnabled(False)
+    main_window.current_vote = -1
 
 
 def enable_sc_buttons(main_window):

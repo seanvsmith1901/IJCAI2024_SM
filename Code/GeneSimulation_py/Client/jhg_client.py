@@ -5,7 +5,18 @@ from PyQt6.QtWidgets import QApplication
 from ClientConnectionManager import ClientConnectionManager
 from combinedLayout.MainWindow import MainWindow
 
+from PyQt6.QtCore import qInstallMessageHandler, QtMsgType
+
+# Trying to track down where the QPainter error is coming from
+def qt_message_handler(mode, context, message):
+    if 'QBackingStore::endPaint() called with active painter' in message:
+        print("Caught the paint error!")
+        raise RuntimeError("QBackingStore::endPaint issue occurred!")
+
+
+
 if __name__ == "__main__":
+    qInstallMessageHandler(qt_message_handler)
     # Create a QApplication first
     app = QApplication(sys.argv)
 

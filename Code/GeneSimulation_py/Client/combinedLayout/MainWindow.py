@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
 
         # keep track of the current vote
-        self.current_vote = None
+        self.current_vote = -1
 
         # Dynamically updated elements
         self.token_label = QLabel()

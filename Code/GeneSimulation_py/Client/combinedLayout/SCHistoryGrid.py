@@ -39,7 +39,8 @@ class SCHistoryGrid(SCGrid):
         # Find the winning vote, if it exists
         vote_counts = {"1": 0, "2": 0, "3": 0}
         for vote in votes:
-            vote_counts[str(vote)] += 1
+            if vote != -1:
+                vote_counts[str(vote)] += 1
         winning_vote = int(max(vote_counts, key=vote_counts.get))
 
         # Ensures that the most popular vote has a majority (> 50%)
