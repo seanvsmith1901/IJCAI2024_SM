@@ -29,6 +29,7 @@ class SCManager:
         self.positive_vote_effects_history = create_empty_vote_matrix(num_players)
         self.negative_vote_effects_history = create_empty_vote_matrix(num_players)
 
+
     def play_social_choice_round(self, new_influence):
         # Initialize the round
         self.sc_sim.start_round(self.sc_groups)
@@ -85,6 +86,7 @@ class SCManager:
 
         return player_votes
 
+
     def compile_sc_votes(self, player_votes, current_options_matrix, round_num):
         bot_votes = self.get_bot_votes(current_options_matrix)
 
@@ -94,6 +96,7 @@ class SCManager:
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes
 
         return all_votes, all_votes_list
+
 
     def update_vote_effects(self, all_votes, current_options_matrix, round_num):
         round_vote_effects = create_empty_vote_matrix(self.num_players)
@@ -109,6 +112,7 @@ class SCManager:
                 elif vote_effect < 0:
                     self.negative_vote_effects_history[i][j] += vote_effect
         self.vote_effects_history[str(round_num)] = round_vote_effects
+
 
     def get_bot_votes(self, current_options_matrix):
         bot_options = current_options_matrix[:self.num_bots]

@@ -1,5 +1,3 @@
-import json
-
 import numpy as np
 
 from Player import Player
@@ -40,7 +38,7 @@ class RoundState:
             jhg_buttons.append(self.players[-1].minus_button)
             jhg_buttons.append(self.players[-1].plus_button)
 
+
     def get_allocations_list(self):
         self.allocations[int(self.client_id)] = self.tokens
         return self.allocations
-        # return [self.client_id, self.allocations, self.round_number]

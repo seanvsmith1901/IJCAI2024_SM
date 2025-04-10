@@ -13,15 +13,11 @@ def create_jhg_network_graph(main_window):
     net = NodeNetwork()
     net.setupPlayers([f"{i}" for i in range(np.shape(current_popularity)[0])])
     net.initNodes(init_pops=current_popularity)
-
-    # Update the network with the influence matrix and current popularity
-    net.update(main_window.round_state.influence_mat, current_popularity)
+    net.update(main_window.round_state.influence_mat, current_popularity) # Update the network with the influence matrix and current popularity
 
     # Set up the graph in the PyQtGraph widget
     main_window.jhg_network.clear()  # Clear any existing items
-
-    # Create a scatter plot for the nodes
-    node_positions = np.array([node.position[-1] for node in net.nodes])  # Assuming node.position is a (x, y) tuple
+    node_positions = np.array([node.position[-1] for node in net.nodes])  # Create a scatter plot for the nodes
 
     spots = []
     for i, (x, y) in enumerate(node_positions):
@@ -52,13 +48,11 @@ def create_jhg_network_graph(main_window):
 
         return color, opacity
 
-    # Now, create edges based on the influence matrix
+    # Create edges based on the influence matrix
     for i, node in enumerate(net.nodes):
         for j, weight in enumerate(main_window.round_state.influence_mat[i]):
             if weight != 0:
                 edge_color, opacity = get_edge_color_and_opacity(weight)
-
-                # Explicitly create the pen with the color and alpha
                 pen = pg.mkPen(color=edge_color + (opacity,), width=2)
 
                 # Create edge (PlotDataItem)
@@ -69,4 +63,4 @@ def create_jhg_network_graph(main_window):
                 line.setZValue(-1)  # Ensure edges are below the nodes
                 main_window.jhg_network.addItem(line)
 
-    main_window.jhg_network.scene().update()  # Force refresh
+    main_window.jhg_network.scene().update()

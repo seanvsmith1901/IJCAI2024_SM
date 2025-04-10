@@ -10,7 +10,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     host = '127.0.0.1'  # your local host address
-    port = 12346  # The port number to connect to
+    port = 12345  # The port number to connect to
 
     connection_manager = ClientConnectionManager(host, port)
 
@@ -23,7 +23,6 @@ if __name__ == "__main__":
     init_vals = connection_manager.get_message()[0]
     client_id = init_vals["CLIENT_ID"]
     num_players = init_vals["NUM_PLAYERS"]
-
 
     # Now, create and show the main window
     window = MainWindow(connection_manager, num_players, client_id)

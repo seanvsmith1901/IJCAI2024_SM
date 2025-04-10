@@ -1,4 +1,4 @@
-from random import randrange, random, shuffle, randint
+from random import randrange, shuffle, randint
 
 even_two_plus_one = {
         5: [2, 2], 6: [0], 7: [3, 3], 8: [3, 3], 9: [4, 4], 10: [4, 4],

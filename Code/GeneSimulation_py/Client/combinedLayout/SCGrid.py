@@ -48,6 +48,7 @@ class SCGrid(QVBoxLayout):
         for i, label in enumerate(self.col_2_labels):
             label.setText(str(col_2_vals[i]))
 
+
     def update_utilities(self, utility_mat):
         for row, row_labels in enumerate(self.cause_utility_labels):
             for col, widget in enumerate(row_labels):

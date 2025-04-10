@@ -1,5 +1,5 @@
 from functools import partial
-from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QPushButton, QWidget, QGridLayout
+from PyQt6.QtWidgets import QHBoxLayout, QVBoxLayout, QLabel, QGridLayout
 from .SubmitButton import SubmitButton
 
 from .colors import COLORS
@@ -38,12 +38,9 @@ class JhgVotingPanel(QVBoxLayout):
             round_state.players[i].id_label.setStyleSheet(f"color: " + COLORS[i])
             player_panel.addWidget(round_state.players[i].popularity_label, i + 1, 1) # Popularity at the start of this round
 
-
-
             # If the current player is the client, then simply place a QLabel labeling it in the allocations_row
             allocations_row = QHBoxLayout()
             if i == int(round_state.client_id):
-                # allocations_row.addWidget(QLabel("You :)"))
                 player_panel.addWidget(round_state.players[i].kept_text_label, i + 1, 3)
                 player_panel.addWidget(round_state.players[i].kept_number_label, i + 1, 4)
             else:

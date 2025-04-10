@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QComboBox, QPushButton
+from PyQt6.QtWidgets import QHBoxLayout, QLabel, QComboBox
 
 from SCGrid import SCGrid
 
@@ -24,12 +24,14 @@ class SCHistoryGrid(SCGrid):
         if round_key in self.sc_history:
             self.update_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"])
 
+
     def update_sc_history(self, round, votes, utilities):
         self.round_drop_down.addItem(f"Round {round}")
         self.sc_history[str(round)] = {"votes": votes, "utilities": utilities}
 
         self.round_drop_down.repaint()
         self.round_drop_down.setCurrentIndex(round - 1)
+
 
     def update_grid(self, votes, utilities):
         super().update_grid(votes, utilities)
@@ -66,6 +68,3 @@ class SCHistoryGrid(SCGrid):
             if winning_vote != -1:
                 if i - 2 == winning_vote: # There are two columns before the utility labels start, so you need to subtract 2
                     label.setStyleSheet("color: green;")
-
-
-

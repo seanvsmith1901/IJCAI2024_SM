@@ -8,6 +8,7 @@ class MinusButton(QWidget):
     def on_minus_button_clicked(self, event):
         self.update.emit()
 
+
     def __init__(self):
         super().__init__()
         self.minus_button = QPushButton("-")
@@ -18,11 +19,13 @@ class MinusButton(QWidget):
         layout.addWidget(self.minus_button)
         self.setLayout(layout)
 
+
 class PlusButton(QWidget):
     update = pyqtSignal()
 
     def on_plus_button_clicked(self, event):
         self.update.emit()
+
 
     def __init__(self):
         super().__init__()

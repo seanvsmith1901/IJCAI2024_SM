@@ -25,7 +25,7 @@ class Server():
         self.max_rounds = options["MAX_ROUNDS"]
 
 
-    def start_server(self, host='127.0.0.1', port=12346):
+    def start_server(self, host='127.0.0.1', port=12345):
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
@@ -34,21 +34,18 @@ class Server():
 
         # Halts execution until enough players have joined
         self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"])
-        # game = GameServer(self.connection_manager, OPTIONS)
 
 
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
         while self.JHG_manager.current_round <= self.max_rounds:
-            # This range says how many jhg rounds to play between sc rounds
-            for i in range(self.jhg_rounds_per_sc_round):
+            for i in range(self.jhg_rounds_per_sc_round): # This range says how many jhg rounds to play between sc rounds
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round)
             new_influence = self.JHG_manager.jhg_sim.get_influence().tolist()
             self.SC_manager.play_social_choice_round(new_influence)
             print("New round")
 
         print("game over")
-
 
 
 if __name__ == "__main__":

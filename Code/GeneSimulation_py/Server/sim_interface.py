@@ -7,10 +7,6 @@ from geneagent3 import GeneAgent3
 from humanagent import HumanAgent
 from simulator import GameSimulator
 
-# from scriptagent import ScriptAgent
-
-
-
 import numpy as np
 import random
 
@@ -25,10 +21,7 @@ class JHG_simulator():
         self.T = None
 
 
-
     def start_game(self, num_human_players, num_players):
-
-
         init_pop = "equal"
 
         numAgents = num_players - num_human_players
@@ -36,14 +29,12 @@ class JHG_simulator():
         popSize = 60  # ??? I think? based on the command line arguemnts
         player_idxs = list(np.arange(0, numAgents))  # where numAgents is the number of actual agents, not players.
 
-
         for _ in range(num_human_players):
             configured_players.append(HumanAgent())
 
 
         for i in range(0, len(configured_players)):
             player_idxs = np.append(player_idxs, popSize + i)
-
 
         theFolder = "../../ResultsStudy"
         theGen = 199
@@ -66,7 +57,6 @@ class JHG_simulator():
         poverty_line = 0
         forcedRandom = False
 
-
         players = [
             *agents
         ]
@@ -78,8 +68,6 @@ class JHG_simulator():
         steal_min, steal_max = 1.6, 1.60
 
         num_players = len(players)
-        base_pop = 100
-        tkns = num_players
 
         game_params = {
             "num_players": num_players,
@@ -90,9 +78,6 @@ class JHG_simulator():
             "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
             "poverty_line": poverty_line,
             "base_popularity": np.array(initial_pops)
-            # "base_popularity": np.array([*[base_pop]*(num_players)])
-            # "base_popularity": np.array(random.sample(range(1, 200), num_players))
-
         }
 
         for a in agents:  # sets the game params for all users.
@@ -103,7 +88,6 @@ class JHG_simulator():
 
 
     def execute_round(self, client_input, round):  # all of the player allocations will get passed in here
-        # print("\nRound: " + str(r))
         # build allocations here.
 
         tkns = self.num_players
@@ -128,6 +112,7 @@ class JHG_simulator():
         self.sim.play_round(T)
         self.T = T
         return self.sim.get_popularity() # I think this is all we need? maybe?
+
 
     def define_initial_pops(self, init_pop, num_players):
         base_pop = 100
@@ -165,8 +150,10 @@ class JHG_simulator():
 
         return np.array(initial_pops)
 
+
     def get_T(self):
         return self.T
+
 
     def get_bot_votes(self, current_options_matrix):
         votes = {}
@@ -175,8 +162,10 @@ class JHG_simulator():
                 votes[str(i)] = player.getVote(current_options_matrix, i)
         return votes
 
+
     def get_influence(self):
         return self.sim.get_influence()
+
 
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
     fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
@@ -200,4 +189,3 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
     fp.close()
 
     return thePopulation
-

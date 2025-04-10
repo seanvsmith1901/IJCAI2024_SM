@@ -23,6 +23,7 @@ class ClientConnectionManager(ConnectionManager):
         message = {"NEW_INPUT": "new_input"}
         self.socket.send(json.dumps(message).encode())
 
+
     def get_message(self):
         # Extracts each JSON object from a string, to handle the case of multiple methods having been sent.
         def extract_json_objects(response_string):

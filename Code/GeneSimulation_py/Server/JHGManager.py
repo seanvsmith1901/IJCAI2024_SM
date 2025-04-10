@@ -25,6 +25,7 @@ class JHGManager:
 
         return client_input
 
+
     def get_sent_and_received(self, allocations_matrix):
         sent_dict = {}
         received_dict = {}

@@ -36,6 +36,7 @@ class ServerListener(QObject):
         self.tabs = tabs
         self.utility_qlabels = utility_qlabels
 
+
     # Once connected to the server, this method is called on a threaded object. Once the thread calls it, it
     # continuously listens for data from the server. This is the entrance point for all functionality based on
     # receiving data from the server. Kinda a switch board of sorts

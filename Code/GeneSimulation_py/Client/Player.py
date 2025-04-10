@@ -10,6 +10,7 @@ class Player:
     # For SC
     displayed_vote = None
 
+
     # Handle updating the sent, received, and tokens remaining fields after the minus button is pressed
     def update_allocation_minus(self, round_state, tokens_label, player):
         # If the client player has decided to steal from the associated player, subtract one from both that player's
@@ -25,6 +26,7 @@ class Player:
         self.allocation_box.setText(str(round_state.allocations[player]))
         tokens_label.setText("Tokens: " + str(round_state.tokens))
 
+
     # Handle updating the sent, received, and tokens remaining fields after the plus button is pressed
     def update_allocation_plus(self, round_state, tokens_label, player):
         # If the client player has not decided to steal tokens, then one should be added to the associated player's
@@ -39,6 +41,7 @@ class Player:
 
         self.allocation_box.setText(str(round_state.allocations[player]))
         tokens_label.setText("Tokens: " + str(round_state.tokens))
+
 
     def __init__(self, id):
         self.id = id

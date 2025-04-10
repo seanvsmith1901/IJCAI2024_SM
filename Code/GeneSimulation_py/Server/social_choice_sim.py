@@ -1,13 +1,10 @@
 import copy
 import math
-import random
 from collections import Counter
 
 import numpy as np
-from networkx import normalized_cut_size
 
 from options_creation import generate_two_plus_one_groups_options_best_of_three
-from Node import Node
 from Bots.Pareto import ParetoBot
 from Bots.Greedy import GreedyBot
 from Bots.gameTheory import gameTheoryBot
@@ -15,6 +12,7 @@ from Bots.Random import RandomBot
 from Node import Node
 
 NUM_CAUSES = 3
+
 
 class Social_Choice_Sim:
     def __init__(self, total_players, num_humans, type_bot):
@@ -36,6 +34,7 @@ class Social_Choice_Sim:
         self.probabilities = []
         self.options_matrix = None
 
+
     def create_bots(self):
         bots_array = []
         for i in range(self.num_bots): # this is where we can add more bots.
@@ -50,11 +49,13 @@ class Social_Choice_Sim:
 
         return bots_array
 
+
     def create_players(self):
         players = {}
         for i in range(self.total_players):
             players[str(i)] = 0
         return players
+
 
     def set_chromosome(self, chromosomes):
         if len(chromosomes) != len(self.bots):
@@ -63,37 +64,40 @@ class Social_Choice_Sim:
             for i in range(len(self.bots)):
                 self.bots[i].set_chromosome(chromosomes[i])
 
+
     def apply_vote(self, winning_vote):
         for i in range(self.total_players):
             self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
+
 
     def create_options_matrix(self, groups):
         self.options_matrix = generate_two_plus_one_groups_options_best_of_three(groups)
         return self.options_matrix # because why not
 
+
     def get_causes(self):
         return self.causes
+
 
     def get_current_options_matrix(self):
         return self.current_options_matrix
 
+
     def get_player_nodes(self):
         return self.player_nodes
+
 
     def get_nodes(self):
         return self.player_nodes + self.causes
 
+
     def get_player_utility(self):
         return self.players
 
-    # def start_round(self):
-    #     # options may change, but the causes themselves don't, so we can generate them in init functionality.
-    #     self.current_options_matrix = self.create_options_matrix()
-    #     # self.player_nodes = self.create_player_nodes() # TODO: UNCOMMENT THIS LINE
-    #     # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
 
     def get_probabilities(self):
         return self.probabilities
+
 
     def get_votes(self): # generic get votes for all bot types. Not optimized for a single chromosome
         bot_votes = {}
@@ -108,6 +112,7 @@ class Social_Choice_Sim:
                 bot_votes[i] = bot.get_vote([], self.current_options_matrix)
 
         return bot_votes
+
 
     def get_votes_single_chromosome(self): # if we want to visualize/test a single chromosome, use this one.
         if self.bots[0].type != "GT":
@@ -143,17 +148,7 @@ class Social_Choice_Sim:
         return winning_vote, results
 
 
-
-
-
-
-    ## NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ##
-
-
-
-
-
-
+    ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###
 
 
     def create_cause_nodes(self):
@@ -164,6 +159,7 @@ class Social_Choice_Sim:
             new_y = math.sin(displacement * i) * self.rad
             causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1)))
         return causes
+
 
     def create_player_nodes(self):
         # normalized_current_options_matrix = self.normalize_current_options_matrix()
@@ -188,11 +184,8 @@ class Social_Choice_Sim:
                 # create the new positions (onyl use teh abs so the flips scale correctly.
                 position_x, position_y = (self.causes[cause_index].get_x()), self.causes[
                     cause_index].get_y()  # get the strength based on where they are
-                # take the absolute value of the strength, we will flip it later. maybe.
-                # position_x = (position_x * abs(normalized_current_options_matrix[i][cause_index])) # normalize it to the circle
                 position_x = ((position_x * abs(normalized_current_options_matrix[i][cause_index])) / (
                             2 * self.rad))  # normalize it to the circle
-                # position_y = (position_y * abs(normalized_current_options_matrix[i][cause_index])) # normalize it to the circleposition_x = ((position_x * abs(normalized_current_options_matrix[i][cause_index])) / (2 * self.rad)) # normalize it to the circle
                 position_y = ((position_y * abs(normalized_current_options_matrix[i][cause_index])) / (
                             2 * self.rad))  # normalize it to the circle
 
@@ -227,6 +220,29 @@ class Social_Choice_Sim:
             player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(player_index+1)))
         return player_nodes
 
+
+    def slope(self, x1, y1, x2, y2):
+        if x2 - x1 == 0:
+            return float('inf')
+        return (y2 - y1) / (x2 - x1)
+
+
+    def perpendicular_slope(self, m):
+        if m == 0:
+            return float('inf')
+        if m == float('inf'):
+            return 0.0
+        else:
+            return -1 / m
+
+
+    # point 1 is the point we want to flip, point 2 is the point we are flipping over
+    def flip_point(self, point_1_x, point_1_y, point_2_x, point_2_y):
+        reflected_x = 2 * point_2_x - point_1_x
+        reflected_y = 2 * point_2_y - point_1_y
+        return reflected_x, reflected_y
+
+
     def flip_point_over_line(self, point_x, point_y, line_point1_x, line_point1_y, line_point2_x, line_point2_y):
         m = self.slope(line_point1_x, line_point1_y, line_point2_x, line_point2_y)
         m_perp = self.perpendicular_slope(m)
@@ -246,64 +262,6 @@ class Social_Choice_Sim:
 
         return x_reflected, y_reflected
 
-    def slope(self, x1, y1, x2, y2):
-        if x2 - x1 == 0:
-            return float('inf')
-        return (y2 - y1) / (x2 - x1)
-
-    def perpendicular_slope(self, m):
-        if m == 0:
-            return float('inf')
-        if m == float('inf'):
-            return 0.0
-        else:
-            return -1 / m
-
-    # point 1 is the point we want to flip, point 2 is the point we are flipping over
-    def flip_point(self, point_1_x, point_1_y, point_2_x, point_2_y):
-        reflected_x = 2 * point_2_x - point_1_x
-        reflected_y = 2 * point_2_y - point_1_y
-        return reflected_x, reflected_y
-
-
-    def flip_point_over_line(self, point_x, point_y, line_point1_x, line_point1_y, line_point2_x, line_point2_y):
-        m = self.slope(line_point1_x, line_point1_y, line_point2_x, line_point2_y)
-        m_perp = self.perpendicular_slope(m)
-
-        if m == float('inf'):
-            x_intersect = line_point1_x
-            y_intersect = point_y
-        elif m == (0):
-            x_intersect = point_x
-            y_intersect = line_point1_y
-        else:
-            x_intersect = (m * line_point1_x - m_perp * point_x - line_point1_y + point_y) / (m - m_perp)
-            y_intersect = m*(x_intersect - line_point1_x) + line_point1_y
-
-        x_reflected = 2 * x_intersect - point_x
-        y_reflected = 2 * y_intersect - point_y
-
-        return x_reflected, y_reflected
-
-
-    def slope(self, x1, y1, x2, y2):
-        if x2-x1 == 0:
-            return float('inf')
-        return (y2 - y1) / (x2 - x1)
-
-    def perpendicular_slope(self, m):
-        if m == 0:
-            return float('inf')
-        if m == float('inf'):
-            return 0.0
-        else:
-            return -1/m
-
-    # point 1 is the point we want to flip, point 2 is the point we are flipping over
-    def flip_point(self, point_1_x, point_1_y, point_2_x, point_2_y):
-        reflected_x = 2 * point_2_x - point_1_x
-        reflected_y = 2 * point_2_y - point_1_y
-        return reflected_x, reflected_y
 
     def normalize_current_options_matrix(self):
         print("This si the current options matrix \n", self.current_options_matrix)
@@ -322,6 +280,7 @@ class Social_Choice_Sim:
         self.player_nodes = self.create_player_nodes()
         # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
 
+
     # takes in the influence matrix, and then spits out the 3 strongest calculated relations for every player.
     def calculate_relation_strength(self, new_relations):
         cpp = self.cpp # how many closest personal promises each player has or something.
@@ -333,6 +292,7 @@ class Social_Choice_Sim:
         return_values = self.make_dict(normalized_values, cpp)
         return_values = self.make_native_type(return_values)
         return return_values
+
 
     def make_native_type(self, return_values):
         new_dict = {}
@@ -378,41 +338,11 @@ class Social_Choice_Sim:
         new_matrix = np.round(new_matrix, decimals=2) # reduce size.
         return new_matrix
 
-    def apply_heuristic(self, new_relations):
-        # I GOT IT FINALLY! This line structure has been messing with me for a while now.
-        relation_strengths = [[0] * self.total_players for _ in range(self.total_players)]
-        for i in range(len(new_relations)):
-            for j in range(len(new_relations)):
-                if i == j: # This way we don't consider self-relations - just remove them from the matrix.
-                    new_relations[i][j] = 0
-                if new_relations[i][j] != 0 and new_relations[j][i] != 0:
-                    new_value = (new_relations[i][j] + new_relations[j][i]) / 2
-                    relation_strengths[i][j] = new_value
-                    relation_strengths[j][i] = new_value
-                elif new_relations[i][j] == 0 and new_relations[j][i] != 0 and new_relations[j][i] > 0:
-                    new_value = math.sqrt(new_relations[j][i])
-                    relation_strengths[j][i] = new_value
-                    relation_strengths[i][j] = new_value
-                elif new_relations[i][j] == 0 and new_relations[j][i] != 0 and new_relations[j][i] < 0:
-                    new_value = math.sqrt(abs(new_relations[j][i])) # make it positive and then negative again
-                    relation_strengths[j][i] = -new_value
-                    relation_strengths[i][j] = -new_value
-                elif new_relations[j][i] == 0 and new_relations[i][j] != 0 and new_relations [i][j] > 0:
-                    new_value = math.sqrt(new_relations[i][j])
-                    relation_strengths[i][j] = new_value
-                    relation_strengths[j][i] = new_value
-                elif new_relations[j][i] == 0 and new_relations[i][j] != 0 and new_relations[i][j] <0:
-                    new_value = math.sqrt(abs(new_relations[i][j]))
-                    relation_strengths[i][j] = -new_value
-                    relation_strengths[j][i] = -new_value
-                else:
-                    relation_strengths[i][j] = 0
-                    relation_strengths[j][i] = 0
-        return relation_strengths
 
     def add_votes(self, round, votes):
         # We have to put them all somewhere and here works as good as anywhere else. Not sure if we will need it.
         self.all_votes[round] = votes
+
 
     def compile_nodes(self):
         player_nodes = self.get_player_nodes()

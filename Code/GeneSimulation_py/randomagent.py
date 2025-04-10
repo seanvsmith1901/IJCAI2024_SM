@@ -10,8 +10,10 @@ class RandomAgent(AbstractAgent):
         self.pay_taxes = True
         self.gameParams = {}
 
+
     def setGameParams(self, gameParams, visualTraits):
         self.gameParams = gameParams
+
 
     def play_round(self, player_idx, round_num, recieved, popularities, influence, extra_data):
         tkns = len(popularities) * 2

@@ -47,6 +47,7 @@ class HumanAgent(AbstractAgent):
     def setGameParams(self, gameParams, _forcedRandom):
         self.gameParams = gameParams
 
+
     def getType(self):
         return self.whoami
 
@@ -55,7 +56,6 @@ class HumanAgent(AbstractAgent):
         numPlayers = len(received)
 
         while True:
-            
             if exists("../State/HumanAllocations.txt"):
                 input = open("../State/HumanAllocations.txt", "r")
                 r = int(input.readline())

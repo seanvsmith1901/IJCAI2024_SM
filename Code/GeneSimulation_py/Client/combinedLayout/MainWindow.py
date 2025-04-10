@@ -1,7 +1,9 @@
+from functools import partial
+
 import numpy as np
 from PyQt6.QtCore import QThread, Qt
 from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QVBoxLayout, QWidget, QTabWidget, QGridLayout, QSplitter
+from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget, QGridLayout, QSplitter
 from RoundState import RoundState
 from ServerListener import ServerListener
 from matplotlib.figure import Figure

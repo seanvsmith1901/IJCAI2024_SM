@@ -1,7 +1,5 @@
-import json
-from functools import partial
 from collections import Counter
-from PyQt6.QtWidgets import QHBoxLayout, QLabel, QVBoxLayout, QTabWidget, QGridLayout, QPushButton
+from PyQt6.QtWidgets import QVBoxLayout, QTabWidget
 
 from .tornado_graph import create_tornado_graph
 from .sc_nodes_graph import update_sc_nodes_graph, create_sc_nodes_graph

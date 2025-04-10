@@ -15,13 +15,14 @@ class SCVotingGrid(SCGrid):
         self.insertLayout(0, graphs_layout)
         self.vote_buttons = [QPushButton("Vote") for _ in range(NUM_CAUSES)]
 
+        # Set up the submit button
         from ui_functions.SC_functions import sc_vote, sc_submit
         submit_button = QPushButton("Submit")
         submit_button.setEnabled(False)
         submit_button.clicked.connect(partial(sc_submit, main_window))
         self.grid.addWidget(submit_button, num_players + 2, 0)
 
-
+        # Add the voting buttons
         for col in range(NUM_CAUSES):
             button = self.vote_buttons[col]
             button.setEnabled(False)
