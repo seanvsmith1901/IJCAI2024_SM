@@ -3,7 +3,7 @@ from .StudyScripts.network import NodeNetwork
 from ..colors import COLORS
 import pyqtgraph as pg
 
-def create_jhg_network_graph(main_window):
+def update_jhg_network_graph(main_window):
     if main_window.round_state.round_number == 0:
         current_popularity = np.full((main_window.round_state.num_players, main_window.round_state.num_players), 100)
     else:

@@ -1,4 +1,6 @@
 import pyqtgraph as pg
+
+from .jhg_network_graph import update_jhg_network_graph
 from ..colors import COLORS
 
 
@@ -37,9 +39,11 @@ def update_jhg_popularity_graph(round_state, jhg_popularity_graph):
 
 
 
-def disable_jhg_buttons(main_window):
+def jhg_over(main_window):
     for button in main_window.jhg_buttons:
         button.setEnabled(False)
+
+    update_jhg_network_graph(main_window)
 
 
 def enable_jhg_buttons(main_window):

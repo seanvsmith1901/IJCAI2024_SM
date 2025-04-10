@@ -29,11 +29,16 @@ def create_sc_ui_elements(main_window):
     main_window.SC_panel.layout().addLayout(main_window.SC_voting_grid)
 
 
-def update_sc_ui_elements(main_window):
+def SC_round_init(main_window):
+    # Update sc ui elements
     main_window.SC_panel.setStyleSheet("#SC_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
     main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: none; }")
     main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities)
     update_sc_nodes_graph(main_window)
+
+    # Enable the SC buttons
+    for button in main_window.SC_voting_grid.buttons:
+        button.setEnabled(True)
 
 
 def update_sc_utilities_labels(main_window, new_utilities, winning_vote, last_round_votes, last_round_utilities):
@@ -147,8 +152,3 @@ def disable_sc_buttons(main_window):
     for button in main_window.SC_voting_grid.buttons:
         button.setEnabled(False)
     main_window.current_vote = -1
-
-
-def enable_sc_buttons(main_window):
-    for button in main_window.SC_voting_grid.buttons:
-        button.setEnabled(True)

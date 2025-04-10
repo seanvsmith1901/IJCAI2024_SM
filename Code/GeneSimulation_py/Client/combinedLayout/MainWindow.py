@@ -15,7 +15,7 @@ from SCHistoryGrid import SCHistoryGrid
 from .ui_functions.SC_functions import *
 from .ui_functions.JHG_functions import *
 
-from .ui_functions.jhg_network_graph import create_jhg_network_graph
+from .ui_functions.jhg_network_graph import update_jhg_network_graph
 
 
 class MainWindow(QMainWindow):
@@ -92,12 +92,12 @@ class MainWindow(QMainWindow):
 
         # pyqt signal hook-ups
         self.ServerListener.update_jhg_round_signal.connect(partial(update_jhg_ui_elements, self))
-        self.ServerListener.update_sc_round_signal.connect(partial(update_sc_ui_elements, self))
+        self.ServerListener.update_sc_round_signal.connect(partial(SC_round_init, self))
         self.ServerListener.disable_sc_buttons_signal.connect(partial(disable_sc_buttons, self))
-        self.ServerListener.enable_sc_buttons_signal.connect(partial(enable_sc_buttons, self))
-        self.ServerListener.disable_jhg_buttons_signal.connect(partial(disable_jhg_buttons, self))
+        # self.ServerListener.enable_sc_buttons_signal.connect(partial(enable_sc_buttons, self))
+        self.ServerListener.jhg_over_signal.connect(partial(jhg_over, self))
         self.ServerListener.enable_jhg_buttons_signal.connect(partial(enable_jhg_buttons, self))
-        self.ServerListener.update_jhg_network_graph.connect(partial(create_jhg_network_graph, self))
+        # self.ServerListener.update_jhg_network_graph.connect(partial(update_jhg_network_graph, self))
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
 
         self.ServerListener_thread.start()

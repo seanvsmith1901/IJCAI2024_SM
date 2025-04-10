@@ -12,10 +12,8 @@ class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
     update_sc_round_signal = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
-    enable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
-    disable_jhg_buttons_signal = pyqtSignal()
-    update_jhg_network_graph = pyqtSignal()
+    jhg_over_signal = pyqtSignal()
 
 
     def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, jhg_popularity_graph, tabs, utility_qlabels):
@@ -61,11 +59,8 @@ class ServerListener(QObject):
         self.round_state.utilities = message["UTILITIES"]
         self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
 
-        # TODO: Combine these signals
         self.update_sc_round_signal.emit()
-        self.enable_sc_buttons_signal.emit()
-        self.disable_jhg_buttons_signal.emit()
-        self.update_jhg_network_graph.emit()
+        self.jhg_over_signal.emit()
 
 
     def SC_VOTES(self, message):
