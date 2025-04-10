@@ -58,8 +58,11 @@ class SCManager:
             winning_vote = -1
 
         # Apply the vote and send out the after round info
-        self.sc_sim.apply_vote(winning_vote)
-        new_utilities = self.sc_sim.get_player_utility()
+        if winning_vote != -1:
+            self.sc_sim.apply_vote(winning_vote)
+            new_utilities = self.sc_sim.get_player_utility()
+        else:
+            new_utilities = [0 for _ in range(self.num_players)]
 
         self.connection_manager.distribute_message("SC_OVER", winning_vote, new_utilities, self.positive_vote_effects_history,
                                                    self.negative_vote_effects_history, one_idx_votes, current_options_matrix)
