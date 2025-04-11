@@ -4,12 +4,23 @@ def create_sc_nodes_graph(main_window):
     main_window.nodes_type = []
     main_window.nodes_text = []
 
+    # Set background colors
     main_window.nodes_fig.patch.set_facecolor("#282828ff")
     main_window.nodes_ax.set_facecolor("#282828ff")
-    main_window.nodes_ax.tick_params(color="#EBEBEB")
-    main_window.nodes_ax.tick_params(color="#EBEBEB")
+
+    # Hide ticks and tick labels
+    main_window.nodes_ax.set_xticks([])
+    main_window.nodes_ax.set_yticks([])
+    main_window.nodes_ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+
+    # Hide spines by setting their color to match background
     for spine in main_window.nodes_ax.spines.values():
-        spine.set_color("#EBEBEB")
+        spine.set_color("#282828")
+
+    # Turn off the grid and clear any pre-existing content
+    main_window.nodes_ax.grid(False)
+    main_window.nodes_ax.cla()
+
     return main_window.nodes_canvas
 
 
@@ -82,17 +93,6 @@ def update_sc_nodes_graph(main_window, winning_vote=None):
         colors.append(color)
 
     main_window.nodes_ax.scatter(main_window.nodes_x, main_window.nodes_y, marker='o', c=colors)
-
-    # Clear the axis spines (the square border)
-    main_window.nodes_ax.spines['top'].set_color('none')
-    main_window.nodes_ax.spines['right'].set_color('none')
-    main_window.nodes_ax.spines['left'].set_color('none')
-    main_window.nodes_ax.spines['bottom'].set_color('none')
-
-    main_window.nodes_ax.set_xticks([])  # Remove x-axis ticks
-    main_window.nodes_ax.set_yticks([])  # Remove y-axis ticks
-    main_window.nodes_ax.set_xticklabels([])  # Optionally remove x-axis labels
-    main_window.nodes_ax.set_yticklabels([])  # Optionally remove y-axis labels
 
     main_window.nodes_ax.set_aspect('equal', adjustable='box')
 

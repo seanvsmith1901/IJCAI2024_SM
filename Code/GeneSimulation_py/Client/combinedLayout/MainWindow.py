@@ -61,11 +61,7 @@ class MainWindow(QMainWindow):
         # Initialize the social choice panel. This includes defining several variables that will be initialized in SC_functions
         self.nodes_fig = Figure(figsize=(5, 4), dpi=100)
         self.nodes_ax = self.nodes_fig.add_subplot(111)
-        self.nodes_x = np.linspace(0, 10, 100)
-        self.nodes_y = np.sin(self.nodes_x)
-        self.nodes_ax.plot(self.nodes_x, self.nodes_y)
         self.nodes_canvas = FigureCanvas(self.nodes_fig)
-
         self.tornado_fig = Figure(figsize=(5, 4), dpi=100)
         self.tornado_y = np.arange(self.round_state.num_players)
         self.tornado_ax = self.tornado_fig.add_subplot(111)
