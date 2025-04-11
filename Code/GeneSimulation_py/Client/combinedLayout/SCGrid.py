@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QVBoxLayout, QGridLayout, QLabel
 
-from colors import COLORS
+from combinedLayout.colors import COLORS
 
 
 class SCGrid(QVBoxLayout):

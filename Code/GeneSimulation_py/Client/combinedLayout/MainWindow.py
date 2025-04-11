@@ -11,11 +11,12 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from combinedLayout.JhgPanel import JhgPanel
 
-from SCHistoryGrid import SCHistoryGrid
+
+from combinedLayout.SCHistoryGrid import SCHistoryGrid
 from .ui_functions.SC_functions import *
 from .ui_functions.JHG_functions import *
 
-from .ui_functions.jhg_network_graph import update_jhg_network_graph
+from .ui_functions.tornado_graph import update_tornado_graph
 
 
 class MainWindow(QMainWindow):
@@ -90,15 +91,7 @@ class MainWindow(QMainWindow):
         self.ServerListener_thread = QThread()
         self.ServerListener.moveToThread(self.ServerListener_thread)
 
-        # pyqt signal hook-ups
-        self.ServerListener.update_jhg_round_signal.connect(partial(update_jhg_ui_elements, self))
-        self.ServerListener.update_sc_round_signal.connect(partial(SC_round_init, self))
-        self.ServerListener.disable_sc_buttons_signal.connect(partial(disable_sc_buttons, self))
-        # self.ServerListener.enable_sc_buttons_signal.connect(partial(enable_sc_buttons, self))
-        self.ServerListener.jhg_over_signal.connect(partial(jhg_over, self))
-        self.ServerListener.enable_jhg_buttons_signal.connect(partial(enable_jhg_buttons, self))
-        # self.ServerListener.update_jhg_network_graph.connect(partial(update_jhg_network_graph, self))
-        self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
+        self.set_up_signals()
 
         self.ServerListener_thread.start()
     #/3#
@@ -135,3 +128,36 @@ class MainWindow(QMainWindow):
 
         self.nodes_dict = {}
         self.arrows = {}
+
+
+### --- Setting up pyqt signals --- ###
+
+
+    def set_up_signals(self):
+        # pyqt signal hook-ups
+        self.ServerListener.update_jhg_round_signal.connect(partial(update_jhg_ui_elements, self))
+        self.ServerListener.update_sc_round_signal.connect(partial(SC_round_init, self))
+        self.ServerListener.disable_sc_buttons_signal.connect(partial(disable_sc_buttons, self))
+        self.ServerListener.update_sc_utilities_labels_signal.connect(self.update_sc_utilities_labels)
+        self.ServerListener.update_tornado_graph_signal.connect(self.update_tornado_graph)
+        self.ServerListener.jhg_over_signal.connect(partial(jhg_over, self))
+        self.ServerListener.enable_jhg_buttons_signal.connect(partial(enable_jhg_buttons, self))
+        self.ServerListener.update_potential_sc_votes_signal.connect(self.update_potential_sc_votes)
+        self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
+        self.ServerListener.update_win_signal.connect(self.update_win)
+        self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
+
+    def update_potential_sc_votes(self, potential_votes):
+        update_potential_sc_votes(self, potential_votes)
+
+    def update_sc_utilities_labels(self, new_utilities, winning_vote, last_round_votes, last_round_utilities):
+        update_sc_utilities_labels(self, new_utilities, winning_vote, last_round_votes, last_round_utilities)
+
+    def update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects):
+        update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)
+
+    def update_sc_nodes_graph(self, winning_vote):
+        update_sc_nodes_graph(self, winning_vote)
+
+    def update_win(self, winning_vote):
+        update_win(self, winning_vote)

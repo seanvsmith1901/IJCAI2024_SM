@@ -1,4 +1,10 @@
 import sys
+import os
+import traceback
+
+from PyQt6.QtGui import QPainter
+
+sys.path.append(os.path.dirname(__file__))
 
 from PyQt6.QtWidgets import QApplication
 
@@ -10,8 +16,32 @@ from PyQt6.QtCore import qInstallMessageHandler, QtMsgType
 # Trying to track down where the QPainter error is coming from
 def qt_message_handler(mode, context, message):
     if 'QBackingStore::endPaint() called with active painter' in message:
-        print("Caught the paint error!")
-        raise RuntimeError("QBackingStore::endPaint issue occurred!")
+        print("⚠️ QBackingStore paint error detected!")
+        print("📍 Python stack at the time:")
+        traceback.print_stack()
+
+# _real_end = QPainter.end
+
+# def debug_end(self):
+#     if self.isActive():
+#         print(f"⚠️ QPainter.end() called on active painter for widget: {self}")
+#         print(f"Widget class: {self.__class__.__name__}")
+#         print(f"Widget ID: {id(self)}")
+#         # Print other relevant attributes here (e.g., position, size)
+#         traceback.print_stack()
+#     return _real_end(self)
+#
+# QPainter.end = debug_end
+
+# Optional: also patch QPainter.begin
+_real_begin = QPainter.begin
+
+def debug_begin(self, *args, **kwargs):
+    print("🎨 QPainter.begin called with:", args[0] if args else "Unknown")
+    traceback.print_stack()
+    return _real_begin(self, *args, **kwargs)
+
+QPainter.begin = debug_begin
 
 
 

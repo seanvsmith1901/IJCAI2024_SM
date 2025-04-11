@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QComboBox
 
-from SCGrid import SCGrid
+from .SCGrid import SCGrid
 
 
 class SCHistoryGrid(SCGrid):

@@ -2,10 +2,7 @@ from collections import defaultdict
 
 import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal
-
-from combinedLayout.ui_functions.tornado_graph import update_tornado_graph
-from combinedLayout.ui_functions.SC_functions import update_potential_sc_votes, update_sc_nodes_graph, update_win, \
-    update_sc_utilities_labels
+from matplotlib.axes import Axes
 
 
 class ServerListener(QObject):
@@ -14,6 +11,11 @@ class ServerListener(QObject):
     disable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal()
+    update_potential_sc_votes_signal = pyqtSignal(dict)
+    update_sc_utilities_labels_signal = pyqtSignal(dict, int, list, list)
+    update_tornado_graph_signal = pyqtSignal(Axes, list, list)
+    update_sc_nodes_graph_signal = pyqtSignal(int)
+    update_win_signal = pyqtSignal(int)
 
 
     def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, jhg_popularity_graph, tabs, utility_qlabels):
@@ -64,17 +66,18 @@ class ServerListener(QObject):
 
 
     def SC_VOTES(self, message):
-        update_potential_sc_votes(self.main_window, message["POTENTIAL_VOTES"])
+        self.update_potential_sc_votes_signal.emit(message["POTENTIAL_VOTES"])
 
 
     def SC_OVER(self, message):
         self.disable_sc_buttons_signal.emit()
-        update_sc_nodes_graph(self.main_window, message["WINNING_VOTE"])
-        update_win(self.main_window, message["WINNING_VOTE"])
-        # new_utilities = json.loads(json.dumps(message["NEW_UTILITIES"]))
+        self.update_sc_nodes_graph_signal.emit(message["WINNING_VOTE"])
+        self.update_win_signal.emit(message["WINNING_VOTE"])
         new_utilities = message["NEW_UTILITIES"]
-        update_sc_utilities_labels(self.main_window, new_utilities, message["WINNING_VOTE"], message["VOTES"], message["UTILITIES"])
-        update_tornado_graph(self.main_window, self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"],
+
+        self.update_sc_utilities_labels_signal.emit(new_utilities, message["WINNING_VOTE"], message["VOTES"], message["UTILITIES"])
+
+        self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"],
                                               message["NEGATIVE_VOTE_EFFECTS"])
 
         # Switch to JHG
