@@ -28,11 +28,13 @@ public:
     std::vector<std::vector<int>> createOptionsMatrix();
     const std::vector<std::vector<int>>& getCurrentOptionsMatrix() const;
     void startRound();
-    const std::vector<float>& getProbabilites() const;
+    const std::vector<std::vector<float>> getProbabilites() const;
     std::unordered_map<int, int> getVotes();
     std::pair<int, std::vector<float>> returnWin(const std::unordered_map<int, int>& all_votes);
-    std::vector<int> generateProbabilities(<std::vector<int> currentOptionsMatrix);
-
+    void genCombinations(int currentID, std::vector<int> current_array, double current_prob, std::vector<std::pair<std::vector<int>, double>>& results);
+    std::vector<float> generateProbabilities(std::vector<std::vector<int>> currentOptionsMatrix);
+    std::vector<std::vector<float>> createChoicesMatrix(std::vector<std::vector<int>> currentOptionsMatrix);
+    std::vector<float> getCauseProbability(std::vector<std::pair<std::vector<int>, double>>& results);
 
 
 private:
@@ -52,8 +54,8 @@ private:
     std::unordered_map<int, int> allVotes;
     std::vector<GameTheoryBot> bots; // this feels easier to me. maybe.
     std::vector<int> currentVotes;
-    std::vector<float> probabilities;
-    std::vector<int> allCombinations;
+    std::vector<std::vector<float>> probabilitiesMatrix;
+    std::vector<float> allCombinations;
 
     std::mt19937 gen; // random number generator
 

@@ -9,12 +9,19 @@
 SocialChoiceSim::SocialChoiceSim(int totalPlayers, int numCauses, int numHumans)
     : totalPlayers(totalPlayers), numCauses(numCauses), numHumans(numHumans), numBots(totalPlayers-numHumans), cpp(3), rad(5), gen(std::random_device()())
 {
+    this->totalPlayers = totalPlayers;
+    this->numCauses = numCauses;
+    this->numHumans = numHumans;
+    this->numBots = totalPlayers-numHumans;
+    this->cpp = 3;
+    this->rad = 5;
+
     createBots();
 
     currentOptionsMatrix = {};
     allVotes.clear();
     currentVotes.clear();
-    probabilities.clear();
+    probabilitiesMatrix.clear();
     allCombinations.clear();
 }
 
@@ -51,8 +58,8 @@ const std::vector<std::vector<int> >& SocialChoiceSim::getCurrentOptionsMatrix()
 void SocialChoiceSim::startRound() { // THats it. theres more in the non genetic version.
     this->currentOptionsMatrix = createOptionsMatrix();
 }
-const std::vector<float>& SocialChoiceSim:: getProbabilites() const {
-    return probabilities;
+const std::vector<std::vector<float>> SocialChoiceSim:: getProbabilites() const {
+    return probabilitiesMatrix;
 
 }
 std::unordered_map<int, int> SocialChoiceSim::getVotes() {
@@ -61,19 +68,58 @@ std::unordered_map<int, int> SocialChoiceSim::getVotes() {
         if (allCombinations.empty()) {
             allCombinations = generateProbabilities(currentOptionsMatrix);
         }
-        botVotes[i] = bots[i].getVote(allCombinations, currentOptionsMatrix);
+        botVotes[i] = bots[i].getVote(currentOptionsMatrix, allCombinations);
     }
     return botVotes;
 
 }
 
-std::vector<int> generateProbabilities(std::vector<int> currentOptionsMatrix) {
-    ;
+std::vector<std::vector<float>> SocialChoiceSim::createChoicesMatrix(std::vector<std::vector<int>> currentOptionsMatrix) {
+
+}
+
+
+void SocialChoiceSim::genCombinations(int currentID, std::vector<int> current_array, double current_prob, std::vector<std::pair<std::vector<int>, double>>& results) {
+    if (currentID == totalPlayers) {
+        // Add the combination and its probability to the results
+        results.emplace_back(current_array, current_prob);
+        return;
+    }
+
+    // Iterate over each cause
+    for (int cause = 0; cause < numCauses; ++cause) {
+        double prob = probabilitiesMatrix[currentID][cause];
+        if (prob > 0) {
+            current_array[currentID] = cause;  // Set the current cause
+            double newProb = prob * current_prob;
+            SocialChoiceSim::genCombinations(currentID+1, current_array, newProb, results);
+        }
+    }
+}
+
+
+
+
+std::vector<float> SocialChoiceSim::generateProbabilities(std::vector<std::vector<int>> currentOptionsMatrix) {
+    createChoicesMatrix(currentOptionsMatrix);
+    std::vector<std::pair<std::vector<int>, double>> results;
+    std::vector<int> currentArray;
+    int currentID = 0;
+    double current_prob = 1;
+    genCombinations(currentID, currentArray, current_prob, results);
+    // results should now hold big boy list if we did this correctly.
+    std::vector<float> cause_probabilities = getCauseProbability(results);
+
+}
+
+std::vector<float> SocialChoiceSim::getCauseProbability(std::vector<std::pair<std::vector<int>, double> > &results) {
+    return; // fix this later. I'm tired
 }
 
 std::pair<int, std::vector<float>> SocialChoiceSim::returnWin(const std::unordered_map<int, int>& all_votes) {
 
 }
+
 
 
 

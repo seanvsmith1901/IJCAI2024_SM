@@ -21,8 +21,8 @@ void GameTheoryBot::setChromosome(Chromosome currChromosome) {
 }
 
 // Get vote based on current options and internal logic
-int GameTheoryBot::getVote(const std::vector<std::vector<int>>& currentOptionsMatrix,
-                const std::vector<std::vector<int>>& bigBoyList) {
+int GameTheoryBot::getVote(const std::vector<std::vector<int>> currentOptionsMatrix,
+                const std::vector<std::vector<int>> bigBoyList) {
     // stub logic here
     return 0;
 }

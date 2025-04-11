@@ -17,7 +17,7 @@ public:
 
     void setChromosome(Chromosome chromosome);
     int getVote(const std::vector<std::vector<int>>& currentOptionsMatrix,
-                const std::vector<std::vector<int>>& bigBoyList);
+                const std::vector<float> bigBoyList);
 
     std::vector<float> generateProbabilities(const std::vector<std::vector<int>>& currentOptionsMatrix);
     int getVoteOptimizedSingle(const std::vector<float>& normalizedCauseProbability,
