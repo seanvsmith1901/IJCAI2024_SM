@@ -9,7 +9,8 @@ sys.path.append(os.path.dirname(__file__))
 from PyQt6.QtWidgets import QApplication
 
 from ClientConnectionManager import ClientConnectionManager
-from combinedLayout.MainWindow import MainWindow
+# from combinedLayout.MainWindow import MainWindow
+from combinedLayout.redesign import MainWindow
 
 from PyQt6.QtCore import qInstallMessageHandler, QtMsgType
 
@@ -20,20 +21,7 @@ def qt_message_handler(mode, context, message):
         print("📍 Python stack at the time:")
         traceback.print_stack()
 
-# _real_end = QPainter.end
 
-# def debug_end(self):
-#     if self.isActive():
-#         print(f"⚠️ QPainter.end() called on active painter for widget: {self}")
-#         print(f"Widget class: {self.__class__.__name__}")
-#         print(f"Widget ID: {id(self)}")
-#         # Print other relevant attributes here (e.g., position, size)
-#         traceback.print_stack()
-#     return _real_end(self)
-#
-# QPainter.end = debug_end
-
-# Optional: also patch QPainter.begin
 _real_begin = QPainter.begin
 
 def debug_begin(self, *args, **kwargs):
@@ -44,11 +32,16 @@ def debug_begin(self, *args, **kwargs):
 QPainter.begin = debug_begin
 
 
+def load_stylesheet(path):
+    with open(path, "r") as file:
+        return file.read()
+
 
 if __name__ == "__main__":
     qInstallMessageHandler(qt_message_handler)
     # Create a QApplication first
     app = QApplication(sys.argv)
+    app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
     host = '127.0.0.1'  # your local host address
     port = 12345  # The port number to connect to

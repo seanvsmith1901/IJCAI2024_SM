@@ -26,7 +26,8 @@ def create_sc_ui_elements(main_window):
     main_window.SC_voting_grid = SCVotingGrid(main_window.round_state.num_players, client_id, graphs_layout, main_window)
     main_window.SC_voting_grid.update_grid([0 for _ in range(main_window.round_state.num_players)], [[0 for _ in range(3)] for _ in range(main_window.round_state.num_players)])
 
-    main_window.SC_panel.layout().addLayout(main_window.SC_voting_grid)
+    main_window.SC_panel.setMinimumWidth(400)
+    main_window.SC_panel.addTab(main_window.SC_voting_grid, "Current Round")
 
 
 def SC_round_init(main_window):
@@ -42,7 +43,7 @@ def SC_round_init(main_window):
 
 
 def update_sc_utilities_labels(main_window, new_utilities, winning_vote, last_round_votes, last_round_utilities):
-    history_grid = main_window.sc_history_grid.findChild(SCHistoryGrid)
+    history_grid = main_window.sc_history_grid
     history_grid.update_sc_history(main_window.round_state.round_number, last_round_votes, last_round_utilities)
     history_grid.change_round(main_window.round_state.round_number)
 
@@ -98,15 +99,16 @@ def update_arrows(main_window, potential_votes):
 
         main_window.arrows = []  # clean the arrows array.
         for key in potential_votes:
-            player_name = "Player " + str(int(key) + 1)
-            start_x = main_window.nodes_dict[player_name]["x_pos"]
-            start_y = main_window.nodes_dict[player_name]["y_pos"]
-            cause_name = "Cause " + str(int(potential_votes[key]) + 1)
-            end_x = main_window.nodes_dict[cause_name]["x_pos"]
-            end_y = main_window.nodes_dict[cause_name]["y_pos"]
+            if int(potential_votes[key]) != -1:
+                player_name = "Player " + str(int(key) + 1)
+                start_x = main_window.nodes_dict[player_name]["x_pos"]
+                start_y = main_window.nodes_dict[player_name]["y_pos"]
+                cause_name = "Cause " + str(int(potential_votes[key]) + 1)
+                end_x = main_window.nodes_dict[cause_name]["x_pos"]
+                end_y = main_window.nodes_dict[cause_name]["y_pos"]
 
-            new_arrow = Arrow((start_x, start_y), (end_x, end_y), color=COLORS[int(key)])
-            main_window.arrows.append(new_arrow)
+                new_arrow = Arrow((start_x, start_y), (end_x, end_y), color=COLORS[int(key)])
+                main_window.arrows.append(new_arrow)
 
         for arrow in main_window.arrows:
             arrow.draw(main_window.nodes_ax)
@@ -119,7 +121,8 @@ def sc_vote(main_window, vote):
     main_window.connection_manager.send_message("POTENTIAL_SC_VOTE", main_window.round_state.client_id, vote)
 
 
-def sc_submit(main_window):
+def sc_submit(main_window, voting_grid):
+    voting_grid.select_button(None) # Clears the selection from the SC voting buttons
     main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, main_window.current_vote)
 
 

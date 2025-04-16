@@ -1,21 +1,31 @@
-from PyQt6.QtWidgets import QVBoxLayout, QGridLayout, QLabel
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QTabWidget
 
 from combinedLayout.colors import COLORS
 
 
-class SCGrid(QVBoxLayout):
+class SCGrid(QTabWidget):
     def __init__(self, num_players, client_id, col_2_header_text, col_2_vals, utility_mat):
         super().__init__()
         header_text_list = ["Player", col_2_header_text] + [f"Cause #{i + 1}" for i in range(3)] # 3 is the number of causes
 
         self.id = int(client_id)
-        self.header_labels = [QLabel(header_text) for header_text in header_text_list]
-        self.player_labels = [QLabel(f"{i + 1}") for i in range(num_players)]
-        self.col_2_labels = [QLabel(str(val)) for val in col_2_vals]
-        self.cause_utility_labels = [[QLabel(str(utility)) for utility in utility_mat[i]] for i in range(num_players)]
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+
+        def centered_label(text):
+            label = QLabel(text)
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            return label
+
+        self.header_labels = [centered_label(header_text) for header_text in header_text_list]
+        self.player_labels = [centered_label(f"{i + 1}") for i in range(num_players)]
+        self.col_2_labels = [centered_label(str(val)) for val in col_2_vals]
+        self.cause_utility_labels = [[centered_label(str(utility)) for utility in utility_mat[i]] for i in
+                                     range(num_players)]
 
         self.grid = QGridLayout()
-        self.addLayout(self.grid)
+        self.layout.addLayout(self.grid)
         # Add the header
         for col, label in enumerate(self.header_labels):
             self.grid.addWidget(label, 0, col)

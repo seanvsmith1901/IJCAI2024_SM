@@ -17,7 +17,7 @@ class SCHistoryGrid(SCGrid):
         self.selector_layout.addWidget(QLabel("Round to view"))
         self.selector_layout.addWidget(self.round_drop_down)
 
-        self.insertLayout(0, self.selector_layout)
+        self.layout.insertLayout(0, self.selector_layout)
 
     def change_round(self, index):
         round_key = str(index + 1)

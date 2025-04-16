@@ -1,3 +1,4 @@
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QLabel
 
 from combinedLayout.allocation_buttons import MinusButton, PlusButton
@@ -52,6 +53,13 @@ class Player:
         self.popularity_label = QLabel(str(self.popularity))
         self.sent_label = QLabel(str(self.received_from_player))
         self.received_label = QLabel(str(self.sent_to_player))
+
+        # Center the labels
+        self.id_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.popularity_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.sent_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.received_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         self.kept_text_label = QLabel("Tokens kept:")
         self.kept_number_label = QLabel()
         self.minus_button = MinusButton()

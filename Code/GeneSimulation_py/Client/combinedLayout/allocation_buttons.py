@@ -13,6 +13,8 @@ class MinusButton(QWidget):
         super().__init__()
         self.minus_button = QPushButton("-")
         self.minus_button.setFixedWidth(self.minus_button.fontMetrics().horizontalAdvance("-") + 20)
+        self.minus_button.setMinimumWidth(30)
+        self.minus_button.setMaximumWidth(30)
         self.minus_button.clicked.connect(self.on_minus_button_clicked)
 
         layout = QHBoxLayout()

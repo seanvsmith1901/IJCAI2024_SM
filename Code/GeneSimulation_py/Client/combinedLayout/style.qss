@@ -1,0 +1,82 @@
+/* Global styles */
+
+QMainWindow {
+    background-color: #171717;
+    color: #ffffff;
+}
+
+QLabel {
+    color: white;
+}
+
+QPushButton {
+    background-color: #3a414a;
+    border: solid 2px black;
+    border-radius: 5px;
+    color: white;
+    min-height: 2em;
+}
+
+QPushButton:hover {
+    background-color: #2c353f;
+    border: solid 2px #2980b9;
+    color: #ecf0f1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+QPushButton:disabled {
+    background-color: #2a2f35;
+    color: #777;
+    border: solid 2px #444;
+}
+
+
+/* This doesn't actually seem to work, but it does remove a bad border, so... */
+QTabWidget {
+    border: solid 3px white;
+    padding: 10px;
+    background-color: #171717;
+}
+
+QTabBar {
+    width: 100%;
+}
+
+QTabBar::tab {
+    color: black;
+    background-color: #979ea8;
+    /*border-top-left-radius: 5px;*/
+    /*border-top-right-radius: 5px;*/
+    padding: 5px;
+    /*margin-right: 3px;*/
+    /*margin-top: 4px;*/
+    /*min-width: 200px;*/
+}
+
+QTabBar::tab:selected {
+    background-color: #ced4db;
+}
+
+
+QSplitter {
+    padding: 2px;
+}
+
+/* SC voting styles */
+
+#SC_panel {
+    background-color: #282828;
+}
+
+QPushButton[btnState="checked"] {
+    background-color: #2980b9;
+    color: #ecf0f1;
+    border: solid 2px #2980b9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+QWidget#DraggablePanel {
+    border: 2px solid lime;
+    border-radius: 6px;
+    background-color: #1c1c1c;
+}
