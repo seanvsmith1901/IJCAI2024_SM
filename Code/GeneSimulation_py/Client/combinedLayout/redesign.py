@@ -119,7 +119,7 @@ class MainWindow(QMainWindow):
         self.sc_history_grid = SCHistoryGrid(self.round_state.num_players, self.round_state.client_id, "Voted for")
         self.SC_panel.addTab(self.sc_history_grid, "History")
 
-        self.setWindowTitle("Four Corners Drag-Reorder")
+        self.setWindowTitle("JHG: Round 1")
         self.setCentralWidget(CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs))
     #/4#
 

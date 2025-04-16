@@ -51,3 +51,5 @@ def enable_jhg_buttons(main_window):
     main_window.SC_panel.setStyleSheet("#SC_Panel { border: none; }")
     for button in main_window.jhg_buttons:
         button.setEnabled(True)
+
+    main_window.setWindowTitle(f"JHG: Round {main_window.round_state.round_number + 1}")
