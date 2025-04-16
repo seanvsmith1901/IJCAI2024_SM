@@ -3,12 +3,10 @@ from functools import partial
 import numpy as np
 from PyQt6.QtCore import QThread, Qt, QMimeData, QEvent
 from PyQt6.QtGui import QFont, QDrag
-from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget, QGridLayout, QSplitter, QDockWidget, QSizePolicy, \
-    QPushButton
+from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget
 from RoundState import RoundState
 from ServerListener import ServerListener
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from combinedLayout.JhgPanel import JhgPanel
 
@@ -16,6 +14,7 @@ from combinedLayout.JhgPanel import JhgPanel
 from combinedLayout.SCHistoryGrid import SCHistoryGrid
 
 from .MainDocks import CornerContainer
+from .SCCausesGraph import SCCausesGraph
 from .ui_functions.SC_functions import *
 from .ui_functions.JHG_functions import *
 
@@ -32,9 +31,8 @@ class MainWindow(QMainWindow):
     #1# Block one: Sets up the round_state and client socket. Must be the first thing done
         self.tornado_ax = None
         self.tornado_canvas = None
-        self.graph_canvas = None
+        self.SC_cause_graph = SCCausesGraph()
         self.player_labels = {}
-        self.cause_labels = {}
         self.jhg_buttons = []
         self.round_state = RoundState(client_id, num_players, self.jhg_buttons)
         self.connection_manager = connection_manager
@@ -61,9 +59,6 @@ class MainWindow(QMainWindow):
         tabs = QTabWidget()
 
         # Initialize the social choice panel. This includes defining several variables that will be initialized in SC_functions
-        self.nodes_fig = Figure(figsize=(5, 4), dpi=100)
-        self.nodes_ax = self.nodes_fig.add_subplot(111)
-        self.nodes_canvas = FigureCanvas(self.nodes_fig)
         self.tornado_fig = Figure(figsize=(5, 4), dpi=100)
         self.tornado_y = np.arange(self.round_state.num_players)
         self.tornado_ax = self.tornado_fig.add_subplot(111)
@@ -103,7 +98,6 @@ class MainWindow(QMainWindow):
 
         self.SC_panel = QTabWidget()
         self.SC_panel.setObjectName("SC_Panel")
-        self.SC_panel.setStyleSheet("QTabWidget { background-color: red; }")
         self.SC_panel.setLayout(QVBoxLayout())
 
         plots_panel = QTabWidget()
@@ -112,12 +106,12 @@ class MainWindow(QMainWindow):
         plots_panel.addTab(self.jhg_network, "Network graph")
 
         create_sc_ui_elements(self)
+        self.SC_cause_graph.init_sc_nodes_graph(self.round_state)
 
         graphs_layout = QVBoxLayout()
 
         sc_graph_tabs = QTabWidget()
-        sc_graph_tabs.tabBar().setExpanding(True)
-        sc_graph_tabs.addTab(self.graph_canvas, "Causes Graph")
+        sc_graph_tabs.addTab(self.SC_cause_graph, "Causes Graph")
         sc_graph_tabs.addTab(self.tornado_canvas, "Effect of past votes")
 
         graphs_layout.addWidget(sc_graph_tabs)
@@ -127,9 +121,6 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("Four Corners Drag-Reorder")
         self.setCentralWidget(CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs))
-
-        self.nodes_dict = {}
-        self.arrows = {}
     #/4#
 
 
@@ -148,11 +139,10 @@ class MainWindow(QMainWindow):
         self.ServerListener.enable_jhg_buttons_signal.connect(partial(enable_jhg_buttons, self))
         self.ServerListener.update_potential_sc_votes_signal.connect(self.update_potential_sc_votes)
         self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
-        self.ServerListener.update_win_signal.connect(self.update_win)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
 
     def update_potential_sc_votes(self, potential_votes):
-        update_potential_sc_votes(self, potential_votes)
+        self.SC_cause_graph.update_arrows(potential_votes)
 
     def update_sc_utilities_labels(self, new_utilities, winning_vote, last_round_votes, last_round_utilities):
         update_sc_utilities_labels(self, new_utilities, winning_vote, last_round_votes, last_round_utilities)
@@ -161,7 +151,4 @@ class MainWindow(QMainWindow):
         update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)
 
     def update_sc_nodes_graph(self, winning_vote):
-        update_sc_nodes_graph(self, winning_vote)
-
-    def update_win(self, winning_vote):
-        update_win(self, winning_vote)
+        self.SC_cause_graph.update_sc_nodes_graph(winning_vote)

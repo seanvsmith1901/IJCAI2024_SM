@@ -15,7 +15,6 @@ class ServerListener(QObject):
     update_sc_utilities_labels_signal = pyqtSignal(dict, int, list, list)
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
     update_sc_nodes_graph_signal = pyqtSignal(int)
-    update_win_signal = pyqtSignal(int)
 
 
     def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, jhg_popularity_graph, tabs, utility_qlabels):
@@ -72,7 +71,6 @@ class ServerListener(QObject):
     def SC_OVER(self, message):
         self.disable_sc_buttons_signal.emit()
         self.update_sc_nodes_graph_signal.emit(message["WINNING_VOTE"])
-        self.update_win_signal.emit(message["WINNING_VOTE"])
         new_utilities = message["NEW_UTILITIES"]
 
         self.update_sc_utilities_labels_signal.emit(new_utilities, message["WINNING_VOTE"], message["VOTES"], message["UTILITIES"])
