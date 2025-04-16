@@ -32,7 +32,8 @@ def SC_round_init(main_window):
 
     # Enable the SC buttons
     for button in main_window.SC_voting_grid.buttons:
-        button.setEnabled(True)
+        if button.objectName() != "clear_button":
+            button.setEnabled(True)
 
 
 def update_sc_utilities_labels(main_window, new_utilities, winning_vote, last_round_votes, last_round_utilities):

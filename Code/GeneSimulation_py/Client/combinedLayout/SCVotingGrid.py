@@ -18,6 +18,7 @@ class SCVotingGrid(SCGrid):
 
         # Set up the clear button
         self.clear_button = QPushButton("Clear Vote")
+        self.clear_button.setObjectName("clear_button")
         self.clear_button.setEnabled(False)
         self.clear_button.clicked.connect(partial(sc_vote, main_window, -1))
         self.clear_button.clicked.connect(partial(self.select_button, None))
