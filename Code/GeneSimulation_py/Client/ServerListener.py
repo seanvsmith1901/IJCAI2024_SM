@@ -65,6 +65,7 @@ class ServerListener(QObject):
 
 
     def SC_VOTES(self, message):
+        self.round_state.current_potential_votes = message["POTENTIAL_VOTES"]
         self.update_potential_sc_votes_signal.emit(message["POTENTIAL_VOTES"])
 
 

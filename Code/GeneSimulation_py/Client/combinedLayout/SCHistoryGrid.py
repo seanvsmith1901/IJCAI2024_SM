@@ -32,7 +32,7 @@ class SCHistoryGrid(SCGrid):
         self.sc_history[str(round)] = {"votes": votes, "utilities": utilities}
 
         self.round_drop_down.repaint()
-        self.round_drop_down.setCurrentIndex(round - 1)
+        # self.round_drop_down.setCurrentIndex(round - 1)
 
 
     def update_grid(self, votes, utilities, round_num):

@@ -49,88 +49,89 @@ class SCCausesGraph(QWidget):
     
     
     def update_sc_nodes_graph(self, round_num, winning_vote=None):
-        print("Winning vote", winning_vote)
-        # Clear graph
-        self.nodes_ax.cla()
-        self.arrows.clear()
-        self.nodes_x.clear()
-        self.nodes_y.clear()
-        self.nodes_type.clear()
-        self.nodes_text.clear()
+        if self.round_state.nodes:
+            # Clear graph
+            self.nodes_ax.cla()
+            self.arrows.clear()
+            self.nodes_x.clear()
+            self.nodes_y.clear()
+            self.nodes_type.clear()
+            self.nodes_text.clear()
 
-        # Update node data
-        for node in self.round_state.nodes[round_num]:
-            mini_dict = {"x_pos": float(node["x_pos"]), "y_pos": float(node["y_pos"])}
-            self.nodes_dict[node["text"]] = mini_dict
-            self.nodes_x.append(float(node["x_pos"]))
-            self.nodes_y.append(float(node["y_pos"]))
-            self.nodes_type.append(node["type"])
-            self.nodes_text.append(node["text"])
+            # Update node data
+            for node in self.round_state.nodes[round_num]:
+                mini_dict = {"x_pos": float(node["x_pos"]), "y_pos": float(node["y_pos"])}
+                self.nodes_dict[node["text"]] = mini_dict
+                self.nodes_x.append(float(node["x_pos"]))
+                self.nodes_y.append(float(node["y_pos"]))
+                self.nodes_type.append(node["type"])
+                self.nodes_text.append(node["text"])
 
-        colors = []
+            colors = []
 
-        # Update or add annotations to the axes
-        if winning_vote:
-            winning_vote += 1
+            # Update or add annotations to the axes
+            if winning_vote:
+                winning_vote += 1
 
-        for i, (x_val, y_val) in enumerate(zip(self.nodes_x, self.nodes_y)):
-            text = self.nodes_text[i]
-            if text.startswith("Player"):
-                split_string = text.split()
-                text = split_string[1]
-                color = COLORS[int(split_string[1]) - 1]
-            elif text == "Cause " + str(winning_vote):
-                color = "#e41e1e"  # red
-            else:
-                color = "#EBEBEB"
+            for i, (x_val, y_val) in enumerate(zip(self.nodes_x, self.nodes_y)):
+                text = self.nodes_text[i]
+                if text.startswith("Player"):
+                    split_string = text.split()
+                    text = split_string[1]
+                    color = COLORS[int(split_string[1]) - 1]
+                elif text == "Cause " + str(winning_vote):
+                    color = "#e41e1e"  # red
+                else:
+                    color = "#EBEBEB"
 
-            # If an annotation already exists, update it; otherwise, create a new one
-            annotations = [ann for ann in self.nodes_ax.texts if ann.get_text() == text]
-            if annotations:
-                # Update existing annotation
-                annotations[0].set_position((x_val, y_val))
-                annotations[0].set_color(color)
-            else:
-                # Create new annotation
-                self.nodes_ax.annotate(
-                    text,
-                    (x_val, y_val),
-                    textcoords="offset points",
-                    xytext=(0, 3),
-                    ha='center',
-                    fontsize=9,
-                    color=color,
-                    weight='bold',
-                    zorder=587,
-                )
+                # If an annotation already exists, update it; otherwise, create a new one
+                annotations = [ann for ann in self.nodes_ax.texts if ann.get_text() == text]
+                if annotations:
+                    # Update existing annotation
+                    annotations[0].set_position((x_val, y_val))
+                    annotations[0].set_color(color)
+                else:
+                    # Create new annotation
+                    self.nodes_ax.annotate(
+                        text,
+                        (x_val, y_val),
+                        textcoords="offset points",
+                        xytext=(0, 3),
+                        ha='center',
+                        fontsize=9,
+                        color=color,
+                        weight='bold',
+                        zorder=587,
+                    )
 
-            colors.append(color)
+                colors.append(color)
 
-        self.nodes_ax.text(
-            0.98, 0.98,  # near top-right corner
-            f"Round {round_num}",
-            transform=self.nodes_ax.transAxes,
-            ha='right',
-            va='top',
-            fontsize=10,
-            color='white',
-            weight='bold',
-            zorder=10,
-        )
+            self.nodes_ax.text(
+                0.98, 0.98,  # near top-right corner
+                f"Round {round_num}",
+                transform=self.nodes_ax.transAxes,
+                ha='right',
+                va='top',
+                fontsize=10,
+                color='white',
+                weight='bold',
+                zorder=10,
+            )
 
-        self.nodes_ax.scatter(self.nodes_x, self.nodes_y, marker='o', c=colors)
+            self.nodes_ax.scatter(self.nodes_x, self.nodes_y, marker='o', c=colors)
 
-        max_x = max(abs(x) for x in self.nodes_x)
-        max_y = max(abs(y) for y in self.nodes_y)
-        max_range = max(max_x, max_y) + 1  # Add some padding if you like
+            max_x = max(abs(x) for x in self.nodes_x)
+            max_y = max(abs(y) for y in self.nodes_y)
+            max_range = max(max_x, max_y) + 1  # Add some padding if you like
 
-        self.nodes_ax.set_xlim(-max_range, max_range)
-        self.nodes_ax.set_ylim(-max_range, max_range)
+            self.nodes_ax.set_xlim(-max_range, max_range)
+            self.nodes_ax.set_ylim(-max_range, max_range)
 
-        self.nodes_ax.set_aspect('equal', adjustable='box')
+            self.nodes_ax.set_aspect('equal', adjustable='box')
 
-        # Redraw the canvas
-        self.nodes_canvas.draw()
+            # Redraw the canvas
+            self.nodes_canvas.draw()
+
 
     def update_arrows(self, potential_votes):
         # checks for existing arrows, and removes them.

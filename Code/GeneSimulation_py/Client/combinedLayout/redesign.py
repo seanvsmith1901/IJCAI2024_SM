@@ -118,6 +118,7 @@ class MainWindow(QMainWindow):
 
         self.sc_history_grid = SCHistoryGrid(self.round_state.num_players, self.round_state.client_id, "Voted for", self.SC_cause_graph)
         self.SC_panel.addTab(self.sc_history_grid, "History")
+        self.SC_panel.currentChanged.connect(self.SC_tab_changed)
 
         self.setWindowTitle("JHG: Round 1")
         self.setCentralWidget(CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs))
@@ -152,3 +153,18 @@ class MainWindow(QMainWindow):
 
     def update_sc_nodes_graph(self, winning_vote):
         self.SC_cause_graph.update_sc_nodes_graph(self.round_state.round_number, winning_vote)
+
+    def SC_tab_changed(self, index):
+        current_tab = self.SC_panel.widget(index)
+        cause_graph = self.SC_cause_graph
+
+        if current_tab == self.SC_voting_grid and self.round_state.current_potential_votes:
+            cause_graph.update_sc_nodes_graph(self.round_state.round_number)
+            cause_graph.update_arrows(self.round_state.current_potential_votes)
+        elif current_tab == self.sc_history_grid and self.sc_history_grid.sc_history:
+            sc_history_tab = self.sc_history_grid
+            selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
+            votes = sc_history_tab.sc_history[str(selected_round)]["votes"]
+            winning_vote = get_winning_vote(votes)
+
+            cause_graph.update_sc_nodes_graph(selected_round, winning_vote)
