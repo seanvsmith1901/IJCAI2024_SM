@@ -116,7 +116,7 @@ class MainWindow(QMainWindow):
 
         graphs_layout.addWidget(sc_graph_tabs)
 
-        self.sc_history_grid = SCHistoryGrid(self.round_state.num_players, self.round_state.client_id, "Voted for")
+        self.sc_history_grid = SCHistoryGrid(self.round_state.num_players, self.round_state.client_id, "Voted for", self.SC_cause_graph)
         self.SC_panel.addTab(self.sc_history_grid, "History")
 
         self.setWindowTitle("JHG: Round 1")
@@ -151,4 +151,4 @@ class MainWindow(QMainWindow):
         update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)
 
     def update_sc_nodes_graph(self, winning_vote):
-        self.SC_cause_graph.update_sc_nodes_graph(winning_vote)
+        self.SC_cause_graph.update_sc_nodes_graph(self.round_state.round_number, winning_vote)

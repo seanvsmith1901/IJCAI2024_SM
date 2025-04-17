@@ -79,8 +79,8 @@ class SCManager:
             for response in responses.values():
                 if response["TYPE"] == "POTENTIAL_SC_VOTE":
                     if response["CLIENT_ID"] not in player_fake_votes or player_fake_votes[response["CLIENT_ID"]] != \
-                            response["POTENTIAL_SC_VOTE"]:
-                        player_fake_votes[response["CLIENT_ID"]] = response["POTENTIAL_SC_VOTE"]
+                            response["POTENTIAL_SC_VOTE"] + 1:
+                        player_fake_votes[response["CLIENT_ID"]] = response["POTENTIAL_SC_VOTE"] + 1 # It's easier to make it one indexed here than later
                 elif response["TYPE"] == "SUBMIT_SC":
                     if response["FINAL_VOTE"] not in player_votes or player_votes[response["FINAL_VOTE"]] != \
                             response["FINAL_VOTE"]:

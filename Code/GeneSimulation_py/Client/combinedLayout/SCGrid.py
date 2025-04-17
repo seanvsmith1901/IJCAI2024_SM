@@ -47,7 +47,7 @@ class SCGrid(QTabWidget):
                 self.grid.addWidget(label, row + 1, col + 2)
 
 
-    def update_grid(self, col_2_vals, utility_mat):
+    def update_grid(self, col_2_vals, utility_mat, round_num):
         self.update_col_2(col_2_vals)
         self.update_utilities(utility_mat)
 

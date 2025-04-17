@@ -18,7 +18,7 @@ class RoundState:
 
     # Stuff for sc
     options = []
-    nodes = []
+    nodes = {}
     utilities = []
 
     def __init__(self, id, num_players, jhg_buttons):

@@ -56,7 +56,7 @@ class ServerListener(QObject):
     def SC_INIT(self, message):
         self.tabs.setCurrentIndex(1)
         self.round_state.options = message["OPTIONS"]
-        self.round_state.nodes = message["NODES"]
+        self.round_state.nodes[self.round_state.round_number] = message["NODES"]
         self.round_state.utilities = message["UTILITIES"]
         self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
 

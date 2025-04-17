@@ -18,6 +18,8 @@ class SCCausesGraph(QWidget):
         self.arrows = {}
         self.nodes_type = []
         self.nodes_text = []
+        self.nodes_x = []
+        self.nodes_y = []
         self.round_state = None
 
         layout = QVBoxLayout()
@@ -46,30 +48,18 @@ class SCCausesGraph(QWidget):
         self.nodes_ax.cla()
     
     
-    def update_sc_nodes_graph(self, winning_vote=None):
-        # Clear axes before plotting
+    def update_sc_nodes_graph(self, round_num, winning_vote=None):
+        print("Winning vote", winning_vote)
+        # Clear graph
         self.nodes_ax.cla()
-
-        if winning_vote != None:
-            if winning_vote == -1:
-                print("NO ONE WON! NO RED.")
-            else:
-                print("WE HAVE A WINNING VOTE! ITS ", winning_vote)
-                winning_vote += 1
-        else:
-            self.arrows.clear()
-
-        # Instead of clearing the axes, let's just update the elements
-        for arrow in self.arrows:
-            arrow.draw(self.nodes_ax)  # Redraw the arrows if there are any. If there is a winning vote, we erase them.
-
-        self.nodes_x = []
-        self.nodes_y = []
-        self.nodes_type = []
-        self.nodes_text = []
+        self.arrows.clear()
+        self.nodes_x.clear()
+        self.nodes_y.clear()
+        self.nodes_type.clear()
+        self.nodes_text.clear()
 
         # Update node data
-        for node in self.round_state.nodes:
+        for node in self.round_state.nodes[round_num]:
             mini_dict = {"x_pos": float(node["x_pos"]), "y_pos": float(node["y_pos"])}
             self.nodes_dict[node["text"]] = mini_dict
             self.nodes_x.append(float(node["x_pos"]))
@@ -80,6 +70,9 @@ class SCCausesGraph(QWidget):
         colors = []
 
         # Update or add annotations to the axes
+        if winning_vote:
+            winning_vote += 1
+
         for i, (x_val, y_val) in enumerate(zip(self.nodes_x, self.nodes_y)):
             text = self.nodes_text[i]
             if text.startswith("Player"):
@@ -108,14 +101,35 @@ class SCCausesGraph(QWidget):
                     fontsize=9,
                     color=color,
                     weight='bold',
+                    zorder=587,
                 )
 
             colors.append(color)
 
+        self.nodes_ax.text(
+            0.98, 0.98,  # near top-right corner
+            f"Round {round_num}",
+            transform=self.nodes_ax.transAxes,
+            ha='right',
+            va='top',
+            fontsize=10,
+            color='white',
+            weight='bold',
+            zorder=10,
+        )
+
         self.nodes_ax.scatter(self.nodes_x, self.nodes_y, marker='o', c=colors)
+
+        max_x = max(abs(x) for x in self.nodes_x)
+        max_y = max(abs(y) for y in self.nodes_y)
+        max_range = max(max_x, max_y) + 1  # Add some padding if you like
+
+        self.nodes_ax.set_xlim(-max_range, max_range)
+        self.nodes_ax.set_ylim(-max_range, max_range)
 
         self.nodes_ax.set_aspect('equal', adjustable='box')
 
+        # Redraw the canvas
         self.nodes_canvas.draw()
 
     def update_arrows(self, potential_votes):
@@ -130,7 +144,7 @@ class SCCausesGraph(QWidget):
                     player_name = "Player " + str(int(key) + 1)
                     start_x = self.nodes_dict[player_name]["x_pos"]
                     start_y = self.nodes_dict[player_name]["y_pos"]
-                    cause_name = "Cause " + str(int(potential_votes[key]) + 1)
+                    cause_name = "Cause " + str(int(potential_votes[key]))
                     end_x = self.nodes_dict[cause_name]["x_pos"]
                     end_y = self.nodes_dict[cause_name]["y_pos"]
 
@@ -141,3 +155,8 @@ class SCCausesGraph(QWidget):
                 arrow.draw(self.nodes_ax)
 
             self.nodes_canvas.draw()
+
+    def draw_causes_graph(self, votes, utilities, winning_vote, round_num):
+        self.update_sc_nodes_graph(round_num, winning_vote)
+        vote_dict = {str(i) : votes[i] for i in range(len(votes))}
+        self.update_arrows(vote_dict)

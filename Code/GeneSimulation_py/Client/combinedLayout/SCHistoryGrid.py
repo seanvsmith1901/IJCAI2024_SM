@@ -1,11 +1,13 @@
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QComboBox
 
 from .SCGrid import SCGrid
+from .ui_functions.SC_functions import get_winning_vote
 
 
 class SCHistoryGrid(SCGrid):
-    def __init__(self, num_players, player_id, col_2_header_text):
+    def __init__(self, num_players, player_id, col_2_header_text, causes_graph):
         self.sc_history = {}
+        self.causes_graph = causes_graph
         col_2_vals = [0 for _ in range(num_players)]
         utility_mat = [[0 for _ in range(3)] for _ in range(num_players)]
         super().__init__(num_players, player_id, col_2_header_text, col_2_vals, utility_mat)
@@ -22,7 +24,7 @@ class SCHistoryGrid(SCGrid):
     def change_round(self, index):
         round_key = str(index + 1)
         if round_key in self.sc_history:
-            self.update_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"])
+            self.update_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"], round_key)
 
 
     def update_sc_history(self, round, votes, utilities):
@@ -33,22 +35,10 @@ class SCHistoryGrid(SCGrid):
         self.round_drop_down.setCurrentIndex(round - 1)
 
 
-    def update_grid(self, votes, utilities):
-        super().update_grid(votes, utilities)
+    def update_grid(self, votes, utilities, round_num):
+        super().update_grid(votes, utilities, round_num)
+        winning_vote = get_winning_vote(votes)
 
-        # Find the winning vote, if it exists
-        vote_counts = {"1": 0, "2": 0, "3": 0}
-        for vote in votes:
-            if vote != -1:
-                vote_counts[str(vote)] += 1
-        winning_vote = int(max(vote_counts, key=vote_counts.get))
-
-        # Ensures that the most popular vote has a majority (> 50%)
-        if vote_counts[str(winning_vote)] <= len(votes) // 2:
-            winning_vote = 0
-
-        # if winning_vote != 0:
-        winning_vote -= 1 # Winning vote is one indexed, so it needs to be converted to 0 index
         # Loop through the labels for each player
         for row_idx, row in enumerate(self.cause_utility_labels):
             # Access each label in the row
@@ -69,3 +59,6 @@ class SCHistoryGrid(SCGrid):
             if winning_vote != -1:
                 if i - 2 == winning_vote: # There are two columns before the utility labels start, so you need to subtract 2
                     label.setStyleSheet("color: green;")
+
+        # Draw the graph for the selected round
+        self.causes_graph.draw_causes_graph(votes, utilities, winning_vote, int(round_num))
