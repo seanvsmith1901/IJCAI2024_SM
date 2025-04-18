@@ -45,6 +45,22 @@ def update_sc_utilities_labels(main_window, new_utilities, winning_vote, last_ro
         main_window.SC_voting_grid.update_col_2(new_utilities)
 
 
+def tab_changed(main_window, index):
+    current_tab = main_window.SC_panel.widget(index)
+    cause_graph = main_window.SC_cause_graph
+
+    if current_tab == main_window.SC_voting_grid:
+        cause_graph.update_sc_nodes_graph(main_window.round_state.round_number)
+        cause_graph.update_arrows(main_window.round_state.current_potential_votes)
+    elif current_tab == main_window.sc_history_grid and main_window.sc_history_grid.sc_history:
+        sc_history_tab = main_window.sc_history_grid
+        selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
+        votes = sc_history_tab.sc_history[str(selected_round)]["votes"]
+        winning_vote = get_winning_vote(votes)
+
+        cause_graph.update_sc_nodes_graph(selected_round, winning_vote)
+
+
 def sc_vote(main_window, vote):
     main_window.current_vote = vote
     main_window.connection_manager.send_message("POTENTIAL_SC_VOTE", main_window.round_state.client_id, vote)
