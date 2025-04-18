@@ -33,7 +33,7 @@ class SCGrid(QTabWidget):
         # Add the Player numbers to identify each row
         for row, label in enumerate(self.player_labels):
             if row == self.id:
-                label.setText(f"{row + 1} (you)")
+                label.setText(f"You ({row + 1})")
             label.setStyleSheet("color: " + COLORS[row])
             self.grid.addWidget(label, row + 1, 0)
 

@@ -13,14 +13,11 @@ class JhgVotingPanel(QVBoxLayout):
         while round_state.client_id == -1: # tripping over its own shoelaces.
             pass
         # footer
-        footer = QHBoxLayout()
         # Needs to go through the SubmitButton class so that the signal and socket works correctly
         submitButton = SubmitButton()
         jhg_buttons.append(submitButton)
         submitButton.clicked.connect(lambda: submitButton.submit(round_state, connection_manager))
-        # footer.addWidget(submitButton)
         token_counter.setText(f"Tokens: {round_state.tokens}")
-        # footer.addWidget(token_counter)
 
         # Each of the following blocks of code creates a column to display a particular type of data per player.
         # Each column loops through the players and adds the respective element from the associated player class.
@@ -43,6 +40,8 @@ class JhgVotingPanel(QVBoxLayout):
             # If the current player is the client, then simply place a QLabel labeling it in the allocations_row
             allocations_row = QGridLayout()
             if i == int(round_state.client_id):
+                round_state.players[i].id_label.setText(f"You ({i + 1})")
+
                 player_panel.addWidget(round_state.players[i].kept_text_label, i + 1, 3)
                 player_panel.addWidget(round_state.players[i].kept_number_label, i + 1, 4)
             else:
