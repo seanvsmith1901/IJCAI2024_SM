@@ -59,6 +59,7 @@ def tab_changed(main_window, index):
         winning_vote = get_winning_vote(votes)
 
         cause_graph.update_sc_nodes_graph(selected_round, winning_vote)
+        cause_graph.update_arrows(votes)
 
 
 def sc_vote(main_window, vote):

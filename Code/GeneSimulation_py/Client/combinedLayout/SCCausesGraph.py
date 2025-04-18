@@ -141,7 +141,7 @@ class SCCausesGraph(QWidget):
 
             self.arrows = []  # clean the arrows array.
             for key in potential_votes:
-                if int(potential_votes[key]) != -1:
+                if int(potential_votes[key]) > 0:
                     player_name = "Player " + str(int(key) + 1)
                     start_x = self.nodes_dict[player_name]["x_pos"]
                     start_y = self.nodes_dict[player_name]["y_pos"]
