@@ -37,7 +37,7 @@ class SCVotingGrid(SCGrid):
 
         # self.grid.addWidget(submit_button, num_players + 2, 0)
 
-        self.vote_buttons = [QPushButton("Vote") for _ in range(NUM_CAUSES)]
+        self.vote_buttons = [QPushButton(f"Cause {i + 1}") for i in range(NUM_CAUSES)]
         for col in range(NUM_CAUSES):
             button = self.vote_buttons[col]
             button.setMinimumWidth(70)

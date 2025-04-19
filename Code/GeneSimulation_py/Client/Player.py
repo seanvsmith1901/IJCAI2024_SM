@@ -61,7 +61,7 @@ class Player:
         self.received_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.kept_text_label = QLabel("Tokens kept:")
-        self.kept_number_label = QLabel()
+        self.kept_number_label = QLabel("0")
         self.minus_button = MinusButton()
         self.plus_button = PlusButton()
         self.allocation_box = QLabel("0")
