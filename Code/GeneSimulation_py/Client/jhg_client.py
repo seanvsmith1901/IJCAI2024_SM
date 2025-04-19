@@ -9,27 +9,7 @@ sys.path.append(os.path.dirname(__file__))
 from PyQt6.QtWidgets import QApplication
 
 from ClientConnectionManager import ClientConnectionManager
-# from combinedLayout.MainWindow import MainWindow
-from combinedLayout.redesign import MainWindow
-
-from PyQt6.QtCore import qInstallMessageHandler, QtMsgType
-
-# Trying to track down where the QPainter error is coming from
-def qt_message_handler(mode, context, message):
-    if 'QBackingStore::endPaint() called with active painter' in message:
-        print("⚠️ QBackingStore paint error detected!")
-        print("📍 Python stack at the time:")
-        traceback.print_stack()
-
-
-_real_begin = QPainter.begin
-
-def debug_begin(self, *args, **kwargs):
-    print("🎨 QPainter.begin called with:", args[0] if args else "Unknown")
-    traceback.print_stack()
-    return _real_begin(self, *args, **kwargs)
-
-QPainter.begin = debug_begin
+from combinedLayout.MainWindow import MainWindow
 
 
 def load_stylesheet(path):
@@ -38,7 +18,6 @@ def load_stylesheet(path):
 
 
 if __name__ == "__main__":
-    qInstallMessageHandler(qt_message_handler)
     # Create a QApplication first
     app = QApplication(sys.argv)
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
