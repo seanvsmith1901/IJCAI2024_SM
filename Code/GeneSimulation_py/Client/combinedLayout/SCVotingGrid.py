@@ -10,7 +10,7 @@ NUM_CAUSES = 3
 
 class SCVotingGrid(SCGrid):
     def __init__(self, num_players, player_id, graphs_layout, main_window):
-        from ui_functions.SC_functions import sc_vote, sc_submit
+        from ui_functions.SC_functions import sc_vote
 
         col_2_vals = [0 for _ in range(num_players)]
         utility_mat = [[0 for _ in range(NUM_CAUSES)] for _ in range(num_players)]
@@ -26,7 +26,8 @@ class SCVotingGrid(SCGrid):
         # Set up the submit button
         submit_button = QPushButton("Submit Vote")
         submit_button.setEnabled(False)
-        submit_button.clicked.connect(partial(sc_submit, main_window, self))
+        submit_button.clicked.connect(partial(self.submit_clicked, main_window, submit_button))
+        submit_button.setObjectName("SCSubmitButton")
 
         # Add the submit and clear buttons to a layout and set that as the header
         self.header = QHBoxLayout()
@@ -76,3 +77,9 @@ class SCVotingGrid(SCGrid):
 
         if button is None:
             self.clear_button.setEnabled(False)
+
+    def submit_clicked(self, main_window, submit_button):
+        from ui_functions.SC_functions import sc_submit
+        sc_submit(main_window, self)
+
+        submit_button.setText(f"Resubmit Vote")

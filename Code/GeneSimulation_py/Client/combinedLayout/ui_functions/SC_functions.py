@@ -75,6 +75,8 @@ def sc_submit(main_window, voting_grid):
 def disable_sc_buttons(main_window):
     for button in main_window.SC_voting_grid.buttons:
         button.setEnabled(False)
+        if button.objectName() == "SCSubmitButton":
+            button.setText("Submit Vote")
     main_window.current_vote = -1
 
 

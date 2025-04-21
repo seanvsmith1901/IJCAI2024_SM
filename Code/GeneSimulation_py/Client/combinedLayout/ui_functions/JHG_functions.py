@@ -50,6 +50,8 @@ def enable_jhg_buttons(main_window):
     main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
     main_window.SC_panel.setStyleSheet("#SC_Panel { border: none; }")
     for button in main_window.jhg_buttons:
+        if button.objectName() == "JHGSubmitButton":
+            button.setText("Submit")
         button.setEnabled(True)
 
     main_window.setWindowTitle(f"JHG: Round {main_window.round_state.jhg_round_num + 1}")

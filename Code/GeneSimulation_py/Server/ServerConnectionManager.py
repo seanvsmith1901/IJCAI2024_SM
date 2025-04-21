@@ -72,12 +72,15 @@ class ServerConnectionManager(ConnectionManager):
         # Keep listening until all clients have responded
         while num_received < self.num_clients:
             data = self.read_responses() # Gets all the responses that have been sent thus far
-            num_received += len(data)
+
 
             # Creates a response and appends it to responses for each received response
             for client, received_json in data.items():
                 message_type = received_json["TYPE"]
                 client_id = received_json["CLIENT_ID"]
+
+                if client_id not in responses:
+                    num_received += 1
 
                 response = {"TYPE": message_type, "CLIENT_ID": client_id}
                 for name in self.received_message_type_names[message_type]:
