@@ -151,7 +151,7 @@ class MainWindow(QMainWindow):
         update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)
 
     def update_sc_nodes_graph(self, winning_vote):
-        self.SC_cause_graph.update_sc_nodes_graph(self.round_state.round_number, winning_vote)
+        self.SC_cause_graph.update_sc_nodes_graph(self.round_state.sc_round_num, winning_vote)
 
     def SC_tab_changed(self, index):
         tab_changed(self, index)

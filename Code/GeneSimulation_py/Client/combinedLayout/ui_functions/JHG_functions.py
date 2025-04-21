@@ -32,9 +32,9 @@ def update_jhg_popularity_graph(round_state, jhg_popularity_graph):
             max_popularity = max(round_state.players[i].popularity_over_time)
 
     view_box = jhg_popularity_graph.getViewBox()
-    view_box.setLimits(xMin=0, xMax = round_state.round_number + 1, yMin=0, yMax=max_popularity + 10)
+    view_box.setLimits(xMin=0, xMax =round_state.jhg_round_num + 1, yMin=0, yMax=max_popularity + 10)
 
-    jhg_popularity_graph.setXRange(0, round_state.round_number + 1, padding=0)
+    jhg_popularity_graph.setXRange(0, round_state.jhg_round_num + 1, padding=0)
     jhg_popularity_graph.setYRange(0, max_popularity + 10, padding=0)
 
 
@@ -52,4 +52,4 @@ def enable_jhg_buttons(main_window):
     for button in main_window.jhg_buttons:
         button.setEnabled(True)
 
-    main_window.setWindowTitle(f"JHG: Round {main_window.round_state.round_number + 1}")
+    main_window.setWindowTitle(f"JHG: Round {main_window.round_state.jhg_round_num + 1}")

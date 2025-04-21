@@ -55,8 +55,9 @@ class ServerListener(QObject):
 
     def SC_INIT(self, message):
         self.tabs.setCurrentIndex(1)
+        self.round_state.sc_round_num += 1
         self.round_state.options = message["OPTIONS"]
-        self.round_state.nodes[self.round_state.round_number] = message["NODES"]
+        self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities = message["UTILITIES"]
         self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
 
@@ -71,8 +72,8 @@ class ServerListener(QObject):
 
     def SC_OVER(self, message):
         # This is the only time that the user won't switch the tab to see a round it the history tab, so it needs a little manual help.
-        if self.round_state.round_number == 1:
-            self.main_window.sc_history_grid.update_grid(message["VOTES"], message["UTILITIES"], self.round_state.round_number)
+        if self.round_state.jhg_round_num == 1:
+            self.main_window.sc_history_grid.update_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num)
 
         self.disable_sc_buttons_signal.emit()
         new_utilities = message["NEW_UTILITIES"]
@@ -97,12 +98,12 @@ class ServerListener(QObject):
 
         self.round_state.received = json_data["RECEIVED"]
         self.round_state.sent = json_data["SENT"]
-        self.round_state.round_number = json_data["ROUND"]
+        self.round_state.jhg_round_num = json_data["ROUND"]
         self.round_state.tokens = self.round_state.num_players * 2
         self.round_state.current_popularities = json_data["POPULARITY"]
         self.jhg_popularity_graph.clear()
 
         self.update_jhg_round_signal.emit()
 
-        self.round_counter.setText(f'Round {self.round_state.round_number + 1}')
+        self.round_counter.setText(f'Round {self.round_state.jhg_round_num + 1}')
         self.token_label.setText(f"Tokens: {self.round_state.tokens}")

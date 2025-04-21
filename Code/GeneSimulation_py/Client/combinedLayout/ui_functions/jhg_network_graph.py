@@ -4,7 +4,7 @@ from ..colors import COLORS
 import pyqtgraph as pg
 
 def update_jhg_network_graph(main_window):
-    if main_window.round_state.round_number == 0:
+    if main_window.round_state.jhg_round_num == 0:
         current_popularity = np.full((main_window.round_state.num_players, main_window.round_state.num_players), 100)
     else:
         current_popularity = np.array(main_window.round_state.current_popularities)

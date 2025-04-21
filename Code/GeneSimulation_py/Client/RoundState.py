@@ -6,7 +6,8 @@ from Player import Player
 class RoundState:
     players = []
     client_id = -1 # look at JHG panel for debugging stuff.
-    round_number = 0
+    jhg_round_num = 0
+    sc_round_num = 0
 
     # Stuff for jhg
     tokens = 0 # Number of tokens remaining for the current round

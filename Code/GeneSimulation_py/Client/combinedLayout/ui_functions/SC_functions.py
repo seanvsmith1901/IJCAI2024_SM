@@ -28,7 +28,7 @@ def SC_round_init(main_window):
     main_window.SC_panel.setStyleSheet("#SC_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
     main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: none; }")
     main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities)
-    main_window.SC_cause_graph.update_sc_nodes_graph(main_window.round_state.round_number)
+    main_window.SC_cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
 
     # Enable the SC buttons
     for button in main_window.SC_voting_grid.buttons:
@@ -38,8 +38,8 @@ def SC_round_init(main_window):
 
 def update_sc_utilities_labels(main_window, new_utilities, winning_vote, last_round_votes, last_round_utilities):
     history_grid = main_window.sc_history_grid
-    history_grid.update_sc_history(main_window.round_state.round_number, last_round_votes, last_round_utilities)
-    history_grid.change_round(main_window.round_state.round_number)
+    history_grid.update_sc_history(main_window.round_state.sc_round_num, last_round_votes, last_round_utilities)
+    history_grid.change_round(main_window.round_state.sc_round_num)
 
     if winning_vote != -1:
         main_window.SC_voting_grid.update_col_2(new_utilities)
@@ -50,7 +50,7 @@ def tab_changed(main_window, index):
     cause_graph = main_window.SC_cause_graph
 
     if current_tab == main_window.SC_voting_grid:
-        cause_graph.update_sc_nodes_graph(main_window.round_state.round_number)
+        cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
         cause_graph.update_arrows(main_window.round_state.current_potential_votes)
     elif current_tab == main_window.sc_history_grid and main_window.sc_history_grid.sc_history:
         sc_history_tab = main_window.sc_history_grid

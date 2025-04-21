@@ -39,11 +39,11 @@ class SCHistoryGrid(SCGrid):
         super().update_grid(votes, utilities, round_num)
         winning_vote = get_winning_vote(votes)
 
-        # Loop through the labels for each player
+        # Color the labels for each player coinciding with the winning vote. Green if that cause has positive utility
+        # for that player, red if it has negative utility for the player, and white if it is zero. Also resets the labels
+        # for every other cause to white
         for row_idx, row in enumerate(self.cause_utility_labels):
-            # Access each label in the row
             for cause_idx, label in enumerate(row):
-                # If this label coincides with the winning vote, color it based off of the utility for the current player
                 if cause_idx == winning_vote:
                     if utilities[row_idx][winning_vote] > 0:
                         label.setStyleSheet("color: green;")
