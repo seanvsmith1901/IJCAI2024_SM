@@ -162,7 +162,6 @@ class Social_Choice_Sim:
 
 
     def create_player_nodes(self):
-        # normalized_current_options_matrix = self.normalize_current_options_matrix()
         normalized_current_options_matrix = self.current_options_matrix
 
         player_nodes = []
@@ -278,7 +277,6 @@ class Social_Choice_Sim:
         # options may change, but the causes themselves don't, so we can generate them in init functionality.
         self.current_options_matrix = self.create_options_matrix(groups)
         self.player_nodes = self.create_player_nodes()
-        # YOU ARE GOING TO NEED TO GET THE BOT VOTES FROM THE JHG OBJECT - WE USE THOSE BOTS AGAIN.
 
 
     # takes in the influence matrix, and then spits out the 3 strongest calculated relations for every player.
