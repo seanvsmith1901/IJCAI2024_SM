@@ -23,23 +23,19 @@ def create_sc_ui_elements(main_window):
     main_window.SC_panel.addTab(main_window.SC_voting_grid, "Current Round")
 
 
+# Triggered by SC_INIT
 def SC_round_init(main_window):
     # Update sc ui elements
-    main_window.SC_panel.setStyleSheet("#SC_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
-    main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: none; }")
     main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities)
     main_window.SC_cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
 
-    # Enable the SC buttons
-    for button in main_window.SC_voting_grid.buttons:
-        if button.objectName() != "clear_button":
-            button.setEnabled(True)
 
-
-def update_sc_utilities_labels(main_window, new_utilities, winning_vote, last_round_votes, last_round_utilities):
+# Triggered by SC_OVER
+def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
     history_grid = main_window.sc_history_grid
-    history_grid.update_sc_history(main_window.round_state.sc_round_num, last_round_votes, last_round_utilities)
-    history_grid.change_round(main_window.round_state.sc_round_num)
+    print("update_sc_utilities_labels ", round_num)
+    history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities)
+    history_grid.change_round(round_num)
 
     if winning_vote != -1:
         main_window.SC_voting_grid.update_col_2(new_utilities)

@@ -20,12 +20,12 @@ class ServerConnectionManager(ConnectionManager):
         self.clients = {}
 
         self.message_type_names = {
-            "SC_INIT": ["OPTIONS", "NODES", "UTILITIES"],
+            "SC_INIT": ["ROUND_NUM", "OPTIONS", "NODES", "UTILITIES"],
             "SETUP": ["CLIENT_ID", "NUM_PLAYERS"],
             "JHG": ["CURRENT_VOTES"],
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "RECEIVED", "SENT"],
             "SC_VOTES": ["POTENTIAL_VOTES"],
-            "SC_OVER": ["WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
+            "SC_OVER": ["ROUND_NUM", "WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
                         "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES"],
         }
 

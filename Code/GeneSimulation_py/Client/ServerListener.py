@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 
 import numpy as np
@@ -12,7 +13,7 @@ class ServerListener(QObject):
     enable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal()
     update_potential_sc_votes_signal = pyqtSignal(dict)
-    update_sc_utilities_labels_signal = pyqtSignal(dict, int, list, list)
+    update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, list, list)
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
     update_sc_nodes_graph_signal = pyqtSignal(int)
 
@@ -52,17 +53,18 @@ class ServerListener(QObject):
         self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
         self.tabs.setCurrentIndex(0)
         self.update_jhg_state(message)
+        self.jhg_over_signal.emit()
 
 
     def SC_INIT(self, message):
         self.tabs.setCurrentIndex(1)
-        self.round_state.sc_round_num += 1
+        print("SC INIT ", message["ROUND_NUM"])
+        self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities = message["UTILITIES"]
 
         self.update_sc_round_signal.emit()
-        self.jhg_over_signal.emit()
 
 
     def SC_VOTES(self, message):
@@ -78,7 +80,7 @@ class ServerListener(QObject):
         self.disable_sc_buttons_signal.emit()
         new_utilities = message["NEW_UTILITIES"]
 
-        self.update_sc_utilities_labels_signal.emit(new_utilities, message["WINNING_VOTE"], message["VOTES"], message["UTILITIES"])
+        self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, message["WINNING_VOTE"], message["VOTES"], message["UTILITIES"])
 
         self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"],
                                               message["NEGATIVE_VOTE_EFFECTS"])

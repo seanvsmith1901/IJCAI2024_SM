@@ -45,6 +45,14 @@ def jhg_over(main_window):
 
     update_jhg_network_graph(main_window)
 
+    # Enable the SC buttons
+    for button in main_window.SC_voting_grid.buttons:
+        if button.objectName() != "clear_button":
+            button.setEnabled(True)
+
+    main_window.SC_panel.setStyleSheet("#SC_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
+    main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: none; }")
+
 
 def enable_jhg_buttons(main_window):
     main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")

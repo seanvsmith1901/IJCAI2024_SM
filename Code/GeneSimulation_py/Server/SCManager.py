@@ -1,3 +1,4 @@
+import time
 from collections import Counter
 
 from social_choice_sim import Social_Choice_Sim
@@ -11,7 +12,7 @@ def create_empty_vote_matrix(num_players):
 class SCManager:
     def __init__(self, connection_manager, num_humans, num_players, num_bots, sc_group_option):
         self.connection_manager = connection_manager
-        self.round_num = 0
+        self.round_num = 1
         self.save_dict = {}
         self.big_dict = {}
         self.utilities = {i: 0 for i in range(num_humans)}
@@ -38,11 +39,12 @@ class SCManager:
         self.causes = self.sc_sim.get_causes()
         self.all_nodes = self.causes + self.player_nodes
 
-        self.connection_manager.distribute_message("SC_INIT", self.current_options_matrix,
+        print(self.round_num)
+        self.connection_manager.distribute_message("SC_INIT", self.round_num, self.current_options_matrix,
                                                    [node.to_json() for node in self.all_nodes], self.current_options_matrix)
 
     def play_social_choice_round(self):
-        self.init_next_round()
+        # self.init_next_round()
 
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting()
@@ -65,12 +67,15 @@ class SCManager:
             self.sc_sim.apply_vote(winning_vote)
             new_utilities = self.sc_sim.get_player_utility()
 
-        self.connection_manager.distribute_message("SC_OVER", winning_vote, new_utilities, self.positive_vote_effects_history,
+        self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities, self.positive_vote_effects_history,
                                                    self.negative_vote_effects_history, one_idx_votes, self.current_options_matrix)
 
+        time.sleep(.2) # Without this, messages get sent out of order, and the sc_history gets screwed up.
         self.round_num += 1
+        self.init_next_round()
 
 
+    # I don't love this... Definite candidate for a rewrite, or at least some documentation
     def run_sc_voting(self):
         player_votes = {}
         player_fake_votes = {}
