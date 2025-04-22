@@ -10,7 +10,7 @@ def create_empty_vote_matrix(num_players):
 
 
 class SCManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots, sc_group_option):
+    def __init__(self, connection_manager, num_humans, num_players, num_bots, sc_group_option, vote_cycles):
         self.connection_manager = connection_manager
         self.round_num = 1
         self.save_dict = {}
@@ -20,6 +20,7 @@ class SCManager:
         self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots
+        self.vote_cycles = vote_cycles
 
         # Tracking the SC game over time
         self.options_history = {}
@@ -70,7 +71,7 @@ class SCManager:
         self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities, self.positive_vote_effects_history,
                                                    self.negative_vote_effects_history, one_idx_votes, self.current_options_matrix)
 
-        time.sleep(.2) # Without this, messages get sent out of order, and the sc_history gets screwed up.
+        time.sleep(.5) # Without this, messages get sent out of order, and the sc_history gets screwed up.
         self.round_num += 1
         self.init_next_round()
 
@@ -80,18 +81,22 @@ class SCManager:
         player_votes = {}
         player_fake_votes = {}
 
-        while len(player_votes) < self.connection_manager.num_clients:
-            responses = self.connection_manager.get_responses()
-            for response in responses.values():
-                if response["TYPE"] == "POTENTIAL_SC_VOTE":
-                    if response["CLIENT_ID"] not in player_fake_votes or player_fake_votes[response["CLIENT_ID"]] != \
-                            response["POTENTIAL_SC_VOTE"] + 1:
-                        player_fake_votes[response["CLIENT_ID"]] = response["POTENTIAL_SC_VOTE"] + 1 # It's easier to make it one indexed here than later
-                elif response["TYPE"] == "SUBMIT_SC":
-                    if response["FINAL_VOTE"] not in player_votes or player_votes[response["FINAL_VOTE"]] != \
-                            response["FINAL_VOTE"]:
-                        player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+        for cycle in range(self.vote_cycles):
+            player_votes.clear()
+            player_fake_votes.clear()
+            while len(player_votes) < self.connection_manager.num_clients:
+                responses = self.connection_manager.get_responses()
+                for response in responses.values():
+                    if response["TYPE"] == "POTENTIAL_SC_VOTE":
+                        if response["CLIENT_ID"] not in player_fake_votes or player_fake_votes[response["CLIENT_ID"]] != \
+                                response["POTENTIAL_SC_VOTE"] + 1:
+                            player_fake_votes[response["CLIENT_ID"]] = response["POTENTIAL_SC_VOTE"] + 1 # It's easier to make it one indexed here than later
+                    elif response["TYPE"] == "SUBMIT_SC":
+                        if response["FINAL_VOTE"] not in player_votes or player_votes[response["FINAL_VOTE"]] != \
+                                response["FINAL_VOTE"]:
+                            player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
             self.connection_manager.distribute_message("SC_VOTES", player_fake_votes)
+
 
         return player_votes
 

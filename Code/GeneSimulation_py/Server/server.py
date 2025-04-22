@@ -5,11 +5,12 @@ from ServerConnectionManager import ServerConnectionManager
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1,
+    "NUM_HUMANS": 2,
     "TOTAL_PLAYERS": 5,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
     "MAX_ROUNDS": 1000,
-    "SC_GROUP_OPTION": 2 # See options_creation.py -> group_size_options to understand what this means
+    "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means
+    "SC_VOTE_CYCLES": 3
 }
 OPTIONS["NUM_BOTS"] =  OPTIONS["TOTAL_PLAYERS"] - OPTIONS["NUM_HUMANS"]
 
@@ -23,13 +24,14 @@ class Server():
         self.sc_group_option = options["SC_GROUP_OPTION"]
         self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
         self.max_rounds = options["MAX_ROUNDS"]
+        self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
 
 
     def start_server(self, host='127.0.0.1', port=12345):
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
-                                    self.sc_group_option)
+                                    self.sc_group_option, self.sc_vote_cycles)
         print("Server started")
 
         # Halts execution until enough players have joined
