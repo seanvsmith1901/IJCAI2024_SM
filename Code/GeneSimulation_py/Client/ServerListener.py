@@ -49,6 +49,7 @@ class ServerListener(QObject):
 
 
     def JHG_OVER(self, message):
+        self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
         self.tabs.setCurrentIndex(0)
         self.update_jhg_state(message)
 
@@ -59,7 +60,6 @@ class ServerListener(QObject):
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities = message["UTILITIES"]
-        self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
 
         self.update_sc_round_signal.emit()
         self.jhg_over_signal.emit()

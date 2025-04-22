@@ -19,7 +19,7 @@ class JHGManager:
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
         unique_messages = [received_dict, sent_dict]
         self.connection_manager.distribute_message("JHG_OVER", round_num, list(current_popularity),
-                                                   unique_messages=unique_messages)
+                                                   self.jhg_sim.get_influence().tolist(), unique_messages=unique_messages)
 
         self.current_round += 1
 

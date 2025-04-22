@@ -29,24 +29,25 @@ class SCManager:
         self.positive_vote_effects_history = create_empty_vote_matrix(num_players)
         self.negative_vote_effects_history = create_empty_vote_matrix(num_players)
 
-
-    def play_social_choice_round(self, new_influence):
+    def init_next_round(self):
         # Initialize the round
         self.sc_sim.start_round(self.sc_groups)
-        current_options_matrix = self.sc_sim.get_current_options_matrix()
-        self.options_history[self.round_num] = current_options_matrix
-        player_nodes = self.sc_sim.get_player_nodes()
-        causes = self.sc_sim.get_causes()
-        all_nodes = causes + player_nodes
+        self.current_options_matrix = self.sc_sim.get_current_options_matrix()
+        self.options_history[self.round_num] = self.current_options_matrix
+        self.player_nodes = self.sc_sim.get_player_nodes()
+        self.causes = self.sc_sim.get_causes()
+        self.all_nodes = self.causes + self.player_nodes
 
-        self.connection_manager.distribute_message("SC_INIT", current_options_matrix,
-                                                   [node.to_json() for node in all_nodes], current_options_matrix,
-                                                   new_influence)
+        self.connection_manager.distribute_message("SC_INIT", self.current_options_matrix,
+                                                   [node.to_json() for node in self.all_nodes], self.current_options_matrix)
+
+    def play_social_choice_round(self):
+        self.init_next_round()
 
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting()
-        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, current_options_matrix, self.round_num)
-        self.update_vote_effects(zero_idx_votes, current_options_matrix,
+        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.current_options_matrix, self.round_num)
+        self.update_vote_effects(zero_idx_votes, self.current_options_matrix,
                                  self.round_num)  # Tracks the effects of each player's vote on everyone else
 
         # Calculate the winning vote
@@ -65,7 +66,7 @@ class SCManager:
             new_utilities = self.sc_sim.get_player_utility()
 
         self.connection_manager.distribute_message("SC_OVER", winning_vote, new_utilities, self.positive_vote_effects_history,
-                                                   self.negative_vote_effects_history, one_idx_votes, current_options_matrix)
+                                                   self.negative_vote_effects_history, one_idx_votes, self.current_options_matrix)
 
         self.round_num += 1
 
