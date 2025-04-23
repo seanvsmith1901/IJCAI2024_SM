@@ -141,8 +141,10 @@ class MainWindow(QMainWindow):
         self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
 
-    def update_potential_sc_votes(self, potential_votes):
+    def update_potential_sc_votes(self, potential_votes, is_last_cycle):
         self.SC_cause_graph.update_arrows(potential_votes)
+
+        if not is_last_cycle: self.SC_voting_grid.submit_button.setText("Submit")
 
     def update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
         print("Main ", self.round_state.sc_round_num)

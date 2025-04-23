@@ -24,7 +24,7 @@ class ServerConnectionManager(ConnectionManager):
             "SETUP": ["CLIENT_ID", "NUM_PLAYERS"],
             "JHG": ["CURRENT_VOTES"],
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "RECEIVED", "SENT"],
-            "SC_VOTES": ["POTENTIAL_VOTES"],
+            "SC_VOTES": ["POTENTIAL_VOTES", "IS_LAST_CYCLE"],
             "SC_OVER": ["ROUND_NUM", "WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
                         "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES"],
         }

@@ -80,6 +80,7 @@ class SCManager:
     def run_sc_voting(self):
         player_votes = {}
         player_fake_votes = {}
+        is_last_cycle = False
 
         for cycle in range(self.vote_cycles):
             player_votes.clear()
@@ -95,7 +96,9 @@ class SCManager:
                         if response["FINAL_VOTE"] not in player_votes or player_votes[response["FINAL_VOTE"]] != \
                                 response["FINAL_VOTE"]:
                             player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
-            self.connection_manager.distribute_message("SC_VOTES", player_fake_votes)
+
+            if cycle == self.vote_cycles - 1: is_last_cycle = True
+            self.connection_manager.distribute_message("SC_VOTES", player_fake_votes, is_last_cycle)
 
 
         return player_votes

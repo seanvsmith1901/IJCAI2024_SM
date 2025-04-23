@@ -24,19 +24,17 @@ class SCVotingGrid(SCGrid):
         self.clear_button.clicked.connect(partial(self.select_button, None))
 
         # Set up the submit button
-        submit_button = QPushButton("Submit Vote")
-        submit_button.setEnabled(False)
-        submit_button.clicked.connect(partial(self.submit_clicked, main_window, submit_button))
-        submit_button.setObjectName("SCSubmitButton")
+        self.submit_button = QPushButton("Submit Vote")
+        self.submit_button.setEnabled(False)
+        self.submit_button.clicked.connect(partial(self.submit_clicked, main_window, self.submit_button))
+        self.submit_button.setObjectName("SCSubmitButton")
 
         # Add the submit and clear buttons to a layout and set that as the header
         self.header = QHBoxLayout()
-        self.header.addWidget(submit_button)
+        self.header.addWidget(self.submit_button)
         self.header.addWidget(self.clear_button)
 
         self.layout.insertLayout(0, self.header)
-
-        # self.grid.addWidget(submit_button, num_players + 2, 0)
 
         self.vote_buttons = [QPushButton(f"Cause {i + 1}") for i in range(NUM_CAUSES)]
         for col in range(NUM_CAUSES):
@@ -59,7 +57,7 @@ class SCVotingGrid(SCGrid):
             button.clicked.connect(partial(self.select_button, button))
 
         self.buttons = self.vote_buttons
-        self.buttons.append(submit_button)
+        self.buttons.append(self.submit_button)
         self.buttons.append(self.clear_button)
 
     # If None is passed as button, it will clear the vote (used for teh clear vote button and to reset after the round)
