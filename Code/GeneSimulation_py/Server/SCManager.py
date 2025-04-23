@@ -41,7 +41,8 @@ class SCManager:
         self.all_nodes = self.causes + self.player_nodes
 
         self.connection_manager.distribute_message("SC_INIT", self.round_num, self.current_options_matrix,
-                                                   [node.to_json() for node in self.all_nodes], self.current_options_matrix)
+                                                   [node.to_json() for node in self.all_nodes],
+                                                   self.current_options_matrix)
 
     def play_social_choice_round(self):
         # self.init_next_round()
@@ -67,15 +68,15 @@ class SCManager:
             self.sc_sim.apply_vote(winning_vote)
             new_utilities = self.sc_sim.get_player_utility()
 
-        self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities, self.positive_vote_effects_history,
-                                                   self.negative_vote_effects_history, one_idx_votes, self.current_options_matrix)
+        self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities,
+                                                   self.positive_vote_effects_history,
+                                                   self.negative_vote_effects_history, zero_idx_votes,
+                                                   self.current_options_matrix)
 
-        time.sleep(.5) # Without this, messages get sent out of order, and the sc_history gets screwed up.
+        time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
         self.round_num += 1
         self.init_next_round()
 
-
-    # I don't love this... Definite candidate for a rewrite, or at least some documentation
     def run_sc_voting(self):
         player_votes = {}
         is_last_cycle = False
@@ -88,22 +89,22 @@ class SCManager:
                 for response in responses.values():
                     player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
 
+            zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.current_options_matrix,
+                                                                  self.round_num)
             if cycle == self.vote_cycles - 1: is_last_cycle = True
-            self.connection_manager.distribute_message("SC_VOTES", player_votes, is_last_cycle)
-
+            self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, is_last_cycle)
 
         return player_votes
-
 
     def compile_sc_votes(self, player_votes, current_options_matrix, round_num):
         bot_votes = self.get_bot_votes(current_options_matrix)
 
         all_votes = {**bot_votes, **player_votes}
-        all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in all_votes.values()] # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
+        all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in
+                          all_votes.values()]  # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes
 
         return all_votes, all_votes_list
-
 
     def update_vote_effects(self, all_votes, current_options_matrix, round_num):
         round_vote_effects = create_empty_vote_matrix(self.num_players)
@@ -120,7 +121,6 @@ class SCManager:
                     elif vote_effect < 0:
                         self.negative_vote_effects_history[i][j] += vote_effect
         self.vote_effects_history[str(round_num)] = round_vote_effects
-
 
     def get_bot_votes(self, current_options_matrix):
         bot_options = current_options_matrix[:self.num_bots]

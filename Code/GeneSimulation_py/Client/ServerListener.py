@@ -13,7 +13,7 @@ class ServerListener(QObject):
     enable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal()
     update_sc_votes_signal = pyqtSignal(dict, bool)
-    update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, list, list)
+    update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, dict, list)
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
     update_sc_nodes_graph_signal = pyqtSignal(int)
 
@@ -67,7 +67,7 @@ class ServerListener(QObject):
 
 
     def SC_VOTES(self, message):
-        self.round_state.current_potential_votes = message["VOTES"]
+        self.round_state.current_votes = message["VOTES"]
         self.update_sc_votes_signal.emit(message["VOTES"], message["IS_LAST_CYCLE"])
 
 

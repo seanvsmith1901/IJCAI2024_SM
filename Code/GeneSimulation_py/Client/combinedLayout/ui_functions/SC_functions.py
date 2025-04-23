@@ -46,8 +46,7 @@ def tab_changed(main_window, index):
 
     if current_tab == main_window.SC_voting_grid:
         cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
-        cause_graph.update_arrows(main_window.round_state.current_potential_votes)
-        print(main_window.round_state.current_potential_votes)
+        cause_graph.update_arrows(main_window.round_state.current_votes)
     elif current_tab == main_window.sc_history_grid and main_window.sc_history_grid.sc_history:
         sc_history_tab = main_window.sc_history_grid
         selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
@@ -76,8 +75,8 @@ def disable_sc_buttons(main_window):
 
 
 def get_winning_vote(votes):
-    vote_counts = {"1": 0, "2": 0, "3": 0}
-    for vote in votes:
+    vote_counts = {"0": 0, "1": 0, "2": 0}
+    for vote in votes.values():
         if vote != -1:
             vote_counts[str(vote)] += 1
     winning_vote = int(max(vote_counts, key=vote_counts.get))

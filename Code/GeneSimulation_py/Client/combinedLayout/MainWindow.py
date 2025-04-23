@@ -145,7 +145,7 @@ class MainWindow(QMainWindow):
         if not is_last_cycle: self.SC_voting_grid.submit_button.setText("Submit")
 
     def update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
-        update_sc_utilities_labels(self, self.round_state.sc_round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities)
+        update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities)
 
     def update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects):
         update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)

@@ -133,19 +133,20 @@ class SCCausesGraph(QWidget):
             self.nodes_canvas.draw()
 
 
-    def update_arrows(self, potential_votes):
+    def update_arrows(self, votes):
         # checks for existing arrows, and removes them.
-        if potential_votes:  # only run this if there are actual potential votes.
+        if votes:  # only run this if there are actual potential votes.
             for arrow in self.arrows:  # if there is anything in there.
                 arrow.remove()
 
             self.arrows = []  # clean the arrows array.
-            for key in potential_votes:
-                if int(potential_votes[key]) > 0:
+            for key in votes:
+                vote = votes[key] + 1
+                if vote > 0:
                     player_name = "Player " + str(int(key) + 1)
                     start_x = self.nodes_dict[player_name]["x_pos"]
                     start_y = self.nodes_dict[player_name]["y_pos"]
-                    cause_name = "Cause " + str(int(potential_votes[key]))
+                    cause_name = "Cause " + str(vote)
                     end_x = self.nodes_dict[cause_name]["x_pos"]
                     end_y = self.nodes_dict[cause_name]["y_pos"]
 
@@ -159,5 +160,5 @@ class SCCausesGraph(QWidget):
 
     def draw_causes_graph(self, votes, utilities, winning_vote, round_num):
         self.update_sc_nodes_graph(round_num, winning_vote)
-        vote_dict = {str(i) : votes[i] for i in range(len(votes))}
-        self.update_arrows(vote_dict)
+        # vote_dict = {str(i) : votes[i] for i in range(len(votes))}
+        self.update_arrows(votes)

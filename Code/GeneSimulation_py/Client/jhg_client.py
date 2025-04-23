@@ -1,8 +1,5 @@
 import sys
 import os
-import traceback
-
-from PyQt6.QtGui import QPainter
 
 sys.path.append(os.path.dirname(__file__))
 
@@ -23,7 +20,7 @@ if __name__ == "__main__":
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
     host = '127.0.0.1'  # your local host address
-    port = 12346  # The port number to connect to
+    port = 12345  # The port number to connect to
 
     connection_manager = ClientConnectionManager(host, port)
 
