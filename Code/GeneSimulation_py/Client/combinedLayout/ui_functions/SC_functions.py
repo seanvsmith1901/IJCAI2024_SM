@@ -59,13 +59,14 @@ def tab_changed(main_window, index):
 
 
 def sc_vote(main_window, vote):
-    main_window.current_vote = vote
-    main_window.connection_manager.send_message("POTENTIAL_SC_VOTE", main_window.round_state.client_id, vote)
+    main_window.SC_voting_grid.current_vote = vote
+    # main_window.connection_manager.send_message("POTENTIAL_SC_VOTE", main_window.round_state.client_id, vote)
 
 
 def sc_submit(main_window, voting_grid):
     voting_grid.select_button(None) # Clears the selection from the SC voting buttons
-    main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, main_window.current_vote)
+    print("Final vote: ", main_window.SC_voting_grid.current_vote)
+    main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, main_window.SC_voting_grid.current_vote)
 
 
 def disable_sc_buttons(main_window):
@@ -73,7 +74,7 @@ def disable_sc_buttons(main_window):
         button.setEnabled(False)
         if button.objectName() == "SCSubmitButton":
             button.setText("Submit Vote")
-    main_window.current_vote = -1
+    main_window.SC_voting_grid.current_vote = -1
 
 
 def get_winning_vote(votes):

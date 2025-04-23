@@ -27,7 +27,7 @@ class Server():
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
 
 
-    def start_server(self, host='127.0.0.1', port=12345):
+    def start_server(self, host='127.0.0.1', port=12346):
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,

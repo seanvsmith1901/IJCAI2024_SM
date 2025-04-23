@@ -87,6 +87,7 @@ class ServerConnectionManager(ConnectionManager):
                     response[name] = received_json[name]
 
                 responses[client_id] = response
+                print(response)
 
             # Sometimes you want to continuously send out the responses until everyone has responded. If the
             # continuousDistributionType parameter is not none, it is the name of the message to send.

@@ -41,9 +41,6 @@ class MainWindow(QMainWindow):
     #2# Block two: Creates the elements that will be passed to the server listener for dynamic updating. Must happen before the server listener is created
         self.setWindowTitle(f"Junior High Game: Player {int(self.round_state.client_id) + 1}")
 
-        # keep track of the current vote
-        self.current_vote = -1
-
         # Dynamically updated elements
         self.token_label = QLabel()
         self.jhg_popularity_graph = pg.PlotWidget()
@@ -143,6 +140,7 @@ class MainWindow(QMainWindow):
 
     def update_potential_sc_votes(self, potential_votes, is_last_cycle):
         self.SC_cause_graph.update_arrows(potential_votes)
+        self.SC_voting_grid.current_vote = -1
 
         if not is_last_cycle: self.SC_voting_grid.submit_button.setText("Submit")
 
