@@ -72,9 +72,3 @@ QPushButton[btnState="checked"] {
     color: #ecf0f1;
     border: solid 2px #2980b9;
 }
-
-QWidget#DraggablePanel {
-    border: 2px solid lime;
-    border-radius: 6px;
-    background-color: #1c1c1c;
-}

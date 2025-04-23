@@ -62,7 +62,7 @@ def sc_vote(main_window, vote):
 
 
 def sc_submit(main_window, voting_grid):
-    voting_grid.select_button(None) # Clears the selection from the SC voting buttons
+    # voting_grid.select_button(None) # Clears the selection from the SC voting buttons
     main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, main_window.SC_voting_grid.current_vote)
 
 
