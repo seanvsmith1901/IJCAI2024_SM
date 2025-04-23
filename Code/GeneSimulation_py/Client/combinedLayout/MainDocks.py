@@ -118,7 +118,7 @@ class CornerContainer(QWidget):
 
         # Create draggable panels
         top_left = DraggablePanel(top_left_widget, "Junior High Game")
-        top_left.setMinimumSize(400, 400)
+        top_left.setMinimumSize(400, top_left_widget.property("min-height"))
         top_right = DraggablePanel(top_right_widget, "JHG Graphs")
         top_right.setMinimumSize(400, 400)
         bottom_left = DraggablePanel(bottom_left_widget, "Social Choice Voting")
