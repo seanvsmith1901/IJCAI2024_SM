@@ -40,7 +40,6 @@ class SCManager:
         self.causes = self.sc_sim.get_causes()
         self.all_nodes = self.causes + self.player_nodes
 
-        print(self.round_num)
         self.connection_manager.distribute_message("SC_INIT", self.round_num, self.current_options_matrix,
                                                    [node.to_json() for node in self.all_nodes], self.current_options_matrix)
 
@@ -87,7 +86,6 @@ class SCManager:
             while len(player_votes) < self.connection_manager.num_clients:
                 responses = self.connection_manager.get_responses()
                 for response in responses.values():
-                    print("client ", response["CLIENT_ID"])
                     player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
 
             if cycle == self.vote_cycles - 1: is_last_cycle = True
@@ -100,7 +98,6 @@ class SCManager:
     def compile_sc_votes(self, player_votes, current_options_matrix, round_num):
         bot_votes = self.get_bot_votes(current_options_matrix)
 
-        print(player_votes)
         all_votes = {**bot_votes, **player_votes}
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in all_votes.values()] # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes

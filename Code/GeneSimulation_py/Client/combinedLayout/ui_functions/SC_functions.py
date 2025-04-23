@@ -33,7 +33,6 @@ def SC_round_init(main_window):
 # Triggered by SC_OVER
 def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
     history_grid = main_window.sc_history_grid
-    print("update_sc_utilities_labels ", round_num)
     history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities)
     history_grid.change_round(round_num)
 
@@ -48,6 +47,7 @@ def tab_changed(main_window, index):
     if current_tab == main_window.SC_voting_grid:
         cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
         cause_graph.update_arrows(main_window.round_state.current_potential_votes)
+        print(main_window.round_state.current_potential_votes)
     elif current_tab == main_window.sc_history_grid and main_window.sc_history_grid.sc_history:
         sc_history_tab = main_window.sc_history_grid
         selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
@@ -64,7 +64,6 @@ def sc_vote(main_window, vote):
 
 def sc_submit(main_window, voting_grid):
     voting_grid.select_button(None) # Clears the selection from the SC voting buttons
-    print("Final vote: ", main_window.SC_voting_grid.current_vote)
     main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, main_window.SC_voting_grid.current_vote)
 
 
