@@ -134,12 +134,12 @@ class MainWindow(QMainWindow):
         self.ServerListener.update_tornado_graph_signal.connect(self.update_tornado_graph)
         self.ServerListener.jhg_over_signal.connect(partial(jhg_over, self))
         self.ServerListener.enable_jhg_buttons_signal.connect(partial(enable_jhg_buttons, self))
-        self.ServerListener.update_potential_sc_votes_signal.connect(self.update_potential_sc_votes)
+        self.ServerListener.update_sc_votes_signal.connect(self.update_sc_votes)
         self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
 
-    def update_potential_sc_votes(self, potential_votes, is_last_cycle):
-        self.SC_cause_graph.update_arrows(potential_votes)
+    def update_sc_votes(self, votes, is_last_cycle):
+        self.SC_cause_graph.update_arrows(votes)
         self.SC_voting_grid.current_vote = -1
 
         if not is_last_cycle: self.SC_voting_grid.submit_button.setText("Submit")

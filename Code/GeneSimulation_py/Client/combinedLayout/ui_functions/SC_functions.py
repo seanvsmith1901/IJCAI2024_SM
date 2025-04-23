@@ -60,7 +60,6 @@ def tab_changed(main_window, index):
 
 def sc_vote(main_window, vote):
     main_window.SC_voting_grid.current_vote = vote
-    # main_window.connection_manager.send_message("POTENTIAL_SC_VOTE", main_window.round_state.client_id, vote)
 
 
 def sc_submit(main_window, voting_grid):

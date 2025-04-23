@@ -32,7 +32,6 @@ class RoundState:
         self.popularity_over_time = [100 for _ in range(num_players)]
         self.influence_mat = np.array([[0 for _ in range(num_players)] for _ in range(num_players)])
         self.relationships_mat = np.array([[0 for _ in range(num_players)] for _ in range(num_players)])
-        self.current_potential_votes = None
 
 
         for i in range(num_players):

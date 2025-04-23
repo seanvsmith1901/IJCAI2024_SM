@@ -24,7 +24,7 @@ class ServerConnectionManager(ConnectionManager):
             "SETUP": ["CLIENT_ID", "NUM_PLAYERS"],
             "JHG": ["CURRENT_VOTES"],
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "RECEIVED", "SENT"],
-            "SC_VOTES": ["POTENTIAL_VOTES", "IS_LAST_CYCLE"],
+            "SC_VOTES": ["VOTES", "IS_LAST_CYCLE"],
             "SC_OVER": ["ROUND_NUM", "WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
                         "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES"],
         }
@@ -33,7 +33,6 @@ class ServerConnectionManager(ConnectionManager):
         self.received_message_type_names = {
             "JHG_ALLOCATIONS": ["ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_JHG": ["ROUND_NUMBER", "ALLOCATIONS"],
-            "POTENTIAL_SC_VOTE": ["POTENTIAL_SC_VOTE"],
             "SUBMIT_SC": ["FINAL_VOTE"],
         }
 
@@ -87,7 +86,6 @@ class ServerConnectionManager(ConnectionManager):
                     response[name] = received_json[name]
 
                 responses[client_id] = response
-                print(response)
 
             # Sometimes you want to continuously send out the responses until everyone has responded. If the
             # continuousDistributionType parameter is not none, it is the name of the message to send.

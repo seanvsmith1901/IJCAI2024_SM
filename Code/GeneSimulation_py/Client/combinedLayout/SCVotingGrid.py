@@ -81,14 +81,12 @@ class SCVotingGrid(SCGrid):
             vote_button.update()
 
         if not button_found:
-            print("Why?")
             self.current_vote = -1
 
         if button is None:
             self.clear_button.setEnabled(False)
 
     def submit_clicked(self, main_window, submit_button):
-        print("Submitted")
         from ui_functions.SC_functions import sc_submit
         sc_submit(main_window, self)
 

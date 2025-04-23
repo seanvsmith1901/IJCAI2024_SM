@@ -14,7 +14,6 @@ class ClientConnectionManager(ConnectionManager):
 
         self.message_type_names = {
             "SUBMIT_JHG": ["CLIENT_ID", "ROUND_NUMBER", "ALLOCATIONS"],
-            "POTENTIAL_SC_VOTE": ["CLIENT_ID", "POTENTIAL_SC_VOTE"],
             "SUBMIT_SC": ["CLIENT_ID", "FINAL_VOTE"],
         }
 
