@@ -79,24 +79,16 @@ class SCManager:
     # I don't love this... Definite candidate for a rewrite, or at least some documentation
     def run_sc_voting(self):
         player_votes = {}
-        player_fake_votes = {}
         is_last_cycle = False
 
         for cycle in range(self.vote_cycles):
             player_votes.clear()
-            player_fake_votes.clear()
+            # Waits for a vote from each client
             while len(player_votes) < self.connection_manager.num_clients:
                 responses = self.connection_manager.get_responses()
                 for response in responses.values():
                     print("client ", response["CLIENT_ID"])
-                    if response["TYPE"] == "POTENTIAL_SC_VOTE":
-                        if response["CLIENT_ID"] not in player_fake_votes or player_fake_votes[response["CLIENT_ID"]] != \
-                                response["POTENTIAL_SC_VOTE"] + 1:
-                            player_fake_votes[response["CLIENT_ID"]] = response["POTENTIAL_SC_VOTE"] + 1 # It's easier to make it one indexed here than later
-                    elif response["TYPE"] == "SUBMIT_SC":
-                        if response["FINAL_VOTE"] not in player_votes or player_votes[response["FINAL_VOTE"]] != \
-                                response["FINAL_VOTE"]:
-                            player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                    player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
 
             if cycle == self.vote_cycles - 1: is_last_cycle = True
             self.connection_manager.distribute_message("SC_VOTES", player_votes, is_last_cycle)
