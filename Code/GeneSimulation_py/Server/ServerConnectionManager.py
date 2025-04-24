@@ -21,7 +21,7 @@ class ServerConnectionManager(ConnectionManager):
 
         self.message_type_names = {
             "SC_INIT": ["ROUND_NUM", "OPTIONS", "NODES", "UTILITIES"],
-            "SETUP": ["CLIENT_ID", "NUM_PLAYERS"],
+            "SETUP": ["CLIENT_ID", "NUM_PLAYERS", "NUM_CYCLES"],
             "JHG": ["CURRENT_VOTES"],
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "RECEIVED", "SENT"],
             "SC_VOTES": ["VOTES", "IS_LAST_CYCLE"],
@@ -118,7 +118,7 @@ class ServerConnectionManager(ConnectionManager):
     # Wait until the expected number of clients have connected and initialize those connections
     # NOTE: This is somewhat hard coded for JHG/SC.
     # If trying to make this a more general use codebase, this needs some refactoring.
-    def add_clients(self, num_clients, num_bots):
+    def add_clients(self, num_clients, num_bots, num_cycles):
         next_id = 0
 
         # Accept new connections and add them to the connection manager until the specified number of connections have been made
@@ -130,4 +130,4 @@ class ServerConnectionManager(ConnectionManager):
 
             #Send the info needed to set up the client
             new_id = len(self.clients) - 1 + num_bots
-            self.send_message(client_socket, "SETUP", new_id, num_clients + num_bots)
+            self.send_message(client_socket, "SETUP", new_id, num_clients + num_bots, num_cycles)

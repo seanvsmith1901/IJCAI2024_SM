@@ -22,7 +22,7 @@ from .ui_functions.tornado_graph import update_tornado_graph
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, connection_manager, num_players, client_id):
+    def __init__(self, connection_manager, num_players, client_id, num_cycles):
         super().__init__()
         # This window is very dependent on things happening in the correct order.
         # If you mess with it, you might break a lot of things.
@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
         self.jhg_buttons = []
         self.round_state = RoundState(client_id, num_players, self.jhg_buttons)
         self.connection_manager = connection_manager
+        self.num_cycles = num_cycles
     #/1#
 
     #2# Block two: Creates the elements that will be passed to the server listener for dynamic updating. Must happen before the server listener is created

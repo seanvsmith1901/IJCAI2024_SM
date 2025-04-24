@@ -20,7 +20,7 @@ if __name__ == "__main__":
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
     host = '127.0.0.1'  # your local host address
-    port = 12347  # The port number to connect to
+    port = 12345  # The port number to connect to
 
     connection_manager = ClientConnectionManager(host, port)
 
@@ -33,9 +33,10 @@ if __name__ == "__main__":
     init_vals = connection_manager.get_message()[0]
     client_id = init_vals["CLIENT_ID"]
     num_players = init_vals["NUM_PLAYERS"]
+    num_cycles = init_vals["NUM_CYCLES"]
 
     # Now, create and show the main window
-    window = MainWindow(connection_manager, num_players, client_id)
+    window = MainWindow(connection_manager, num_players, client_id, num_cycles)
     window.show()
 
     # Start the event loop
