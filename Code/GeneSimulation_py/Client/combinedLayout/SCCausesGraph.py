@@ -8,7 +8,7 @@ from combinedLayout.Arrow import Arrow
 
 
 class SCCausesGraph(QWidget):
-    def __init__(self):
+    def __init__(self, num_cycles):
         super().__init__()
 
         self.nodes_fig = Figure(figsize=(5, 4), dpi=100)
@@ -21,6 +21,7 @@ class SCCausesGraph(QWidget):
         self.nodes_x = []
         self.nodes_y = []
         self.round_state = None
+        self.num_cycles = num_cycles
 
         layout = QVBoxLayout()
         layout.addWidget(self.nodes_canvas)
@@ -124,7 +125,7 @@ class SCCausesGraph(QWidget):
                 self.nodes_ax.annotate(text, (x - 0.05, y - 0.1), ha='center', va='center',
                                        fontsize=10, color=color, weight='bold', zorder=587)
             for x, y, text, color in zip(cause_x, cause_y, cause_texts, cause_text_colors):
-                self.nodes_ax.annotate(text, (x, y - 0.3), ha='center', va='center',
+                self.nodes_ax.annotate(text, (x, y - 0.25), ha='center', va='center',
                                        fontsize=10, color=color, weight='bold', zorder=587)
 
             # Draw nodes: players as circles, causes as triangles
@@ -146,7 +147,7 @@ class SCCausesGraph(QWidget):
             self.nodes_canvas.draw()
 
 
-    def update_arrows(self, votes):
+    def update_arrows(self, votes, current_round_tab = False):
         # checks for existing arrows, and removes them.
         if votes:  # only run this if there are actual potential votes.
             for arrow in self.arrows:  # if there is anything in there.
@@ -169,9 +170,26 @@ class SCCausesGraph(QWidget):
             for arrow in self.arrows:
                 arrow.draw(self.nodes_ax)
 
+        if self.round_state.sc_cycle and current_round_tab:
+            self.update_cycle_label(self.round_state.sc_cycle, current_round_tab)
+        elif votes:
             self.nodes_canvas.draw()
+
 
     def draw_causes_graph(self, votes, utilities, winning_vote, round_num):
         self.update_sc_nodes_graph(round_num, winning_vote)
-        # vote_dict = {str(i) : votes[i] for i in range(len(votes))}
         self.update_arrows(votes)
+
+    def update_cycle_label(self, cycle, current_round_tab = False):
+        if cycle and cycle <= self.num_cycles and current_round_tab:
+            self.nodes_ax.text(
+                1.2, 1,  # top-right corner in axes coords
+                f"Cycle {cycle}/{self.num_cycles} ",
+                transform=self.nodes_ax.transAxes,
+                ha='right',
+                va='top',
+                fontsize=10,
+                color='white',  # adjust for contrast; white looks good on dark bg
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='#444444', edgecolor='none')
+            )
+        self.nodes_canvas.draw()

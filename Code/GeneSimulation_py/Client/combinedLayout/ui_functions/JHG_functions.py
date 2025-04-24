@@ -50,6 +50,10 @@ def jhg_over(main_window):
         if button.objectName() != "clear_button":
             button.setEnabled(True)
 
+    main_window.SC_panel.setCurrentIndex(0)
+    main_window.round_state.sc_cycle = 1
+    main_window.SC_cause_graph.update_cycle_label(1, True)
+
     main_window.SC_panel.setStyleSheet("#SC_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
     main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: none; }")
 

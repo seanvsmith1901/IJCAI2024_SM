@@ -92,7 +92,7 @@ class SCManager:
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.current_options_matrix,
                                                                   self.round_num)
             if cycle == self.vote_cycles - 1: is_last_cycle = True
-            self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, is_last_cycle)
+            self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle)
 
         return player_votes
 

@@ -33,6 +33,7 @@ class RoundState:
         self.influence_mat = np.array([[0 for _ in range(num_players)] for _ in range(num_players)])
         self.relationships_mat = np.array([[0 for _ in range(num_players)] for _ in range(num_players)])
         self.current_votes = [-1 for _ in range(num_players)]
+        self.sc_cycle = None
 
 
         for i in range(num_players):

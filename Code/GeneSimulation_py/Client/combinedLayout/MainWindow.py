@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
     #1# Block one: Sets up the round_state and client socket. Must be the first thing done
         self.tornado_ax = None
         self.tornado_canvas = None
-        self.SC_cause_graph = SCCausesGraph()
+        self.SC_cause_graph = SCCausesGraph(num_cycles)
         self.player_labels = {}
         self.jhg_buttons = []
         self.round_state = RoundState(client_id, num_players, self.jhg_buttons)
@@ -141,13 +141,17 @@ class MainWindow(QMainWindow):
         self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
 
-    def update_sc_votes(self, votes, is_last_cycle):
-        self.SC_cause_graph.update_arrows(votes)
+    def update_sc_votes(self, votes, cycle, is_last_cycle):
+        self.round_state.sc_cycle = cycle
+        self.SC_cause_graph.update_arrows(votes, True)
         self.SC_voting_grid.current_vote = -1
         self.SC_voting_grid.select_button(None)  # Clears the selection from the SC voting buttons
 
         if not is_last_cycle:
             self.SC_voting_grid.submit_button.setText("Submit")
+        else:
+            self.round_state.current_votes = {i: -1 for i in range(self.round_state.num_players)}
+
 
     def update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
         update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities)
