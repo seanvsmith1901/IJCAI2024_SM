@@ -45,9 +45,15 @@ class ClientConnectionManager(ConnectionManager):
 
         while True:
             try:
-                data = self.socket.recv(4096)
+                # data = self.socket.recv(4096)
+                data = ''
+                while True:  # Accumulate data until the full message is received
+                    chunk = self.socket.recv(4096).decode()
+                    data += chunk
+                    if len(chunk) < 4096:  # End of the message
+                        break
                 if data:
-                    responses = extract_json_objects(data.decode())
+                    responses = extract_json_objects(data)
 
                     return responses
 
