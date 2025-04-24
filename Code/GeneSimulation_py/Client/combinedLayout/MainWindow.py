@@ -92,10 +92,11 @@ class MainWindow(QMainWindow):
         self.JHG_panel.setLayout( JhgPanel(self.round_state, connection_manager, self.token_label,
                                            self.jhg_popularity_graph, self.jhg_network, self.jhg_buttons))
         self.JHG_panel.setObjectName("JHG_Panel")
-        self.JHG_panel.setProperty("min-height", 80 + 55*self.round_state.num_players)
+        self.JHG_panel.setProperty("min-height", 80 + 44*self.round_state.num_players)
 
         self.SC_panel = QTabWidget()
         self.SC_panel.setObjectName("SC_Panel")
+        self.SC_panel.setProperty("min-height", 40 + 51*self.round_state.num_players)
         self.SC_panel.setLayout(QVBoxLayout())
 
         plots_panel = QTabWidget()

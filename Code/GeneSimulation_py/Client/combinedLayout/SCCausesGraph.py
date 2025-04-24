@@ -46,8 +46,7 @@ class SCCausesGraph(QWidget):
         # Turn off the grid and clear any pre-existing content
         self.nodes_ax.grid(False)
         self.nodes_ax.cla()
-    
-    
+
     def update_sc_nodes_graph(self, round_num, winning_vote=None):
         if self.round_state.nodes:
             # Clear graph
@@ -74,51 +73,41 @@ class SCCausesGraph(QWidget):
                 winning_vote += 1
 
             for i, (x_val, y_val) in enumerate(zip(self.nodes_x, self.nodes_y)):
-                text = self.nodes_text[i]
-                if text.startswith("Player"):
-                    split_string = text.split()
-                    text = split_string[1]
-                    color = COLORS[int(split_string[1]) - 1]
-                elif text == "Cause " + str(winning_vote):
-                    color = "#e41e1e"  # red
+                full_text = self.nodes_text[i]
+                display_text = full_text
+                text_color = 'black'  # Default text color for most nodes
+
+                if full_text.startswith("Player"):
+                    player_num = int(full_text.split()[1])
+                    display_text = str(player_num)
+                    color = COLORS[player_num - 1]
+                elif full_text.startswith("Cause "):
+                    display_text = full_text.replace("Cause ", "")
+
+                    if winning_vote and full_text == f"Cause {winning_vote}":
+                        color = "#e41e1e"  # red for winning cause
+                        text_color = '#36454F'
+                    else:
+                        color = "#EBEBEB"
+                        text_color = '#36454F'
                 else:
                     color = "#EBEBEB"
 
-                # If an annotation already exists, update it; otherwise, create a new one
-                annotations = [ann for ann in self.nodes_ax.texts if ann.get_text() == text]
-                if annotations:
-                    # Update existing annotation
-                    annotations[0].set_position((x_val, y_val))
-                    annotations[0].set_color(color)
-                else:
-                    # Create new annotation
-                    self.nodes_ax.annotate(
-                        text,
-                        (x_val, y_val),
-                        textcoords="offset points",
-                        xytext=(0, 3),
-                        ha='center',
-                        fontsize=9,
-                        color=color,
-                        weight='bold',
-                        zorder=587,
-                    )
+                # Draw the label inside the node with the determined text color
+                self.nodes_ax.annotate(
+                    display_text,
+                    (x_val, y_val),
+                    ha='center',
+                    va='center',
+                    fontsize=10,
+                    color=text_color,
+                    weight='bold',
+                    zorder=587,
+                )
 
                 colors.append(color)
 
-            self.nodes_ax.text(
-                0.98, 0.98,  # near top-right corner
-                f"Round {round_num}",
-                transform=self.nodes_ax.transAxes,
-                ha='right',
-                va='top',
-                fontsize=10,
-                color='white',
-                weight='bold',
-                zorder=10,
-            )
-
-            self.nodes_ax.scatter(self.nodes_x, self.nodes_y, marker='o', c=colors)
+            self.nodes_ax.scatter(self.nodes_x, self.nodes_y, marker='o', c=colors, s=150)
 
             max_x = max(abs(x) for x in self.nodes_x)
             max_y = max(abs(y) for y in self.nodes_y)

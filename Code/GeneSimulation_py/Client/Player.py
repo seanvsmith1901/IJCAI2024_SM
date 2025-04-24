@@ -63,7 +63,11 @@ class Player:
         self.kept_text_label = QLabel("Tokens kept:")
         self.kept_number_label = QLabel("0")
         self.minus_button = MinusButton()
+        self.minus_button.setStyleSheet("max-height: 1.5em")
+        self.minus_button.setStyleSheet("min-height: 1.5em")
         self.plus_button = PlusButton()
+        self.plus_button.setStyleSheet("max-height: 1.5em")
+        self.plus_button.setStyleSheet("min-height: 1.5em")
         self.allocation_box = QLabel("0")
 
         self.minus_button.setMinimumWidth(self.minus_button.fontMetrics().horizontalAdvance("-") + 20)
