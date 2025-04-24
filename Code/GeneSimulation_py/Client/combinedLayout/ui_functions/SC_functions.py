@@ -1,3 +1,5 @@
+import time
+
 from PyQt6.QtWidgets import QVBoxLayout, QTabWidget
 
 from .tornado_graph import create_tornado_graph
@@ -27,14 +29,16 @@ def create_sc_ui_elements(main_window):
 def SC_round_init(main_window):
     # Update sc ui elements
     main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities)
-    main_window.SC_cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
+    if main_window.round_state.sc_round_num == 1:
+        main_window.SC_cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
 
 
 # Triggered by SC_OVER
 def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
     history_grid = main_window.sc_history_grid
     history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities)
-    history_grid.change_round(round_num)
+    main_window.SC_panel.setCurrentIndex(1)
+    main_window.SC_cause_graph.update_arrows(history_grid.sc_history[str(round_num)]["votes"], True)
 
     if winning_vote != -1:
         main_window.SC_voting_grid.update_col_2(new_utilities)
@@ -43,7 +47,6 @@ def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vo
 def tab_changed(main_window, index):
     current_tab = main_window.SC_panel.widget(index)
     cause_graph = main_window.SC_cause_graph
-
     if current_tab == main_window.SC_voting_grid:
         cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
         cause_graph.update_arrows(main_window.round_state.current_votes, True)

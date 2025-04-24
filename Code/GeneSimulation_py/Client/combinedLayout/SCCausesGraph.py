@@ -175,7 +175,6 @@ class SCCausesGraph(QWidget):
         elif votes:
             self.nodes_canvas.draw()
 
-
     def draw_causes_graph(self, votes, utilities, winning_vote, round_num):
         self.update_sc_nodes_graph(round_num, winning_vote)
         self.update_arrows(votes)

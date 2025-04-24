@@ -149,9 +149,6 @@ class MainWindow(QMainWindow):
 
         if not is_last_cycle:
             self.SC_voting_grid.submit_button.setText("Submit")
-        else:
-            self.round_state.current_votes = {i: -1 for i in range(self.round_state.num_players)}
-
 
     def update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
         update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities)
@@ -161,6 +158,8 @@ class MainWindow(QMainWindow):
 
     def update_sc_nodes_graph(self, winning_vote):
         self.SC_cause_graph.update_sc_nodes_graph(self.round_state.sc_round_num, winning_vote)
+        self.SC_cause_graph.update_arrows(self.round_state.current_votes)
+        self.round_state.current_votes = {i: -1 for i in range(self.round_state.num_players)}
 
     def SC_tab_changed(self, index):
         tab_changed(self, index)
