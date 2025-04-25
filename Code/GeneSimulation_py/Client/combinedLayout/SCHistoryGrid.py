@@ -25,6 +25,7 @@ class SCHistoryGrid(SCGrid):
         round_key = str(index + 1)
         if round_key in self.sc_history:
             self.update_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"], round_key)
+        self.parent().parent().setTabText(1, "History")
 
 
     def update_sc_history(self, round, votes, utilities):

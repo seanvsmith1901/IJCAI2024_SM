@@ -56,6 +56,7 @@ def jhg_over(main_window):
 
     main_window.SC_panel.setStyleSheet("#SC_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
     main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: none; }")
+    main_window.SC_panel.setTabText(0, "Current Round")
 
 
 def enable_jhg_buttons(main_window):

@@ -22,7 +22,7 @@ def create_sc_ui_elements(main_window):
     main_window.SC_voting_grid.update_grid([0 for _ in range(main_window.round_state.num_players)], [[0 for _ in range(3)] for _ in range(main_window.round_state.num_players)], 0)
 
     main_window.SC_panel.setMinimumWidth(400)
-    main_window.SC_panel.addTab(main_window.SC_voting_grid, "Current Round")
+    main_window.SC_panel.addTab(main_window.SC_voting_grid, "Next Round")
 
 
 # Triggered by SC_INIT
@@ -39,6 +39,8 @@ def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vo
     history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities)
     main_window.SC_panel.setCurrentIndex(1)
     main_window.SC_cause_graph.update_arrows(history_grid.sc_history[str(round_num)]["votes"], True)
+    main_window.SC_panel.setTabText(1, "Results")
+    main_window.SC_panel.setTabText(0, "Next Round")
 
     if winning_vote != -1:
         main_window.SC_voting_grid.update_col_2(new_utilities)
@@ -50,6 +52,9 @@ def tab_changed(main_window, index):
     if current_tab == main_window.SC_voting_grid:
         cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
         cause_graph.update_arrows(main_window.round_state.current_votes, True)
+
+        if main_window.SC_panel.tabText(1) == "Results":
+            main_window.SC_panel.setTabText(1, "History")
     elif current_tab == main_window.sc_history_grid and main_window.sc_history_grid.sc_history:
         sc_history_tab = main_window.sc_history_grid
         selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
