@@ -72,3 +72,9 @@ QPushButton[btnState="checked"] {
     color: #ecf0f1;
     border: solid 2px #2980b9;
 }
+
+QToolTip {
+    background-color: rgba(0, 0, 0, 150); /* fully transparent */
+    color: gray;
+    /*border: 1px solid gray;*/
+}
