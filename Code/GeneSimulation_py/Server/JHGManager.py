@@ -10,7 +10,18 @@ class JHGManager:
         self.num_bots = num_bots
 
     def play_jhg_round(self, round_num):
-        client_input = self.connection_manager.get_responses()  # Gets responses of type "JHG"
+        # Occasionally if the JHG round was played to quickly after the SC round, this would catch the SC vote and brick the server.
+        # UPDATE: It appears that if the SC submit vote button is spammed quick enough, it would send an additional,
+        # unexpected vote. That's the root cause that should get fixed, but this seems to stop it from breaking for now
+        while True:
+            client_input = self.connection_manager.get_responses()  # Gets responses of type "JHG"
+
+            try:
+                first_key = next(iter(client_input))
+                client_input[first_key]["ALLOCATIONS"]
+                break
+            except KeyError:
+                print("Error processinging client_input: ", client_input)
         current_popularity = self.jhg_sim.execute_round(client_input, round_num - 1)
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
