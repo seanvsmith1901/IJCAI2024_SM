@@ -22,7 +22,7 @@ def update_jhg_network_graph(main_window):
     spots = []
     for i, (x, y) in enumerate(node_positions):
         color = COLORS[i % len(COLORS)]  # Cycle through COLORS if there are more nodes than COLORS
-        spots.append({'pos': (x, y), 'size': 10, 'brush': pg.mkBrush(color), 'pen': None})
+        spots.append({'pos': (x, y), 'size': 15, 'brush': pg.mkBrush(color), 'pen': None})
 
     scatter = pg.ScatterPlotItem()
     scatter.addPoints(spots)  # Add all nodes with individual COLORS
