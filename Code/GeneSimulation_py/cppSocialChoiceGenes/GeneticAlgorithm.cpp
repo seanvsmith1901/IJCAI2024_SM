@@ -79,11 +79,13 @@ void GeneticAlgorithm::reproduce(int elite_size, int population_size) {
         auto parent2 = population[rand() % elite_size].getChromosome();
         auto [offspring1, offspring2] = onePointCrossover(parent1, parent2);
 
-        mutate(offspring1);
-        mutate(offspring2);
+        Chromosome offSpring1Chrom(offspring1);
+        Chromosome offSpring2Chrom(offspring2);
+        mutate(offSpring1Chrom);
+        mutate(offSpring2Chrom);
 
-        new_population.push_back(Chromosome(offspring1));
-        new_population.push_back(Chromosome(offspring2));
+        new_population.push_back(offSpring1Chrom);
+        new_population.push_back(offSpring2Chrom);
     }
     population = new_population;
 }

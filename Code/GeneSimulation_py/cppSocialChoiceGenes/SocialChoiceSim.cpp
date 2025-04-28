@@ -2,6 +2,10 @@
 // Created by Sean on 4/8/2025.
 //
 
+
+
+#include <utility>
+
 #include "Chromosome.h"
 #include "socialChoiceSim.h"
 
@@ -101,7 +105,7 @@ void SocialChoiceSim::genCombinations(int currentID, std::vector<int> current_ar
 
 
 std::vector<float> SocialChoiceSim::generateProbabilities(std::vector<std::vector<int>> currentOptionsMatrix) {
-    createChoicesMatrix(currentOptionsMatrix);
+    createChoicesMatrix(std::move(currentOptionsMatrix));
     std::vector<std::pair<std::vector<int>, double>> results;
     std::vector<int> currentArray;
     int currentID = 0;
@@ -113,14 +117,40 @@ std::vector<float> SocialChoiceSim::generateProbabilities(std::vector<std::vecto
 }
 
 std::vector<float> SocialChoiceSim::getCauseProbability(std::vector<std::pair<std::vector<int>, double> > &results) {
-    return; // fix this later. I'm tired
+    std::vector<float> newVector = {1.0}; // fix this later. I'm tired
+    return newVector;
 }
 
-std::pair<int, std::vector<float>> SocialChoiceSim::returnWin(const std::unordered_map<int, int>& all_votes) {
+std::pair<int, std::vector<int>> SocialChoiceSim::returnWin(const std::unordered_map<int, int>& all_votes) {
+    std::vector<int> results;
+    std::unordered_map<int, int> total_votes = all_votes;
+    std::unordered_map<int, int> vote_counts;
+    for (const auto& [agent, vote] : all_votes) {
+        vote_counts[vote]++;
+    }
+    int winning_vote = -1;
+    int winning_vote_count = 0;
+    for (const auto& [vote, count] : vote_counts) {
+        if (count > winning_vote_count) {
+            winning_vote = vote;
+            winning_vote_count = count;
+        }
+    }
 
+    if (!(winning_vote_count < static_cast<int>(all_votes.size()) / 2)) {
+        winning_vote = -1;
+    }
+
+    if (winning_vote != -1) {
+        for (size_t i = 0; i < all_votes.size(); i++) {
+            results.push_back(currentOptionsMatrix[i][winning_vote]);
+        }
+    } else {
+        for (size_t i = 0; i < all_votes.size(); i++) {
+            results.push_back(0);
+        }
+    }
+
+    return std::make_pair(winning_vote, results);
 }
 
-
-
-
-void createBots();

@@ -4,11 +4,11 @@
 #include "SocialChoiceSim.h"
 #include "Chromosome.h"
 #include <vector>
-
+#include <string>
 #include "GeneticAlgorithm.h"
 
 
-// this can be thought of as "SocialChoiceTest" but I'm not gonn arename it just yet. 
+// this can be thought of as "SocialChoiceTest" but I'm not gonn arename it just yet.
 
 int main() {
     int pop_size = 100;
@@ -18,7 +18,9 @@ int main() {
     int numtoKeep = 11;
 
     Logger logger{};
+
     auto start = std::chrono::system_clock::now();
+
     SocialChoiceSim sim(11, 3, 11); // never different for this edge case
     GeneticAlgorithm geneticAlgorithm(pop_size, num_genes, lower_bound, upper_bound);
     geneticAlgorithm.initializePopulation();
@@ -26,21 +28,22 @@ int main() {
     std::vector<float> fitness_history;
     std::vector<float> diversity_history;
     auto startTime = std::chrono::system_clock::now();
+    std::srand(static_cast<unsigned int>(time(0))); // generate the random seed here instead.
 
     for (int generation = 0; generation < 200; generation++) { // for generation in generations
         int cooperationScore = 0;
         std::map<Chromosome, std::vector<float>> chromosomesUsed; // a map of chromosomes to a list of their fitnersses
         for (int i = 0; i < 10; i++) {
             std::vector<Chromosome> currentPopulation;
-            std::srand(static_cast<unsigned int>(time(0)));
+
             std::vector<int> selectedPopulation;
 
             // this is a pain - we need to create reandom numbers as add them to the population.
             for (int i = 0; i < numtoKeep; i++) {
                 selectedPopulation.push_back(std::rand() % 100);
             }
-            for (int i = 0; i < numtoKeep; i++) {
-                currentPopulation.push_back(population[i]);
+            for (int idx: selectedPopulation) {
+                currentPopulation.push_back(population[idx]);
             }
             sim.setChromosome(currentPopulation); // take in the chromosomes and set them as appropriate for the bots.
 
@@ -49,11 +52,12 @@ int main() {
                 auto botVotes = sim.getVotes();
                 auto pair = sim.returnWin(botVotes);
                 int winningVote = pair.first;
-                std::vector<float> results = pair.second;
+                std::vector<int> results = pair.second;
                 if (winningVote != -1) {
                     cooperationScore++;
                 }
                 for (size_t i = 0; i < currentPopulation.size(); i++) {
+                    // this might be broken, as per chat, but Imma keep it this way.
                     Chromosome chromosome = currentPopulation[i];
 
                     if (chromosomesUsed.find(chromosome) == chromosomesUsed.end()) {

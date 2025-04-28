@@ -30,11 +30,11 @@ public:
     void startRound();
     const std::vector<std::vector<float>> getProbabilites() const;
     std::unordered_map<int, int> getVotes();
-    std::pair<int, std::vector<float>> returnWin(const std::unordered_map<int, int>& all_votes);
+    std::pair<int, std::vector<int>> returnWin(const std::unordered_map<int, int>& all_votes);
     void genCombinations(int currentID, std::vector<int> current_array, double current_prob, std::vector<std::pair<std::vector<int>, double>>& results);
-    std::vector<float> generateProbabilities(std::vector<std::vector<int>> currentOptionsMatrix);
-    std::vector<std::vector<float>> createChoicesMatrix(std::vector<std::vector<int>> currentOptionsMatrix);
-    std::vector<float> getCauseProbability(std::vector<std::pair<std::vector<int>, double>>& results);
+    //std::vector<float> generateProbabilities(std::vector<std::vector<int>> currentOptionsMatrix);
+    //std::vector<std::vector<float>> createChoicesMatrix(std::vector<std::vector<int>> currentOptionsMatrix);
+    //std::vector<float> getCauseProbability(std::vector<std::pair<std::vector<int>, double>>& results);
 
 
 private:

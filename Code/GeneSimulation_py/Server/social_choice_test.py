@@ -19,7 +19,7 @@ if __name__ == "__main__":
     chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
 
     results = {}
-    num_rounds = 100
+    num_rounds = 10000
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()

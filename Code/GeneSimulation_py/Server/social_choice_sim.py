@@ -105,9 +105,6 @@ class Social_Choice_Sim:
         return bot_votes
 
     def get_votes_single_chromosome(self): # if we want to visualize/test a single chromosome, use this one.
-        if self.bots[0].type != "GT":
-            print("Hey thats wrong, try again ")
-            return
         bot_votes = {}
         self.probabilities = [] # used for the current implementation of the GT bot.
 
@@ -116,6 +113,8 @@ class Social_Choice_Sim:
                 if not self.probabilities:
                     self.probabilities = bot.generate_probabilities(self.current_options_matrix)
                 bot_votes[i] = bot.get_vote_optimized_single(self.probabilities, self.current_options_matrix)
+            else: # only generate the probability matrix if we need it, fetcher is expensive.
+                bot_votes[i] = bot.get_vote([], self.current_options_matrix)
 
         return bot_votes
 
