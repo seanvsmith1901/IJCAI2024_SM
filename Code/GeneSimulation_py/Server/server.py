@@ -5,7 +5,7 @@ from ServerConnectionManager import ServerConnectionManager
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1,
+    "NUM_HUMANS": 2,
     "TOTAL_PLAYERS": 5,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
     "MAX_ROUNDS": 1000,
@@ -27,7 +27,7 @@ class Server():
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
 
 
-    def start_server(self, host='127.0.0.1', port=12346):
+    def start_server(self, host='10.55.10.49', port=12346):
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,

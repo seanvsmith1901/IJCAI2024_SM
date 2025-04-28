@@ -19,7 +19,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
-    host = '127.0.0.1'  # your local host address
+    host = '10.55.10.49'  # your local host address
     port = 12346  # The port number to connect to
 
     connection_manager = ClientConnectionManager(host, port)

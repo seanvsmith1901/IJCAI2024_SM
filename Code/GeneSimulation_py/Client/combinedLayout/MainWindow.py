@@ -1,8 +1,8 @@
 from functools import partial
 
 import numpy as np
-from PyQt6.QtCore import QThread, Qt, QMimeData, QEvent
-from PyQt6.QtGui import QFont, QDrag
+from PyQt6.QtCore import QThread
+from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget
 from RoundState import RoundState
 from ServerListener import ServerListener
