@@ -109,11 +109,11 @@ class Social_Choice_Sim:
             print("Hey thats wrong, try again ")
             return
         bot_votes = {}
-        self.all_combinations = [] # used for the current implementation of the GT bot.
+        self.probabilities = [] # used for the current implementation of the GT bot.
 
         for i, bot in enumerate(self.bots):
             if bot.type == "GT":
-                if not self.all_combinations:
+                if not self.probabilities:
                     self.probabilities = bot.generate_probabilities(self.current_options_matrix)
                 bot_votes[i] = bot.get_vote_optimized_single(self.probabilities, self.current_options_matrix)
 

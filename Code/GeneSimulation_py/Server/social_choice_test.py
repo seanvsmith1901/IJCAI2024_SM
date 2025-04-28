@@ -19,7 +19,7 @@ if __name__ == "__main__":
     chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
 
     results = {}
-    num_rounds = 1000
+    num_rounds = 100
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
@@ -28,10 +28,12 @@ if __name__ == "__main__":
     sim.set_chromosome(chromosomes) # in this case its the same every time.
 
     for i in range(num_rounds): # just a ridicuously large number
+        current_start_time = time.time()
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
         bot_votes = sim.get_votes_single_chromosome() # this one is optimized for testing the results of a single chromosome.
+        #bot_votes = sim.get_votes()
 
         total_votes = len(bot_votes)
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here

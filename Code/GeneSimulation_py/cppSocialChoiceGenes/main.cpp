@@ -8,7 +8,7 @@
 #include "GeneticAlgorithm.h"
 
 
-
+// this can be thought of as "SocialChoiceTest" but I'm not gonn arename it just yet. 
 
 int main() {
     int pop_size = 100;
