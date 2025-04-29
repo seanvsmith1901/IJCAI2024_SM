@@ -14,4 +14,6 @@ add_executable(cppSocialChoiceGenes GeneticAlgorithm.cpp
         GeneticAlgorithm.h
         Logger.cpp
         Logger.h
-        SocialChoiceTest.cpp)
+        SocialChoiceTest.cpp
+        GreedyBot.cpp
+        GreedyBot.h)

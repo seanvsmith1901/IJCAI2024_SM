@@ -19,12 +19,13 @@
 // #include <iostream>
 // #include <iterator>
 #include "GameTheoryBot.h"
+#include "GreedyBot.h"
 
 class SocialChoiceSim {
 public:
     SocialChoiceSim(int totalPlayers, int numCauses, int numHumans, int botType); // constructor
 
-    void setChromosome(const std::vector<Chromosome> chromosomes);
+    //void setChromosome(const std::vector<Chromosome> chromosomes);
     std::vector<std::vector<int>> createOptionsMatrix();
     const std::vector<std::vector<int>>& getCurrentOptionsMatrix() const;
     void startRound();
@@ -46,13 +47,14 @@ private:
     int cpp = 3;
     int rad = 5;
     int numCauses;
-    int typeBot;
+    int typeBot{};
 
     std::map<std::string, float> players;
     std::vector<std::vector<int>> optionsMatrix;
     std::vector<std::vector<int>> currentOptionsMatrix;
     std::unordered_map<int, int> allVotes;
-    std::vector<GameTheoryBot> bots; // this feels easier to me. maybe.
+    std::vector<GreedyBot> bots; // this feels easier to me. maybe.
+
     std::vector<int> currentVotes;
     std::vector<std::vector<float>> probabilitiesMatrix;
     std::vector<float> allCombinations;

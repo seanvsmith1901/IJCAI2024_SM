@@ -32,17 +32,11 @@ SocialChoiceSim::SocialChoiceSim(int totalPlayers, int numCauses, int numHumans,
 void SocialChoiceSim::createBots() {// adds bots to the bots vector
     bots.clear(); // first get rid of all the old bots.
     for (int i = 0; i < numBots; i++) {
-        GameTheoryBot newBot(i);
+        GreedyBot newBot(i);
         bots.push_back(newBot);
     }
 }
 
-void SocialChoiceSim::setChromosome(const std::vector<Chromosome> chromosomes) {
-    // could add statement to check if the chromosomes size and the bot  size are different, might do that later
-    for (int i = 0; i < chromosomes.size(); i++) {
-        bots[i].setChromosome(chromosomes[i]);
-    }
-}
 
 std::vector<std::vector<int>> SocialChoiceSim::createOptionsMatrix() {
     currentOptionsMatrix.clear(); // make sure she's clean first
@@ -68,58 +62,19 @@ const std::vector<std::vector<float>> SocialChoiceSim:: getProbabilites() const 
 }
 std::unordered_map<int, int> SocialChoiceSim::getVotes() {
     std::unordered_map<int, int> botVotes;
-    for (int i = 0; i < bots.size(); i++) {
-        if (allCombinations.empty()) {
-            allCombinations = generateProbabilities(currentOptionsMatrix);
-        }
-        botVotes[i] = bots[i].getVote(currentOptionsMatrix, allCombinations);
+    // for (int i = 0; i < bots.size(); i++) {
+    //     if (allCombinations.empty()) {
+    //         allCombinations = generateProbabilities(currentOptionsMatrix);
+    //     }
+    //     botVotes[i] = bots[i].getVote(currentOptionsMatrix, allCombinations);
+    // }
+    for (int i = 0; i < bots.size(); ++i) {
+        botVotes[i] = bots[i].getVote(currentOptionsMatrix);
     }
     return botVotes;
 
 }
 
-std::vector<std::vector<float>> SocialChoiceSim::createChoicesMatrix(std::vector<std::vector<int>> currentOptionsMatrix) {
-
-}
-
-
-void SocialChoiceSim::genCombinations(int currentID, std::vector<int> current_array, double current_prob, std::vector<std::pair<std::vector<int>, double>>& results) {
-    if (currentID == totalPlayers) {
-        // Add the combination and its probability to the results
-        results.emplace_back(current_array, current_prob);
-        return;
-    }
-
-    // Iterate over each cause
-    for (int cause = 0; cause < numCauses; ++cause) {
-        double prob = probabilitiesMatrix[currentID][cause];
-        if (prob > 0) {
-            current_array[currentID] = cause;  // Set the current cause
-            double newProb = prob * current_prob;
-            SocialChoiceSim::genCombinations(currentID+1, current_array, newProb, results);
-        }
-    }
-}
-
-
-
-
-std::vector<float> SocialChoiceSim::generateProbabilities(std::vector<std::vector<int>> currentOptionsMatrix) {
-    createChoicesMatrix(std::move(currentOptionsMatrix));
-    std::vector<std::pair<std::vector<int>, double>> results;
-    std::vector<int> currentArray;
-    int currentID = 0;
-    double current_prob = 1;
-    genCombinations(currentID, currentArray, current_prob, results);
-    // results should now hold big boy list if we did this correctly.
-    std::vector<float> cause_probabilities = getCauseProbability(results);
-
-}
-
-std::vector<float> SocialChoiceSim::getCauseProbability(std::vector<std::pair<std::vector<int>, double> > &results) {
-    std::vector<float> newVector = {1.0}; // fix this later. I'm tired
-    return newVector;
-}
 
 std::pair<int, std::vector<int>> SocialChoiceSim::returnWin(const std::unordered_map<int, int>& all_votes) {
     std::vector<int> results;
@@ -154,3 +109,48 @@ std::pair<int, std::vector<int>> SocialChoiceSim::returnWin(const std::unordered
     return std::make_pair(winning_vote, results);
 }
 
+// std::vector<float> SocialChoiceSim::generateProbabilities(std::vector<std::vector<int>> currentOptionsMatrix) {
+//     createChoicesMatrix(std::move(currentOptionsMatrix));
+//     std::vector<std::pair<std::vector<int>, double>> results;
+//     std::vector<int> currentArray;
+//     int currentID = 0;
+//     double current_prob = 1;
+//     genCombinations(currentID, currentArray, current_prob, results);
+//     // results should now hold big boy list if we did this correctly.
+//     std::vector<float> cause_probabilities = getCauseProbability(results);
+//
+// }
+
+// std::vector<float> SocialChoiceSim::getCauseProbability(std::vector<std::pair<std::vector<int>, double> > &results) {
+//     std::vector<float> newVector = {1.0}; // fix this later. I'm tired
+//     return newVector;
+// }
+
+// std::vector<std::vector<float>> SocialChoiceSim::createChoicesMatrix(std::vector<std::vector<int>> currentOptionsMatrix) {
+//
+// }
+
+// void SocialChoiceSim::setChromosome(const std::vector<Chromosome> chromosomes) {
+//     // could add statement to check if the chromosomes size and the bot  size are different, might do that later
+//     for (int i = 0; i < chromosomes.size(); i++) {
+//         bots[i].setChromosome(chromosomes[i]);
+//     }
+// }
+
+// void SocialChoiceSim::genCombinations(int currentID, std::vector<int> current_array, double current_prob, std::vector<std::pair<std::vector<int>, double>>& results) {
+//     if (currentID == totalPlayers) {
+//         // Add the combination and its probability to the results
+//         results.emplace_back(current_array, current_prob);
+//         return;
+//     }
+//
+//     // Iterate over each cause
+//     for (int cause = 0; cause < numCauses; ++cause) {
+//         double prob = probabilitiesMatrix[currentID][cause];
+//         if (prob > 0) {
+//             current_array[currentID] = cause;  // Set the current cause
+//             double newProb = prob * current_prob;
+//             SocialChoiceSim::genCombinations(currentID+1, current_array, newProb, results);
+//         }
+//     }
+// }
