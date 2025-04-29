@@ -10,7 +10,7 @@
 #include "socialChoiceSim.h"
 
 
-SocialChoiceSim::SocialChoiceSim(int totalPlayers, int numCauses, int numHumans)
+SocialChoiceSim::SocialChoiceSim(int totalPlayers, int numCauses, int numHumans, int botType)
     : totalPlayers(totalPlayers), numCauses(numCauses), numHumans(numHumans), numBots(totalPlayers-numHumans), cpp(3), rad(5), gen(std::random_device()())
 {
     this->totalPlayers = totalPlayers;

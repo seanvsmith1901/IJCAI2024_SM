@@ -22,7 +22,7 @@
 
 class SocialChoiceSim {
 public:
-    SocialChoiceSim(int totalPlayers, int numCauses, int numHumans); // constructor
+    SocialChoiceSim(int totalPlayers, int numCauses, int numHumans, int botType); // constructor
 
     void setChromosome(const std::vector<Chromosome> chromosomes);
     std::vector<std::vector<int>> createOptionsMatrix();

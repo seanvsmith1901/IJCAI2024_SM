@@ -1,11 +1,6 @@
 # ninja log v6
-44	773	7675799537291758	CMakeFiles/cppSocialChoiceGenes.dir/Chromosome.cpp.obj	707e7cfb1986c54d
-3	797	7675800955500702	build.ninja	ea74930e14d1c533
-32	1322	7675799537167005	CMakeFiles/cppSocialChoiceGenes.dir/GameTheoryBot.cpp.obj	5129aff1da884f47
-57	1961	7675799537411883	CMakeFiles/cppSocialChoiceGenes.dir/GeneticAlgorithm.cpp.obj	e5308751c67a32b5
-72	2110	7675799537570505	CMakeFiles/cppSocialChoiceGenes.dir/Logger.cpp.obj	19e47deb5cf70980
-4	513	7675800955500702	build.ninja	ea74930e14d1c533
 42	809	7675800956701324	CMakeFiles/cppSocialChoiceGenes.dir/Chromosome.cpp.obj	e26e6415b3c5f537
+4	513	7675884855312242	build.ninja	ea74930e14d1c533
 29	1316	7675800956574432	CMakeFiles/cppSocialChoiceGenes.dir/GameTheoryBot.cpp.obj	a3c80821e1037563
 55	1925	7675800956839442	CMakeFiles/cppSocialChoiceGenes.dir/GeneticAlgorithm.cpp.obj	c254f3785a40ca34
 69	2090	7675800956985067	CMakeFiles/cppSocialChoiceGenes.dir/Logger.cpp.obj	9fc9064e8248f783
