@@ -14,7 +14,8 @@
 
 // Constructor
 GameTheoryBot::GameTheoryBot(int selfID, std::string type, std::vector<std::vector<int>> currentOptionsMatrix)
-    : selfId(selfID), type("GT"), numPlayers(11), numCauses(3), currentOptionsMatrix(std::move(currentOptionsMatrix)), riskAdversity("MAX"), chromosome(std::vector<double>()) {
+    : selfId(selfID), type("GT"), numPlayers(11), numCauses(3), currentOptionsMatrix(std::move(currentOptionsMatrix)) {
+    this->chromosome = std::vector<double>(); // just give it a blank chromosome that we can mess with later.
     // Initialize other stuff if needed
 }
 

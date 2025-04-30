@@ -25,7 +25,7 @@ class SocialChoiceSim {
 public:
     SocialChoiceSim(int totalPlayers, int numCauses, int numHumans, int botType); // constructor
 
-    //void setChromosome(const std::vector<Chromosome> chromosomes);
+    void setChromosome(const std::vector<Chromosome> chromosomes);
     std::vector<std::vector<int>> createOptionsMatrix();
     const std::vector<std::vector<int>>& getCurrentOptionsMatrix() const;
     void startRound();
@@ -53,7 +53,7 @@ private:
     std::vector<std::vector<int>> optionsMatrix;
     std::vector<std::vector<int>> currentOptionsMatrix;
     std::unordered_map<int, int> allVotes;
-    std::vector<GreedyBot> bots; // this feels easier to me. maybe.
+    std::vector<GameTheoryBot> bots; // this feels easier to me. maybe.
 
     std::vector<int> currentVotes;
     std::vector<std::vector<float>> probabilitiesMatrix;

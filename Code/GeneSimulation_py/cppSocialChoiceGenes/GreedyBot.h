@@ -5,10 +5,11 @@
 #ifndef GREEDYBOT_H
 #define GREEDYBOT_H
 
+#include "ParentBot.h"
 #include <string>
 #include <vector>
 
-class GreedyBot {
+class GreedyBot : public ParentBot {
 public:
     explicit GreedyBot(int selfID); // constructor
     int getVote(const std::vector<std::vector<int>>&) const;

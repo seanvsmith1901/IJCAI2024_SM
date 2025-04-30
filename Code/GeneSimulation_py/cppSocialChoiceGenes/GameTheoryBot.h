@@ -5,11 +5,12 @@
 #ifndef GAMETHEORYBOT_H
 #define GAMETHEORYBOT_H
 
+#include "ParentBot.h"
 #include <vector>
 #include <string>
 #include "Chromosome.h"
 
-class GameTheoryBot {
+class GameTheoryBot : public ParentBot {
 public:
     GameTheoryBot(int selfID, std::string type, std::vector<std::vector<int>> currentOptionsMatrix);
 

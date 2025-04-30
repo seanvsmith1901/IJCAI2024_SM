@@ -32,11 +32,12 @@ double stddev(const std::vector<double>& data) {
 
 
 int main() {
-    int bot_type = 0;
+    int bot_type = 0; // 1 is socialWelfare, 2 is greedy, 3 is GT, and 4 is random. Right now only 2 adn 3 exist in the simulator.
     int total_players = 11;
     int num_causes = 3;
     // I am going to say that I am never expecting this to handle human input. thats silly and weird. pure sims only on this end.
     SocialChoiceSim sim(total_players, num_causes, 0, bot_type);
+    std::vector<std::
     // ignore reading in chromosomes for now, just get a greedy bot functioning and we can call it a day
     std::map<int, std::vector<double>> results;
     int num_rounds = 10000;

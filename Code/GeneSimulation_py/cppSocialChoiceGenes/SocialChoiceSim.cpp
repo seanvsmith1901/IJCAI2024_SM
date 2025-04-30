@@ -31,10 +31,19 @@ SocialChoiceSim::SocialChoiceSim(int totalPlayers, int numCauses, int numHumans,
 
 void SocialChoiceSim::createBots() {// adds bots to the bots vector
     bots.clear(); // first get rid of all the old bots.
-    for (int i = 0; i < numBots; i++) {
-        GreedyBot newBot(i);
-        bots.push_back(newBot);
+    if (this->typeBot == 1) {
+        for (int i = 0; i < numBots; i++) {
+            GreedyBot newBot(i);
+            bots.push_back(newBot);
+        }
     }
+    else if (this-> typeBot == 3) {
+        for (int i = 0; i < numBots; i++) {
+            GameTheoryBot newBot(i, "GT")
+        }
+    }
+
+
 }
 
 
@@ -130,12 +139,12 @@ std::pair<int, std::vector<int>> SocialChoiceSim::returnWin(const std::unordered
 //
 // }
 
-// void SocialChoiceSim::setChromosome(const std::vector<Chromosome> chromosomes) {
-//     // could add statement to check if the chromosomes size and the bot  size are different, might do that later
-//     for (int i = 0; i < chromosomes.size(); i++) {
-//         bots[i].setChromosome(chromosomes[i]);
-//     }
-// }
+void SocialChoiceSim::setChromosome(const std::vector<Chromosome> chromosomes) {
+    // could add statement to check if the chromosomes size and the bot  size are different, might do that later
+    for (int i = 0; i < chromosomes.size(); i++) {
+        bots[i].setChromosome(chromosomes[i]);
+    }
+}
 
 // void SocialChoiceSim::genCombinations(int currentID, std::vector<int> current_array, double current_prob, std::vector<std::pair<std::vector<int>, double>>& results) {
 //     if (currentID == totalPlayers) {
