@@ -39,7 +39,7 @@ int main() {
     SocialChoiceSim sim(total_players, num_causes, 0, bot_type);
     // ignore reading in chromosomes for now, just get a greedy bot functioning and we can call it a day
     std::map<int, std::vector<double>> results;
-    int num_rounds = 100;
+    int num_rounds = 10000;
     for (int i = 0; i < 11; i++) {
         // idek if this works, it might brick on me, might tell me null assingment.
         results[i] = std::vector<double>();
@@ -95,9 +95,9 @@ int main() {
     std::vector<double> totalScoresPerRound(num_rounds, 0.0);
 
     for (int i = 0; i < num_rounds; i++) {
-        for (const auto& player : results) {
-            for (const auto& scoreVector : player.second) {
-                totalScoresPerRound[i] += player.second[i];
+        for (const auto& [player, scores] : results) {
+            if (i < scores.size()) {
+                totalScoresPerRound[i] += scores[i];
             }
         }
     }
@@ -119,8 +119,7 @@ int main() {
         cumulativeAverageScore.begin());
 
 
-    double totalSum = std::accumulate(averageScoresPerRound.begin(), averageScoresPerRound.end(), 0.0);
-    double totalAverageIncrease = totalSum / num_rounds;
+    double totalAverageIncrease = cumulativeAverageScore.back() / num_rounds;
 
 
     std::ofstream outPutFile;
@@ -130,30 +129,22 @@ int main() {
         // algorithmType, cumulativeTotalScore(perRound), totalScore, avgIncrease, coefficientOfVariation, CooperationScore
         // that should be everything we need. first we need to get the sim not coughing up blood.
 
-        outPutFile << "Algorithm Type " << bot_type << std::endl;
-        outPutFile << "mean " << mean << std::endl;
-        outPutFile << "standard deviation " << std << std::endl;
+        outPutFile << "algorithmType: " << bot_type << std::endl;
+        outPutFile << "coefficientOfVariation: " << std / mean << std::endl;
+        outPutFile << "cooperation: " << newCooperationScore << std::endl;
 
-        outPutFile << "Cooperation " << newCooperationScore << std::endl;
-
-        outPutFile << "Average Score Per Round ";
-        for (const auto& element : averageScoresPerRound) {
-            outPutFile << element << ", ";
-        }
-        outPutFile << std::endl;
-
-        outPutFile << "Sums Per Round ";
+        outPutFile << "sumsPerRound: ";
         for (const auto& pair : sumsPerRound) {
-            outPutFile << pair.first << ",";
+            outPutFile << pair.first << ": ";
             for (const auto& element : pair.second) {
                 outPutFile << element << ",";
             }
+            outPutFile << "; ";
         }
         outPutFile << std::endl;
 
-
-        outPutFile << "Total Average Increase " << totalAverageIncrease << std::endl;
-        outPutFile << "Cumulative Average Score ";
+        outPutFile << "totalAverageIncrease: " << totalAverageIncrease << std::endl;
+        outPutFile << "cumulativeAverageScore: ";
         for (const auto& element : cumulativeAverageScore) {
             outPutFile << element << ", ";
         }

@@ -92,7 +92,7 @@ std::pair<int, std::vector<int>> SocialChoiceSim::returnWin(const std::unordered
         }
     }
 
-    if (!(winning_vote_count < static_cast<int>(all_votes.size()) / 2)) {
+    if (!(winning_vote_count > static_cast<int>(all_votes.size()) / 2)) {
         winning_vote = -1;
     }
 

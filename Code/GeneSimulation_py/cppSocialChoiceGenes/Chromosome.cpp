@@ -7,20 +7,20 @@
 
 
 // Constructor
-Chromosome::Chromosome(const std::vector<float>& chromosome)
+Chromosome::Chromosome(const std::vector<double>& chromosome)
     : chromosome(chromosome), fitness(0) {}
 
-std::vector<float> Chromosome::getChromosome() const {
+std::vector<double> Chromosome::getChromosome() const {
     return chromosome;
 }
 
 // so thats how we do that. this->Fitness (our fitness class object) gets set to fitness
-void Chromosome::setFitness(float fitness) {
+void Chromosome::setFitness(double fitness) {
     this->fitness = fitness;
 }
 
 // Add to the fitness value
-void Chromosome::addFitness(float newFitness) {
+void Chromosome::addFitness(double newFitness) {
     this->fitness += newFitness;
 }
 
@@ -34,7 +34,7 @@ int Chromosome::getFitness() const {
 }
 
 // overloaidng the [] for direct access
-float Chromosome::operator[](size_t index) const {
+double Chromosome::operator[](size_t index) const {
     return chromosome[index];
 }
 
@@ -45,10 +45,10 @@ bool Chromosome::operator==(const Chromosome& other) const {
 
 // custom hash function so we can use it to store the chromosome as a key in a dict.
 size_t Chromosome::ChromosomeHash::operator()(const Chromosome& c) const {
-    // Hash the chromosome as a vector of floats
+    // Hash the chromosome as a vector of doubles
     size_t seed = 0;
     for (const auto& value : c.chromosome) {
-        seed ^= std::hash<float>{}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= std::hash<double>{}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
     return seed;
 }

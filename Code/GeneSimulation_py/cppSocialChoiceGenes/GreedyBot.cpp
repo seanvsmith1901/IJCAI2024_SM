@@ -26,6 +26,5 @@ int GreedyBot::getVote(const std::vector<std::vector<int>>& currentOptionsMatrix
         currentVote = -1;
     }
 
-    std::cout << "This is the current vote ! " << currentVote << " based off of this max " << currentMax << std::endl;
     return currentVote;
 }

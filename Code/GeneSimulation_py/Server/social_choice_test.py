@@ -12,14 +12,14 @@ from pathlib import Path
 
 
 if __name__ == "__main__":
-    bot_type = 1 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random
+    bot_type = 3 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random
     sim = Social_Choice_Sim(11, 3, 0, bot_type)  # starts the social choice sim, call it whatever you want
     current_file = "Bots/chromosomesToKeepAround/generation_7.csv"
     df = pd.read_csv(current_file, comment="#")
     chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
 
     results = {}
-    num_rounds = 100
+    num_rounds = 3
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
@@ -32,8 +32,8 @@ if __name__ == "__main__":
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
-        bot_votes = sim.get_votes_single_chromosome() # this one is optimized for testing the results of a single chromosome.
-        #bot_votes = sim.get_votes()
+        #bot_votes = sim.get_votes_single_chromosome() # this one is optimized for testing the results of a single chromosome.
+        bot_votes = sim.get_votes()
 
         total_votes = len(bot_votes)
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here
