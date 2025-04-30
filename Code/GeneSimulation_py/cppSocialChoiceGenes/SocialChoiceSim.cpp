@@ -3,7 +3,7 @@
 //
 
 
-
+#include <ranges>
 #include <utility>
 
 #include "Chromosome.h"
@@ -19,6 +19,7 @@ SocialChoiceSim::SocialChoiceSim(int totalPlayers, int numCauses, int numHumans,
     this->numBots = totalPlayers-numHumans;
     this->cpp = 3;
     this->rad = 5;
+    this->typeBot = botType;
 
     createBots();
 
@@ -33,13 +34,13 @@ void SocialChoiceSim::createBots() {// adds bots to the bots vector
     bots.clear(); // first get rid of all the old bots.
     if (this->typeBot == 1) {
         for (int i = 0; i < numBots; i++) {
-            GreedyBot newBot(i);
-            bots.push_back(newBot);
+            ; //bots.push_back; I haven't implemented polymorphism yet. Project for another day.
         }
     }
     else if (this-> typeBot == 3) {
         for (int i = 0; i < numBots; i++) {
-            GameTheoryBot newBot(i, "GT")
+            GameTheoryBot newBot(i, "GT", currentOptionsMatrix);
+            bots.push_back(newBot);
         }
     }
 
@@ -71,14 +72,21 @@ const std::vector<std::vector<float>> SocialChoiceSim:: getProbabilites() const 
 }
 std::unordered_map<int, int> SocialChoiceSim::getVotes() {
     std::unordered_map<int, int> botVotes;
+    allCombinations.clear();
     // for (int i = 0; i < bots.size(); i++) {
     //     if (allCombinations.empty()) {
     //         allCombinations = generateProbabilities(currentOptionsMatrix);
     //     }
     //     botVotes[i] = bots[i].getVote(currentOptionsMatrix, allCombinations);
     // }
-    for (int i = 0; i < bots.size(); ++i) {
-        botVotes[i] = bots[i].getVote(currentOptionsMatrix);
+    for (int i = 0; i < bots.size(); i++) {
+        auto bot = bots[i];
+        if (bot.getMyType() == "GT") {
+            if (!(allCombinations.empty())) {
+                allCombinations = bot.generateAllPositibilities(currentOptionsMatrix);
+            }
+            botVotes[i] = bot.getVote(currentOptionsMatrix, allCombinations);
+        }
     }
     return botVotes;
 

@@ -57,7 +57,7 @@ private:
 
     std::vector<int> currentVotes;
     std::vector<std::vector<float>> probabilitiesMatrix;
-    std::vector<float> allCombinations;
+    std::vector<std::pair<std::vector<int>, double>> allCombinations;
 
     std::mt19937 gen; // random number generator
 

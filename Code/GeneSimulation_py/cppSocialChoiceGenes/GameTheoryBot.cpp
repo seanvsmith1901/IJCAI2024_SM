@@ -21,7 +21,7 @@ GameTheoryBot::GameTheoryBot(int selfID, std::string type, std::vector<std::vect
 
 
 void GameTheoryBot::setChromosome(const Chromosome& currChromosome) {
-    this->chromosome = currChromosome.getChromosome();
+    chromosome = currChromosome.getChromosome();
 }
 
 int GameTheoryBot::getVote(const std::vector<std::vector<int>>& currentOptionsMatrix,
@@ -333,4 +333,8 @@ void GameTheoryBot::generateCombinations(
 }
 std::vector<double> GameTheoryBot::getChromosome() {
     return this->chromosome;
+}
+
+std::string GameTheoryBot::getMyType() {
+    return this->type;
 }

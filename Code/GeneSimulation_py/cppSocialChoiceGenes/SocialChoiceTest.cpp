@@ -32,12 +32,11 @@ double stddev(const std::vector<double>& data) {
 
 
 int main() {
-    int bot_type = 0; // 1 is socialWelfare, 2 is greedy, 3 is GT, and 4 is random. Right now only 2 adn 3 exist in the simulator.
+    int bot_type = 3; // 1 is socialWelfare, 2 is greedy, 3 is GT, and 4 is random. Right now only 2 adn 3 exist in the simulator.
     int total_players = 11;
     int num_causes = 3;
     // I am going to say that I am never expecting this to handle human input. thats silly and weird. pure sims only on this end.
     SocialChoiceSim sim(total_players, num_causes, 0, bot_type);
-    std::vector<std::
     // ignore reading in chromosomes for now, just get a greedy bot functioning and we can call it a day
     std::map<int, std::vector<double>> results;
     int num_rounds = 10000;
@@ -47,14 +46,25 @@ int main() {
     }
     auto start_time = std::chrono::high_resolution_clock::now();
     int cooperationScore = 0;
-    // like I said, no chromosomes yet
+    std::vector<double> chromosome1 = {
+        0.07608630291702134,0.6384130720727683,0.19168194910868275,0.4621622949954527,0.8947894398834366,0.6144458421842767,0.13055966348312054,0.7007393159760924,0.12892661702624952,0.7011314424376426,0.276691960478721,0.15631126834587383,0.3895274814737226,0.8127386708328449,0.18970050900353053,0.7007645540311098,0.7671485548172058,0.49097298823917235,0.2032415957611493,1
+    };
+
+    std::vector<Chromosome> chromosomes;
+    for (int i = 0; i < total_players; i++) {
+        Chromosome currChrom(chromosome1);
+        chromosomes.push_back(currChrom);
+    }
+    sim.setChromosome(chromosomes);
 
     for (int i = 0; i < num_rounds; i++) {
         sim.startRound();
         auto currentOptionsMatrix = sim.getCurrentOptionsMatrix();
         auto botVotes = sim.getVotes();
         std::size_t total_votes = botVotes.size();
+
         auto [winningVote, roundResults] = sim.returnWin(botVotes);
+        std::cout << "this was the winning vote " << winningVote << std::endl;
         if (winningVote != -1) {
             cooperationScore += 1;
         }

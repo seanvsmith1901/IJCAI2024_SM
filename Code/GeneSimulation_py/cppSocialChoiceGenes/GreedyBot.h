@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-class GreedyBot : public ParentBot {
+class GreedyBot {
 public:
     explicit GreedyBot(int selfID); // constructor
     int getVote(const std::vector<std::vector<int>>&) const;

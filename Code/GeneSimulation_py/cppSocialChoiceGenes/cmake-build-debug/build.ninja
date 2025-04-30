@@ -91,12 +91,6 @@ build CMakeFiles/cppSocialChoiceGenes.dir/GreedyBot.cpp.obj: CXX_COMPILER__cppSo
   OBJECT_DIR = CMakeFiles\cppSocialChoiceGenes.dir
   OBJECT_FILE_DIR = CMakeFiles\cppSocialChoiceGenes.dir
 
-build CMakeFiles/cppSocialChoiceGenes.dir/ParentBot.cpp.obj: CXX_COMPILER__cppSocialChoiceGenes_unscanned_Debug C$:/Users/Sean/Documents/GitHub/IJCAI2024_SM/Code/GeneSimulation_py/cppSocialChoiceGenes/ParentBot.cpp || cmake_object_order_depends_target_cppSocialChoiceGenes
-  DEP_FILE = CMakeFiles\cppSocialChoiceGenes.dir\ParentBot.cpp.obj.d
-  FLAGS = -g -std=gnu++20 -fdiagnostics-color=always
-  OBJECT_DIR = CMakeFiles\cppSocialChoiceGenes.dir
-  OBJECT_FILE_DIR = CMakeFiles\cppSocialChoiceGenes.dir
-
 
 # =============================================================================
 # Link build statements for EXECUTABLE target cppSocialChoiceGenes
@@ -105,7 +99,7 @@ build CMakeFiles/cppSocialChoiceGenes.dir/ParentBot.cpp.obj: CXX_COMPILER__cppSo
 #############################################
 # Link the executable cppSocialChoiceGenes.exe
 
-build cppSocialChoiceGenes.exe: CXX_EXECUTABLE_LINKER__cppSocialChoiceGenes_Debug CMakeFiles/cppSocialChoiceGenes.dir/GeneticAlgorithm.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/SocialChoiceSim.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/GameTheoryBot.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/Chromosome.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/Logger.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/SocialChoiceTest.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/GreedyBot.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/ParentBot.cpp.obj
+build cppSocialChoiceGenes.exe: CXX_EXECUTABLE_LINKER__cppSocialChoiceGenes_Debug CMakeFiles/cppSocialChoiceGenes.dir/GeneticAlgorithm.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/SocialChoiceSim.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/GameTheoryBot.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/Chromosome.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/Logger.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/SocialChoiceTest.cpp.obj CMakeFiles/cppSocialChoiceGenes.dir/GreedyBot.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\cppSocialChoiceGenes.dir
