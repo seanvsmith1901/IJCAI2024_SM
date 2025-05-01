@@ -82,7 +82,7 @@ std::unordered_map<int, int> SocialChoiceSim::getVotes() {
     for (int i = 0; i < bots.size(); i++) {
         auto bot = bots[i];
         if (bot.getMyType() == "GT") {
-            if (!(allCombinations.empty())) {
+            if (allCombinations.empty()) {
                 allCombinations = bot.generateAllPositibilities(currentOptionsMatrix);
             }
             botVotes[i] = bot.getVote(currentOptionsMatrix, allCombinations);

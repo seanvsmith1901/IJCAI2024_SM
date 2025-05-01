@@ -29,7 +29,7 @@ int GameTheoryBot::getVote(const std::vector<std::vector<int>>& currentOptionsMa
     std::vector<double> causeProbability = getCauseProbability(bigBoyList);
     std::vector<double> normalizedCauseProbability = std::vector<double>(); // thank goodness C++ finally allows me to just create copies normally.
     // this normalizes the fetcher.
-    double totalSum = std::accumulate(causeProbability.begin(), causeProbability.end(), 0);
+    double totalSum = std::accumulate(causeProbability.begin(), causeProbability.end(), 0.0);
     for (auto const& element : causeProbability) {
         normalizedCauseProbability.push_back(element / totalSum);
     }
@@ -161,9 +161,8 @@ std::vector<std::pair<std::vector<int>, double>> GameTheoryBot::generateAllPosit
 
     std::vector<std::vector<double>> probabilityMatrix = createProbabilityMatrix(choicesMatrix, weightsArray, currentOptionsMatrix);
 
-    this->numPlayers = currentOptionsMatrix.size();
-    this->numCauses = currentOptionsMatrix[0].size();
-    // this->probabilityMatrix = probabilityMatrix;
+    numPlayers = currentOptionsMatrix.size();
+    numCauses = currentOptionsMatrix[0].size();
 
 
     std::vector<int> ones(this->numPlayers + 1, 1); // [1, 1, ..., 1]
@@ -178,18 +177,18 @@ std::vector<std::pair<std::vector<int>, double>> GameTheoryBot::generateAllPosit
 
 std::pair<std::vector<std::vector<int>>, std::vector<int>> GameTheoryBot::createChoicesMatrix(std::vector<std::vector<int>> currentOptionsMatrix) {
     auto newProbabilitiesMatrix = currentOptionsMatrix;
-    for (auto row : newProbabilitiesMatrix) { // double check the behavior of this fetcher.
+    for (auto& row : newProbabilitiesMatrix) { // double check the behavior of this fetcher.
         row.insert(row.begin(), 0);
         auto sortedRow = row;
         std::sort(sortedRow.begin(), sortedRow.end());
 
-        std::unordered_map<int, int> indexMap;
+        std::unordered_map<int, int> rowIndexMap;
         for (size_t idx = 0; idx < sortedRow.size(); idx++) {
-            indexMap[sortedRow[idx]] = static_cast<int>(idx) -1; // handle the off by 1 error.
+            rowIndexMap[sortedRow[idx]] = static_cast<int>(idx) -1; // handle the off by 1 error.
         }
 
         for (int& val : row) {
-            val = indexMap[val];
+            val = rowIndexMap[val];
         }
     }
     auto numRows = newProbabilitiesMatrix.size();
@@ -207,7 +206,7 @@ std::pair<std::vector<std::vector<int>>, std::vector<int>> GameTheoryBot::create
 
     std::unordered_map<int, int> indexMap;
     for (size_t idx = 0; idx < sortedSums.size(); idx++) {
-        indexMap[sortedSums[idx]] = static_cast<int>(idx) -1; // very similar to what we have done before
+        indexMap[sortedSums[idx]] = static_cast<int>(idx) - 1;
     }
 
     std::vector<int> columnPreferences;
@@ -220,21 +219,19 @@ std::pair<std::vector<std::vector<int>>, std::vector<int>> GameTheoryBot::create
 }
 
 std::vector<std::vector<double>> GameTheoryBot::createProbabilityMatrix(std::vector<std::vector<int>> choicesMatrix, std::vector<double> weightsArray, std::vector<std::vector<int>> currentOptionsMatrix) {
-    int numRows = choicesMatrix.size();
     int numCols = choicesMatrix[0].size();
-
-    std::vector<int> totalSums(numCols, 0);
+    int numRows = choicesMatrix.size();
+    int randomNumber = 2 + 2;
+    std::vector<int> totalSums;
     for (int j = 0; j < numCols; j++) {
+        int newSum = 0;
         for (int i = 0; i < numRows; i++) {
-            totalSums[j] += choicesMatrix[i][j];
+            newSum += choicesMatrix[i][j];
         }
+        totalSums.push_back(newSum);
     }
+    // we need this to become a copy of it, but then replace it with a double. very fun.
     std::vector<std::vector<double>> probabilityMatrix(numRows, std::vector<double>(numCols));
-    for (int i = 0; i < numRows; i++) {
-        for (int j = 0; j < numCols; j++) {
-            probabilityMatrix[i][j] = static_cast<double>(choicesMatrix[i][j]);
-        }
-    }
 
     for (int i = 0; i < numRows; i++) {
         for (int j = 0; j < numCols; j++) {
@@ -247,14 +244,14 @@ std::vector<std::vector<double>> GameTheoryBot::createProbabilityMatrix(std::vec
                 } else {
                     int choiceVal = choicesMatrix[i][j];
                     if (choiceVal == 2) {
-                        probabilityMatrix[i][j] = weightsArray[0];
+                        probabilityMatrix[i][j] = weightsArray[1];
                     }
                     else if (choiceVal == 1)
-                        probabilityMatrix[i][j] = weightsArray[0];
+                        probabilityMatrix[i][j] = weightsArray[2];
                     else if (choiceVal == 0)
-                        probabilityMatrix[i][j] = weightsArray[0];
+                        probabilityMatrix[i][j] = weightsArray[3];
                     else if (choiceVal == -1)
-                        probabilityMatrix[i][j] = weightsArray[0];
+                        probabilityMatrix[i][j] = weightsArray[4];
                 }
             } else {
                 int optionVal = currentOptionsMatrix[i][j-1];
@@ -301,12 +298,14 @@ void GameTheoryBot::generateCombinations(
     std::vector<int>& currentArray,
     double& probabilityProduct,
     std::vector<std::vector<double>>& probabilityMatrix,
-    int numPlayers,
-    int numCauses,
+    const int numPlayers,
+    const int numCauses,
     std::vector<std::pair<std::vector<int>, double>>& results
 ) {
     if (currentID == numPlayers) {
+        //if (probabilityProduct >= threshold) {
         results.emplace_back(currentArray, probabilityProduct);
+        //}
         return;
     }
     for (int cause = 0; cause < numCauses; cause++) {
@@ -328,9 +327,8 @@ void GameTheoryBot::generateCombinations(
             probabilityProduct /= prob;
         }
     }
-
-
 }
+
 std::vector<double> GameTheoryBot::getChromosome() {
     return this->chromosome;
 }

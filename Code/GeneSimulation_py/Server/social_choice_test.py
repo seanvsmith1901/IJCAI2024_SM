@@ -43,6 +43,8 @@ if __name__ == "__main__":
         for bot in range(total_votes):
             results[bot].append(round_results[bot]) # this should work? I should have saved a stable version before hand.
 
+        print("this was the round time ", current_start_time - time.time())
+
     end_time = time.time()
     print("This was the total time ", end_time - start_time)
 

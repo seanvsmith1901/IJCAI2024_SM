@@ -58,6 +58,7 @@ int main() {
     sim.setChromosome(chromosomes);
 
     for (int i = 0; i < num_rounds; i++) {
+        auto roundStart = std::chrono::high_resolution_clock::now();
         sim.startRound();
         auto currentOptionsMatrix = sim.getCurrentOptionsMatrix();
         auto botVotes = sim.getVotes();
@@ -72,6 +73,9 @@ int main() {
         for (std::size_t bot = 0; bot < total_votes; bot++) {
             results[bot].push_back(roundResults[bot]);
         }
+        auto roundEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> roundDuration = roundEnd - roundStart;
+        std::cout << "Round " << i << " took " << roundDuration.count() << " seconds.\n";
 
     }
     auto end_time = std::chrono::high_resolution_clock::now();

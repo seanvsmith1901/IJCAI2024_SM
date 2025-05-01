@@ -55,7 +55,7 @@ private:
     int numPlayers;
     int numCauses;
     std::vector<std::vector<int>> currentOptionsMatrix;
-    std::vector<std::vector<double>> probabilityMatrix;
+    double threshold;
 
 };
 
