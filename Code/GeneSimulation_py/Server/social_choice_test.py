@@ -12,14 +12,14 @@ from pathlib import Path
 
 
 if __name__ == "__main__":
-    bot_type = 3 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random
+    bot_type = 5 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random
     sim = Social_Choice_Sim(11, 3, 0, bot_type)  # starts the social choice sim, call it whatever you want
     current_file = "Bots/chromosomesToKeepAround/generation_7.csv"
     df = pd.read_csv(current_file, comment="#")
     chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
 
     results = {}
-    num_rounds = 3
+    num_rounds = 10000
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
@@ -43,7 +43,7 @@ if __name__ == "__main__":
         for bot in range(total_votes):
             results[bot].append(round_results[bot]) # this should work? I should have saved a stable version before hand.
 
-        print("this was the round time ", current_start_time - time.time())
+        #print("this was the round time ", current_start_time - time.time())
 
     end_time = time.time()
     print("This was the total time ", end_time - start_time)

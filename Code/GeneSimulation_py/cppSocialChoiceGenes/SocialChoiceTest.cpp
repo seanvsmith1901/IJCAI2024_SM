@@ -39,7 +39,7 @@ int main() {
     SocialChoiceSim sim(total_players, num_causes, 0, bot_type);
     // ignore reading in chromosomes for now, just get a greedy bot functioning and we can call it a day
     std::map<int, std::vector<double>> results;
-    int num_rounds = 10000;
+    int num_rounds = 100;
     for (int i = 0; i < 11; i++) {
         // idek if this works, it might brick on me, might tell me null assingment.
         results[i] = std::vector<double>();

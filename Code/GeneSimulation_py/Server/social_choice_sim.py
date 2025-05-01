@@ -9,7 +9,9 @@ from Code.GeneSimulation_py.Server.Bots.Pareto import ParetoBot
 from Code.GeneSimulation_py.Server.Bots.Greedy import GreedyBot
 from Code.GeneSimulation_py.Server.Bots.gameTheory import gameTheoryBot
 from Code.GeneSimulation_py.Server.Bots.Random import RandomBot
+from Code.GeneSimulation_py.Server.Bots.betterGreedy import betterGreedy
 from Code.GeneSimulation_py.Server.Node import Node
+
 
 class Social_Choice_Sim:
     def __init__(self, total_players, num_causes, num_humans, type_bot):
@@ -42,6 +44,8 @@ class Social_Choice_Sim:
                 bots_array.append(gameTheoryBot(i))
             if self.type_bot == 4:
                 bots_array.append(RandomBot(i))
+            if self.type_bot == 5:
+                bots_array.append(betterGreedy(i))
 
         return bots_array
 
