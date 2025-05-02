@@ -11,57 +11,45 @@ class betterGreedy:
         # so RISK adversity is MAX (1) and High (0). It's not implemented yet.
 
     def set_chromosome(self, chromosome):
-        pass
+        self.chromosome = chromosome
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
     def get_vote(self, big_boy_list, current_options_matrix):
-        mutable_current_options_matrix = copy.deepcopy(current_options_matrix)
-        for row in mutable_current_options_matrix:
-            row.insert(0, 0)
 
-        num_rows = len(mutable_current_options_matrix)
-        num_cols = len(mutable_current_options_matrix[0])
+        self_id = self.self_id
+        mutable_matrix = [[max(val + 1, 0) for val in [0] + row] for row in current_options_matrix]
 
-        for i in range(num_rows):
-            for j in range(num_cols):
-                if mutable_current_options_matrix[i][j] < 0:
-                    mutable_current_options_matrix[i][j] = 0
-                else: # to represent 0 in a way that makes sense.
-                    mutable_current_options_matrix[i][j] += 1
+        # Normalize each row
+        for row in mutable_matrix:
+            total = sum(row)
+            if total > 0:
+                for i in range(len(row)):
+                    row[i] /= total
 
-        # this then normalizes it.
-        for i in range(num_rows):
-            total_sum = sum(mutable_current_options_matrix[i])
-            for col in range(num_cols):
-                if mutable_current_options_matrix[i][col] > 0:
-                    mutable_current_options_matrix[i][col] /= total_sum
+        # Sum each column
+        num_cols = len(mutable_matrix[0])
+        col_sums = [sum(mutable_matrix[row][col] for row in range(len(mutable_matrix))) for col in range(num_cols)]
 
-        # now we sum up the columsn to find which column has the best shot of winning
-        total_column_values = []
-        for col in range(num_cols):
-            current_col_value = 0
-            for row in range(num_rows):
-                current_col_value += mutable_current_options_matrix[row][col]
-            total_column_values.append(current_col_value)
+        # Normalize column sums
+        col_total = sum(col_sums)
+        col_probs = [val / col_total for val in col_sums]
 
-        total_sum = sum(total_column_values)
-        total_column_values = [item / total_sum for item in total_column_values]
+        # Compute our new row
+        our_row = current_options_matrix[self_id]
+        new_row = [0]  # offset column 0
+        risk_aversion = self.chromosome[0]
+        for i, val in enumerate(our_row):
+            if val > 0:
+                #new_row.append(col_probs[i + 1] * val)
+                new_prob = col_probs[i + 1] ** risk_aversion
+                new_row.append(new_prob * val)
 
-        our_row = current_options_matrix[self.self_id] # gets us our current row
-        new_row = copy.deepcopy(our_row)
-        new_row.insert(0, 0)
-        for i in range(len(new_row)):
-            if i == 0:
-                new_row[i] = 0
             else:
-                if new_row[i] > 0:
-                    new_row[i] = total_column_values[i] * current_options_matrix[self.self_id][i-1] # to get the current utility
-                else:
-                    new_row[i] = 0
-        max_value = max(new_row)
-        max_index = new_row.index(max_value)
-        return max_index - 1 # off by 1 error.
+                new_row.append(0)
 
+
+        # Return index of max value, correcting for offset
+        return new_row.index(max(new_row)) - 1
 
 
 

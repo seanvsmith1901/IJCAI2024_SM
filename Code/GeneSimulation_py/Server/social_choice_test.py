@@ -14,9 +14,7 @@ from pathlib import Path
 if __name__ == "__main__":
     bot_type = 5 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random
     sim = Social_Choice_Sim(11, 3, 0, bot_type)  # starts the social choice sim, call it whatever you want
-    current_file = "Bots/chromosomesToKeepAround/generation_7.csv"
-    df = pd.read_csv(current_file, comment="#")
-    chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
+    chromosomes = [[1],[1],[1],[1],[1],[1],[1],[1],[1],[1],[1]]
 
     results = {}
     num_rounds = 10000
