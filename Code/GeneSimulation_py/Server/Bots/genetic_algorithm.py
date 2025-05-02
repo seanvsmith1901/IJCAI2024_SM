@@ -1,4 +1,5 @@
 import random
+from tqdm import tqdm
 import time
 
 from Code.GeneSimulation_py.Server.social_choice_sim import Social_Choice_Sim
@@ -74,7 +75,7 @@ def save_to_file(genes_to_save, gen_number):
             writer.writerow(["Gene Index", "C[0]", "C[1]" ,"C[2]","C[3]","C[4]","C[5]","C[6]","C[7]","C[8]","C[9]","C[10]","C[11]","C[12]","C[13]","C[14]","C[15]","C[16]","C[17]","C[18]","C[19]","C[20]"])  # Header row
             for i, gene in enumerate(genes_to_save):
                 writer.writerow([i + 1] + gene.chromosome)  # Keeps proper CSV formatting
-        print(f"Successfully saved {file_path}")
+        #print(f"Successfully saved {file_path}")
     except Exception as e:
         print(f"Error writing file {file_path}: {e}")
 
@@ -84,11 +85,11 @@ def reset_fitness(population):
 
 
 if __name__ == '__main__':
-    pop_size = 100 # lets just generate 100 chromosomes
-    num_genes = 1 # the total parameters I want to explore. look at gameTheory.py.
-    lower_bound = 0
+    pop_size = 1000 # lets just generate 100 chromosomes
+    num_genes = 1 # the total parameters I want to explore. algorithm dependent.
+    lower_bound = -1
     upper_bound = 2
-    num_to_keep = 11 # just becuase, why not.
+    num_to_keep = 20 # just becuase, why not.
 
     logger = Logger()
 
@@ -100,7 +101,7 @@ if __name__ == '__main__':
     diversity_history = []
 
     ## POPULATION INITIALIZING / START ##
-    for generation in range(200): # run 200 generations
+    for generation in tqdm(range(200)): # run 200 generations
         cooperation_score = 0 # starts at 0 for every generation
         chromosomes_used = {} # where the key is the chromosome, and the attribute is all of the fintesses.
         for trial_idx in range(100): # tries 10 trials for chromosome fitness
@@ -122,7 +123,6 @@ if __name__ == '__main__':
         for chromosome in chromosomes_used: # gets the average utility increase for each chromosome.
             chromosome.add_fitness(statistics.mean(chromosomes_used[chromosome]))
 
-        print("chromosomes trained. Selecting the most fit...")
         population = sort_by_fitness(population) # now it shoudl work as anticipated.
         #logger.log_generation(population, cooperation_score)
 

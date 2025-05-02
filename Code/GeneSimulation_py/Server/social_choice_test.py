@@ -1,6 +1,8 @@
 # testbed to test genes and display results in a human readable format.
 import time
 import pandas as pd
+from networkx import chromatic_polynomial
+
 from Code.GeneSimulation_py.Server.social_choice_sim import Social_Choice_Sim
 import matplotlib.pyplot as plt
 from collections import Counter
@@ -12,16 +14,20 @@ from pathlib import Path
 
 
 if __name__ == "__main__":
-    bot_type = 5 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random
+    bot_type = 4 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random
     sim = Social_Choice_Sim(11, 3, 0, bot_type)  # starts the social choice sim, call it whatever you want
-    # current_file = "Bots/chromosomesToKeepAround/generation_57.csv"
-    # df = pd.read_csv(current_file, comment="#")
-    # chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
+    #current_file = "Bots/chromosomesToKeepAround/generation_199.csv"
+    #df = pd.read_csv(current_file, comment="#")
+    #chromosomes = [df.iloc[0, 1:].tolist()] * 11 # automatically selects the most fit singular instance from whatever chromosome.
     #chromosomes = [[1.3703366332467315], [1.3703366332467315], [1.3703366332467315], [1.3703366332467315], [1.3703366332467315], [1.3703366332467315], [1.3703366332467315], [1.3703366332467315], [1.3703366332467315], [1.3703366332467315], [1.3703366332467315]]
-    chromosomes = [[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315]]
+    #chromosomes = [[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315],[-0.3703366332467315]]
+    #chromosomes = [[10.0]] * 11
+    #chromosomes = [[0]] * 11
+    chromosomes = [[0]] * 10 + [[10]] * 1
+
 
     results = {}
-    num_rounds = 10000
+    num_rounds = 100000
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
     start_time = time.time()
