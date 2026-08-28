@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+/Code/Results/smallGenerations
+Code/Results/theGameLogs/log_0_38.csv
+/Code/Results

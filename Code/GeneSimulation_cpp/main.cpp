@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm>   // for std::sort
 
 #include "AbstractAgent.h"
 #include "GeneAgent.h"
@@ -10,6 +11,8 @@
 #include "CoOpAgent.h"
 #include "assassinAgent.h"
 #include "JHGEngine.h"
+
+#include <direct.h>
 
 using namespace std;
 
@@ -199,16 +202,21 @@ void recordState(int roundNum, JHGEngine *jhg, int humanInd, bool gameOver) {
 
     output.close();
 
-    system("move ../State/state.tmp ../State/state.txt");
+    printf("Is it this one??");
+    system("move ..\\State\\state.tmp ..\\State\\state.txt");
 }
 
 PopularityMetrics *playGame(AbstractAgent **agents, int numPlayers, int numRounds, int gener, int gamer, double *initialPopularities, double povertyLine, bool forcedRandom) {
+    cout << "Do we get this far " << endl;
+
     double alpha = 0.2;
     double beta = 0.5;
     double coefs[3] = {0.95, 1.3, 1.6};
 
     // delete all existing contracts
-    system("rm Contracts/*");
+    // make this work with windows maybe.
+    // I think this is outdated, I can't find a spot where its used.
+    // system("del /Q \"Contracts\\*\"");
 
     // tell agents the game parameters and give each the chance to post a contract
     for (int i = 0; i < numPlayers; i++) {
@@ -273,21 +281,21 @@ PopularityMetrics *playGame(AbstractAgent **agents, int numPlayers, int numRound
         }
     }
 
-    jhg->printP();
+    // lets see if thats causing it.
+    // jhg->printP();
 
     if (humanInd >= 0)
         recordState(numRounds, jhg, humanInd, true);
 
     // log game
-    string fnombre = "../Results/theGameLogs/log_" + to_string(gener) + "_" + to_string(gamer) + ".csv";
-    jhg->save(fnombre);
+    // string fnombre = "../Results/theGameLogs/log_" + to_string(gener) + "_" + to_string(gamer) + ".csv";
+    // jhg->save(fnombre);
 
     for (int i = 0; i < numPlayers; i++)
         delete[] transactions[i];
     delete[] transactions;
     delete[] received;
     delete jhg;
-
     return pmetrics;
 }
 
@@ -378,7 +386,7 @@ int compareEm(GeneAgent *a, GeneAgent *b) {
 		return 0;
 }
 
-void writeGenerationResults(GeneAgent **theGenePools, int popSize, int gen, int agentsPerGame) {
+void writeGenerationResults(GeneAgent **theGenePools, int popSize, int gen, int agentsPerGame, string theFolder) {
     for (int i = 0; i < popSize; i++) {
         if (theGenePools[i]->count > 0) {
             theGenePools[i]->relativeFitness /= theGenePools[i]->count;
@@ -397,7 +405,8 @@ void writeGenerationResults(GeneAgent **theGenePools, int popSize, int gen, int 
     // sort(theGenePools[pool], theGenePools[pool]+(numPops*n*2), compareEm);
 
     // print to file
-    string fnombre = "../Results/theGenerations/gen_" + to_string(gen) + ".csv";
+    string fnombre = "../Results/" + theFolder + "/gen_" + to_string(gen) + ".csv";
+    // printf("This is the new string ", fnombre);
     ofstream output(fnombre);       
     double sm = 0.0;
     for (int i = 0; i < popSize; i++) {
@@ -418,7 +427,10 @@ void writeGenerationResults(GeneAgent **theGenePools, int popSize, int gen, int 
 // 
 // To run a game using gene-strings from a particular generation:
 //      ./jhgsim play [generationFolder] [popSize] [numGeneCopies] [gen] [numAgents] [numRounds] [best_agents/rnd_agents] [initPopType] [povertyLine] [deterministic/nondeterministic] [config] 
-// 
+//
+// Sean coming in clutch here: the play command should now look like:
+// //      ./jhgsim play [generationFolder] [popSize] [numGeneCopies] [gen] [numAgents] [numRounds] [best_agents/rnd_agents] [initPopType] [povertyLine] [deterministic/nondeterministic] [config] [selections] [folderToWrite]
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         printf("don't know what mode to run the program in\n");
@@ -441,10 +453,15 @@ int main(int argc, char *argv[]) {
         int numAgents = atoi(argv[6]);
         int numRounds = atoi(argv[7]);
         string agentSelections = argv[8];
+        string selections = argv[13];
+        string folderToWrite = argv[14];
+
         if ((agentSelections != "best_agents") && (agentSelections != "rnd_agents")) {
             printf("don't understand agentSelection: %s; Must be best_agents or rnd_agents\n", agentSelections.c_str());
             return -1;
         }
+
+
         string initPopType = argv[9];
         if ((initPopType != "equal") && (initPopType != "random") && (initPopType != "step") && (initPopType != "power") && (initPopType != "highlow")) {
             printf("don't understand initPopType: %s\n", initPopType.c_str());
@@ -460,11 +477,27 @@ int main(int argc, char *argv[]) {
         vector<AbstractAgent *> configuredPlayers;
 
         string fnombre = "ScenarioIndicator/";
+
+        #ifdef _WIN32
+                cout << "Running on Windows" << endl;
+                fnombre = "ScenarioIndicator\\";
+        #endif
+
         fnombre += argv[12];
         fnombre += ".txt";
         ifstream in(fnombre);
+
+        // For Windows:
+        char cwd[1024];
+        if (_getcwd(cwd, sizeof(cwd)) != NULL) {
+            cout << "Current directory: " << cwd << endl;
+            cout << "Trying to open: " << cwd << "\\" << fnombre << endl;
+        }
+
+
         if (!in) {
             cout << "config file not found: " << fnombre << endl;
+            // aight lets try to figure out where its actually looking
         }
         else {
             string line;
@@ -492,6 +525,7 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < numAgents; i++)
                 plyrIdxs[i] = i;
         }
+
         else {
             for (int i = 0; i < numAgents; i++)
                 plyrIdxs[i] = rand() % popSize;
@@ -697,7 +731,7 @@ int main(int argc, char *argv[]) {
                 delete[] pmetrics;
             }
 
-            writeGenerationResults(theGenePools, popSize, gen, agentsPerGame);
+            writeGenerationResults(theGenePools, popSize, gen, agentsPerGame, theFolder);
 
             // evolve population
             theGenePools_old = theGenePools;

@@ -141,7 +141,7 @@ public:
     void playRound(int numPlayers, int numTokens, int playerIdx, int roundNum, double *received, double *popularities, double **influence, int *allocations) {
         // cout << "*** playRound: " << playerIdx << endl;
 
-        printT(playerIdx, vec2String(received, numPlayers));
+        // printT(playerIdx, vec2String(received, numPlayers));
 
         for (int i = 0; i < numPlayers; i++)
             allocations[i] = 0;
